@@ -2,6 +2,7 @@ import * as dotenv from "./dotenv";
 dotenv.config();
 
 import express, { Application, Request, Response } from "express";
+import userRouter from "@/routes/userRoutes"
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
@@ -27,6 +28,8 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 /* ROUTING */
+
+app.use("/api/user", userRouter);
 app.get("/", (req: Request, res: Response) => {
     res.send("Welcome to our Flower Shop!");
 });
