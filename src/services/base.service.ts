@@ -3,8 +3,8 @@ import { ClassDef } from "@/types/class";
 
 export type ObjectId = Types.ObjectId;
 
-export abstract class BaseService<T extends Document> {
-    public model: Model<T>;
+export abstract class BaseService<T> {
+    protected model: Model<T>;
 
     constructor(model: Model<T>) {
         this.model = model;
