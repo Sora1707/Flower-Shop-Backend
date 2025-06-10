@@ -6,6 +6,10 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
+import { connectDB } from "./config/db";
+
+// Database connection
+connectDB();
 
 const app: Application = express();
 
