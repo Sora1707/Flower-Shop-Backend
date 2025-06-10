@@ -7,6 +7,7 @@ import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 import { connectDB } from "./config/db";
+import { userService } from "./user/user.service";
 
 // Database connection
 connectDB();
@@ -27,8 +28,10 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 /* ROUTING */
-app.get("/", (req: Request, res: Response) => {
-    res.send("Welcome to our Flower Shop!");
+app.get("/", async (req: Request, res: Response) => {
+    const users = await userService.findAll();
+    res.json(users);
+    // res.send("Welcome to our Flower Shop!");
 });
 
 const PORT = process.env.PORT || 5000;
