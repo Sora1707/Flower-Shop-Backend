@@ -1,26 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
-export enum Gender {
-    Male = "male",
-    Female = "female",
-    Other = "other",
-}
-
-export interface IUser extends Document {
-    username: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    birthdate: Date;
-    gender?: Gender;
-    avatar?: string;
-    createdAt: Date;
-    updatedAt: Date;
-    matchPassword(enteredPassword: string): Promise<boolean>;
-}
+import { IUser, Gender } from "./user.interface";
 
 const UserSchema = new Schema<IUser>(
     {
