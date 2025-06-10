@@ -1,0 +1,156 @@
+import { Request, Response, NextFunction } from "express";
+import { UserModel } from "@/user/user.model"; //
+import { userService } from "./user.service";
+import crypto from "crypto"; //
+
+class UserController {
+    // Get all users (for admin purposes)
+    async getAllUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = await userService.findAll();
+            res.status(200).json(users);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Register
+    async register(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { email, password } = req.body;
+
+            if (!email || !password) {
+                return res.status(400).json({ message: "Email and password are required" });
+            }
+
+            // Check if user exists
+            const existingUser = await userService.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ message: "Email already registered" });
+            }
+
+            const newUser = new UserModel({
+                email,
+                password,
+                // role: "RegisteredBuyer",
+            });
+
+            await newUser.save();
+
+            res.status(201).json({
+                message: "User registered successfully",
+                user: newUser,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Login
+    async login(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { email, password } = req.body;
+
+            if (!email || !password) {
+                return res.status(400).json({ message: "Email and password are required" });
+            }
+
+            const user = await userService.findOne({ email });
+            if (!user) {
+                return res.status(401).json({ message: "Invalid email or password" });
+            }
+
+            if (user.password !== password) {
+                return res.status(401).json({ message: "Invalid email or password" });
+            }
+
+            // Generate JWT token (using a placeholder secret for now)
+            const jwt = require("jsonwebtoken");
+            const token = jwt.sign(
+                {
+                    userId: user._id,
+                    email: user.email,
+                    // role: user.role
+                },
+                process.env.JWT_SECRET || "your_jwt_secret",
+                { expiresIn: "1h" }
+            );
+
+            res.status(200).json({
+                message: "Login successful",
+                token,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    // role: user.role
+                },
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // Request Password Reset
+    // async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
+    //     try {
+    //         const { email } = req.body;
+
+    //         if (!email) {
+    //             return res.status(400).json({ message: "Email is required" });
+    //         }
+
+    //         const user = await UserModel.findOne({ email });
+    //         if (!user) {
+    //             return res.status(404).json({ message: "User not found" });
+    //         }
+
+    //         // Generate reset token
+    //         const resetToken = crypto.randomBytes(32).toString("hex");
+    //         user.resetPasswordToken = resetToken;
+    //         user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour expiry
+    //         await user.save();
+
+    //         // In a real app, send email with reset link (e.g., http://yourapp.com/reset?token=resetToken)
+    //         // For now, return token in response for testing
+    //         res.status(200).json({
+    //             message: "Password reset requested. Check your email.",
+    //             resetToken, // Remove in production; send via email instead
+    //         });
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // }
+
+    // // Reset Password
+    // async resetPassword(req: Request, res: Response, next: NextFunction) {
+    //     try {
+    //         const { token, newPassword } = req.body;
+
+    //         if (!token || !newPassword) {
+    //             return res.status(400).json({ message: "Token and new password are required" });
+    //         }
+
+    //         const user = await UserModel.findOne({
+    //             resetPasswordToken: token,
+    //             resetPasswordExpires: { $gt: new Date() },
+    //         });
+
+    //         if (!user) {
+    //             return res.status(400).json({ message: "Invalid or expired token" });
+    //         }
+
+    //         // Update password (plain text for now)
+    //         user.password = newPassword;
+    //         user.resetPasswordToken = undefined;
+    //         user.resetPasswordExpires = undefined;
+    //         await user.save();
+
+    //         res.status(200).json({ message: "Password reset successful" });
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // }
+}
+
+const userController = new UserController();
+export default userController;
