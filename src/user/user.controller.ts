@@ -29,6 +29,24 @@ class UserController {
         }
     }
 
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const update = req.body;
+            const updatedUser = await userService.updateById(id, update);
+
+            if(!updatedUser) {
+                return res.status(404).json({message: "User not found."});
+            }
+            res.status(200).json({ message: "User updated", user: updatedUser });
+            
+            await updatedUser.save();
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+
     // Register
     async register(req: Request, res: Response, next: NextFunction) {
         try {
