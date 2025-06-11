@@ -20,4 +20,3 @@ export interface IUser extends Document {
     updatedAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
-// When Mongoose returns a document, it extends Document
