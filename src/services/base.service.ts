@@ -50,21 +50,11 @@ export abstract class BaseService<T> {
         return result;
     }
 
-    public async deleteById(id: ObjectId) {
-        const item = await this.model.findByIdAndDelete(id);
-        return item;
-    }
-
     public async updateMany(filter: Partial<T> & { id: ObjectId }, input: Partial<T>) {
         const result = await this.model.updateMany(filter, input, { new: true });
         return result;
     }
-
-    public async updateById(id: ObjectId, input: Partial<T>) {
-        const item = await this.model.findByIdAndUpdate(id, input, { new: true });
-        return item;
-    }
-
+    
     public async updateById(id: string, update: Partial<T>): Promise<T | null> {
         const item = await this.model.findByIdAndUpdate(id, update, { new: true });
         return item;
