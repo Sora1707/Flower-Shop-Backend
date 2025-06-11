@@ -39,8 +39,24 @@ class UserController {
                 return res.status(404).json({message: "User not found."});
             }
             res.status(200).json({ message: "User updated", user: updatedUser });
-            
+
             await updatedUser.save();
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const deleteUser = await userService.deleteById(id);
+
+            if(!deleteUser) {
+                return res.status(404).json({message: "User not found."});
+            }
+
+            res.status(200).json({message: "User deleted successfully."});
         }
         catch (error) {
             next(error);
