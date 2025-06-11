@@ -10,29 +10,39 @@ export abstract class BaseService<T> {
         this.model = model;
     }
 
-    public async findAll(): Promise<T[]> {
+    public async findAll() {
         const items = await this.model.find();
         return items;
     }
 
-    public async findById(id: string): Promise<T | null> {
+    public async findById(id: string) {
         const item = await this.model.findById(id);
         return item;
     }
 
-    public async findOne(filter: FilterQuery<T>): Promise<T | null> {
+    public async findOne(filter: FilterQuery<T>) {
         const item = await this.model.findOne(filter);
         return item;
     }
 
-    public async findMany(filter: FilterQuery<T>): Promise<T[]> {
+    public async findMany(filter: FilterQuery<T>) {
         const items = await this.model.find(filter);
         return items;
     }
 
-    public async create(input: Partial<T>): Promise<T> {
+    public async create(input: Partial<T>) {
         const item = await this.model.create(input);
         return item;
+    }
+
+    public async createMany(inputs: Partial<T>[]) {
+        const items = await this.model.insertMany(inputs);
+        return items;
+    }
+
+    public async deleteAll() {
+        const result = await this.model.deleteMany({});
+        return result;
     }
 
     public async deleteMany(filter: Partial<T> & { id: ObjectId }) {
