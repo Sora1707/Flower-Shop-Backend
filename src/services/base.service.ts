@@ -39,4 +39,15 @@ export abstract class BaseService<T> {
         const item = await this.model.deleteMany(filter);
         return item;
     }
+
+    public async updateById(id: string, update: Partial<T>): Promise<T | null> {
+        const item = await this.model.findByIdAndUpdate(id, update, { new: true });
+        return item;
+    }
+
+    public async deleteById(id: string): Promise<T | null> {
+        const item = await this.model.findByIdAndDelete(id);
+        return item;
+    }
+
 }
