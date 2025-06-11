@@ -1,8 +1,8 @@
 import { Document } from "mongoose";
 
 export enum Gender {
-    Male = "male",
-    Female = "female",
+    Male = "Male",
+    Female = "Female",
     Other = "other",
 }
 
