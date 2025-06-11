@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { UserModel } from "@/user/user.model"; //
 import { userService } from "./user.service";
 import crypto from "crypto"; //
+import jwt from "jsonwebtoken"
 
 class UserController {
     async reloadSampleData(req: Request, res: Response, next: NextFunction) {
@@ -147,7 +148,6 @@ class UserController {
             }
 
             // Generate JWT token (using a placeholder secret for now)
-            const jwt = require("jsonwebtoken");
             const token = jwt.sign(
                 {
                     userId: user._id,
