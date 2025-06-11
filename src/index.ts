@@ -2,7 +2,7 @@ import * as dotenv from "./dotenv";
 dotenv.config();
 
 import express, { Application, Request, Response } from "express";
-import userRouter from "@/user/user.route";
+import userRouter from "@/user/user.routes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";

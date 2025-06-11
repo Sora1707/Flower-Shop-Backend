@@ -4,6 +4,17 @@ import { userService } from "./user.service";
 import crypto from "crypto"; //
 
 class UserController {
+    async reloadSampleData(req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = require("@/data/users.json");
+            await userService.deleteAll();
+            const newUsers = await userService.createMany(users);
+            res.status(200).json(newUsers);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // Get all users (for admin purposes)
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
