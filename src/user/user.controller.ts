@@ -17,7 +17,17 @@ class UserController {
     // Register
     async register(req: Request, res: Response, next: NextFunction) {
         try {
-            const { email, password } = req.body;
+            const {
+                email,
+                password,
+                username,
+                firstName,
+                lastName,
+                phoneNumber,
+                birthdate,
+                gender,
+                avatar
+            } = req.body;
 
             if (!email || !password) {
                 return res.status(400).json({ message: "Email and password are required" });
@@ -32,8 +42,15 @@ class UserController {
             const newUser = new UserModel({
                 email,
                 password,
-                // role: "RegisteredBuyer",
+                username,
+                firstName,
+                lastName,
+                phoneNumber,
+                birthdate,
+                gender,
+                avatar
             });
+
 
             await newUser.save();
 
@@ -60,7 +77,8 @@ class UserController {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
 
-            if (user.password !== password) {
+            const isMatch = await user.matchPassword(password);
+            if (!isMatch) {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
 
