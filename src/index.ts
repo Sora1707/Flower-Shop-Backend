@@ -3,6 +3,7 @@ dotenv.config();
 
 import express, { Application, Request, Response } from "express";
 import userRouter from "@/user/user.routes";
+import productRouter from "@/product/product.routes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
@@ -30,6 +31,7 @@ app.use(morgan("dev"));
 /* ROUTING */
 
 app.use("/api/user", userRouter);
+app.use("/api/product", productRouter);
 
 // import { productService } from "./product/product.service";
 // app.use("/api/product", async (req: Request, res: Response) => {
