@@ -33,6 +33,12 @@ class UserController {
         try {
             const { id } = req.params;
             const update = req.body;
+
+            // Prevent update 'password'
+            if ('password' in update) {
+                delete update.password;
+            }
+
             const updatedUser = await userService.updateById(id, update);
 
             if(!updatedUser) {
@@ -155,7 +161,7 @@ class UserController {
         }
     }
 
-    // Request Password Reset
+    // // Request Password Reset
     // async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
     //     try {
     //         const { email } = req.body;
@@ -206,8 +212,8 @@ class UserController {
 
     //         // Update password (plain text for now)
     //         user.password = newPassword;
-    //         user.resetPasswordToken = undefined;
-    //         user.resetPasswordExpires = undefined;
+    //         user.resetPasswordToken = null;
+    //         user.resetPasswordExpires = null;
     //         await user.save();
 
     //         res.status(200).json({ message: "Password reset successful" });
