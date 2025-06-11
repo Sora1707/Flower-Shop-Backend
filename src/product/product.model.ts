@@ -30,4 +30,11 @@ const ProductSchema = new Schema<IProduct>(
     { timestamps: true }
 );
 
+ProductSchema.virtual("rating").get(function () {
+    if (!this.ratings || this.ratings.length === 0) return 0;
+    const total_score = this.ratings.reduce((sum, product) => sum + product.score, 0);
+    const avg_score = total_score / this.ratings.length;
+    return avg_score;
+});
+
 export const ProductModel = mongoose.model<IProduct>("Product", ProductSchema);
