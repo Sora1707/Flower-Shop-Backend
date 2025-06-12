@@ -1,8 +1,8 @@
 import { Document } from "mongoose";
 
 export enum Gender {
-    Male = "male",
-    Female = "female",
+    Male = "Male",
+    Female = "Female",
     Other = "other",
 }
 
@@ -20,4 +20,3 @@ export interface IUser extends Document {
     updatedAt: Date;
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
-// When Mongoose returns a document, it extends Document
