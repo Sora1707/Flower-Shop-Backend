@@ -1,4 +1,5 @@
 import { Document } from "mongoose";
+import { IRating } from "./rating.interface";
 
 export enum Category {
     Bouquet = "bouquet",
@@ -7,13 +8,6 @@ export enum Category {
     Birthday = "birthday",
     Sympathy = "sympathy",
     Anniversary = "anniversary",
-}
-
-export interface IRating {
-    userId: string;
-    score: number;
-    updatedAt: Date;
-    createdAt: Date;
 }
 
 export interface IProduct extends Document {

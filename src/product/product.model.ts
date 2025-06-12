@@ -2,7 +2,8 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Document, Schema } from "mongoose";
 import { PaginateModel } from "mongoose";
 
-import { IProduct, IRating, Category } from "./product.interface";
+import { IProduct, Category } from "./product.interface";
+import { RatingSchema } from "./rating.model";
 
 const ProductSchema = new Schema<IProduct>(
     {
@@ -20,14 +21,7 @@ const ProductSchema = new Schema<IProduct>(
         images: { type: [String], default: [] },
         stock: { type: Number, default: 0 },
         isAvailable: { type: Boolean, default: true },
-        ratings: [
-            {
-                userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-                score: { type: Number, min: 1, max: 5, required: true },
-                updatedAt: { type: Date, default: Date.now },
-                createdAt: { type: Date, default: Date.now },
-            },
-        ],
+        ratings: { type: [RatingSchema], default: [] },
     },
     { timestamps: true }
 );
