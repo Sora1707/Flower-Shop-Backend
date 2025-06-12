@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { PaginateModel } from "mongoose";
 
 import { IProduct, Category } from "./product.interface";
-import { RatingSchema } from "./rating.model";
+import { RatingSchema } from "./rating.schema";
 
 const ProductSchema = new Schema<IProduct>(
     {
