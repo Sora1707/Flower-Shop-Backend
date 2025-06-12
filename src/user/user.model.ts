@@ -4,7 +4,7 @@ import { PaginateModel } from "mongoose";
 
 import { IUser, Gender } from "./user.interface";
 
-import bcrypt from "bcryptjs";
+import * as password from "./password";
 
 const UserSchema = new Schema<IUser>(
     {
@@ -27,15 +27,15 @@ UserSchema.plugin(mongoosePaginate);
 UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(this.password, salt);
-    this.password = hashedPassword;
+    console.log("Hashing password for user:", this.username);
+
+    this.password = await password.hash(this.password);
 
     next();
 });
 
-UserSchema.methods.matchPassword = async function (enteredPassword: string) {
-    return await bcrypt.compare(enteredPassword, this.password);
+UserSchema.methods.matchPassword = async function (inputPassword: string) {
+    return await password.compare(inputPassword, this.password);
 };
 
 export const UserModel = mongoose.model<IUser, PaginateModel<IUser>>("User", UserSchema);
