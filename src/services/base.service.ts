@@ -5,8 +5,8 @@ import { ClassDef } from "@/types/class";
 
 type ObjectId = Types.ObjectId;
 
-abstract class BaseService<T> {
-    protected abstract model: PaginateModel<T>;
+export abstract class BaseService<T> {
+    protected abstract model: Model<T>;
 
     public async findAll() {
         const items = await this.model.find();
@@ -26,11 +26,6 @@ abstract class BaseService<T> {
     public async findMany(filter: FilterQuery<T>) {
         const items = await this.model.find(filter);
         return items;
-    }
-
-    public async paginate(filter: FilterQuery<T>, options: PaginateOptions = {}) {
-        const paginateResult = await this.model.paginate(filter, options);
-        return paginateResult;
     }
 
     public async create(input: Partial<T>) {
@@ -69,4 +64,11 @@ abstract class BaseService<T> {
     }
 }
 
-export default BaseService;
+export abstract class BasePaginateService<T> extends BaseService<T> {
+    protected abstract model: PaginateModel<T>;
+
+    public async paginate(filter: FilterQuery<T>, options: PaginateOptions = {}) {
+        const paginateResult = await this.model.paginate(filter, options);
+        return paginateResult;
+    }
+}

@@ -1,8 +1,8 @@
-import BaseService from "@/services/base.service";
+import { BasePaginateService } from "@/services/base.service";
 import { IProduct } from "./product.interface";
 import { ProductModel } from "./product.model";
 
-class ProductService extends BaseService<IProduct> {
+class ProductService extends BasePaginateService<IProduct> {
     protected model = ProductModel;
 }
 
