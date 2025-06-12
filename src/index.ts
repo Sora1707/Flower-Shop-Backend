@@ -4,12 +4,12 @@ dotenv.config();
 import express, { Application, Request, Response } from "express";
 import userRouter from "@/user/user.routes";
 import productRouter from "@/product/product.routes";
+import tempRouter from "./temp.routes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 import { connectDB } from "./config/db";
-import { userService } from "./user/user.service";
 
 // Database connection
 connectDB();
@@ -31,6 +31,11 @@ app.use(morgan("dev"));
 
 /* ROUTING */
 app.use("/api/user", userRouter);
+app.use("/api/product", productRouter);
+
+// temporary route for testing
+app.use("/api/temp", tempRouter);
+
 app.get("/", (req: Request, res: Response) => {
     res.send("Welcome to our Flower Shop!");
 });
