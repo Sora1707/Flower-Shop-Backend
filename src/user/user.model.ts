@@ -23,15 +23,29 @@ const UserSchema = new Schema<IUser>(
 
 UserSchema.plugin(mongoosePaginate);
 
-// Hash password before saving
+// model.save()
 UserSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+    try {
+        // If the password is not modified, skip hashing
+        if (!this.isModified("password")) return next();
 
-    console.log("Hashing password for user:", this.username);
+        // Hash the password
+        this.password = await password.hash(this.password);
+        next();
+    } catch (error) {
+        next(error as any);
+    }
+});
 
-    this.password = await password.hash(this.password);
-
-    next();
+// model.create() and model.insertMany()
+UserSchema.pre("insertMany", async function (next, docs: IUser[]) {
+    Promise.all(
+        docs.map(async doc => {
+            doc.password = await password.hash(doc.password);
+        })
+    )
+        .then(() => next())
+        .catch(next);
 });
 
 UserSchema.methods.matchPassword = async function (inputPassword: string) {
