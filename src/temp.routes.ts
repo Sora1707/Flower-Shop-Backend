@@ -3,7 +3,10 @@ import { Request, Response, NextFunction } from "express";
 import asyncHandler from "@/middleware/asyncHandler";
 import userService from "./user/user.service";
 import productService from "./product/product.service";
-import { deepCopy } from "@/utils";
+import { randomInt } from "./utils/number";
+import cartService from "./cart/cart.service";
+import { Types } from "mongoose";
+import { ICart } from "./cart/cart.interface";
 
 async function reloadSampleUsers() {
     try {
@@ -27,6 +30,27 @@ async function reloadSampleProducts() {
 
 async function createSampleCart() {
     try {
+        const user = await userService.findOne({});
+        const products = await productService.findAll();
+        const slicedProducts = products.slice(0, 3);
+
+        if (!user) {
+            console.error("No user found to create a sample cart for.");
+            return;
+        }
+
+        const cartData = {
+            user: user.id as Types.ObjectId,
+            items: slicedProducts.map(product => {
+                const quantity = randomInt(1, 3);
+                return {
+                    product: product.id as Types.ObjectId,
+                    quantity,
+                    priceAtAddTime: product.price,
+                };
+            }),
+        };
+        const newCart = await cartService.create(cartData as Partial<ICart>);
     } catch (error) {
         console.error("Error creating sample cart:", error);
     }
