@@ -3,9 +3,9 @@ import { FilterQuery, Types, Model } from "mongoose";
 import { PaginateModel, PaginateOptions } from "mongoose";
 import { ClassDef } from "@/types/class";
 
-export type ObjectId = Types.ObjectId;
+type ObjectId = Types.ObjectId;
 
-export abstract class BaseService<T> {
+abstract class BaseService<T> {
     protected abstract model: PaginateModel<T>;
 
     public async findAll() {
@@ -68,3 +68,5 @@ export abstract class BaseService<T> {
         return item;
     }
 }
+
+export default BaseService;

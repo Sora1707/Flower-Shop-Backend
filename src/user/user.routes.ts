@@ -1,11 +1,8 @@
 import express from "express";
-import { Request, Response, NextFunction } from "express";
 import UserController from "@/user/user.controller";
 import asyncHandler from "@/middleware/asyncHandler";
 
 const router = express.Router();
-
-router.get("/reload_sample_data", asyncHandler(UserController.reloadSampleData));
 
 router.post("/register", asyncHandler(UserController.register));
 router.post("/login", asyncHandler(UserController.login));
