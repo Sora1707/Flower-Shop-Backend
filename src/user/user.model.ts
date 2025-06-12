@@ -1,6 +1,10 @@
+import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Document, Schema } from "mongoose";
+import { PaginateModel } from "mongoose";
 
 import { IUser, Gender } from "./user.interface";
+
+import * as password from "./password";
 
 const UserSchema = new Schema<IUser>(
     {
@@ -17,17 +21,35 @@ const UserSchema = new Schema<IUser>(
     { timestamps: true }
 );
 
-// Hash password before saving
-UserSchema.pre("save", async function (next) {
-    if (!this.isModified("password")) return next();
+UserSchema.plugin(mongoosePaginate);
 
-    const encryptedPassword = this.password;
-    this.password = encryptedPassword;
-    next();
+// model.save()
+UserSchema.pre("save", async function (next) {
+    try {
+        // If the password is not modified, skip hashing
+        if (!this.isModified("password")) return next();
+
+        // Hash the password
+        this.password = await password.hash(this.password);
+        next();
+    } catch (error) {
+        next(error as any);
+    }
 });
 
-UserSchema.methods.matchPassword = async function (enteredPassword: string) {
-    return true;
+// model.create() and model.insertMany()
+UserSchema.pre("insertMany", async function (next, docs: IUser[]) {
+    Promise.all(
+        docs.map(async doc => {
+            doc.password = await password.hash(doc.password);
+        })
+    )
+        .then(() => next())
+        .catch(next);
+});
+
+UserSchema.methods.matchPassword = async function (inputPassword: string) {
+    return await password.compare(inputPassword, this.password);
 };
 
-export const UserModel = mongoose.model<IUser>("User", UserSchema);
+export const UserModel = mongoose.model<IUser, PaginateModel<IUser>>("User", UserSchema);

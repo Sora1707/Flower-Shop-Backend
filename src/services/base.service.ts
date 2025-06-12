@@ -1,14 +1,12 @@
+import "mongoose-paginate-v2";
 import { FilterQuery, Types, Model } from "mongoose";
+import { PaginateModel, PaginateOptions } from "mongoose";
 import { ClassDef } from "@/types/class";
 
-export type ObjectId = Types.ObjectId;
+type ObjectId = Types.ObjectId;
 
 export abstract class BaseService<T> {
-    protected model: Model<T>;
-
-    constructor(model: Model<T>) {
-        this.model = model;
-    }
+    protected abstract model: Model<T>;
 
     public async findAll() {
         const items = await this.model.find();
@@ -54,7 +52,7 @@ export abstract class BaseService<T> {
         const result = await this.model.updateMany(filter, input, { new: true });
         return result;
     }
-    
+
     public async updateById(id: string, update: Partial<T>): Promise<T | null> {
         const item = await this.model.findByIdAndUpdate(id, update, { new: true });
         return item;
@@ -64,5 +62,13 @@ export abstract class BaseService<T> {
         const item = await this.model.findByIdAndDelete(id);
         return item;
     }
+}
 
+export abstract class BasePaginateService<T> extends BaseService<T> {
+    protected abstract model: PaginateModel<T>;
+
+    public async paginate(filter: FilterQuery<T>, options: PaginateOptions = {}) {
+        const paginateResult = await this.model.paginate(filter, options);
+        return paginateResult;
+    }
 }

@@ -4,6 +4,7 @@ dotenv.config();
 import express, { Application, Request, Response } from "express";
 import userRouter from "@/user/user.routes";
 import productRouter from "@/product/product.routes";
+import tempRouter from "./temp.routes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
@@ -29,15 +30,11 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 /* ROUTING */
-
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 
-// import { productService } from "./product/product.service";
-// app.use("/api/product", async (req: Request, res: Response) => {
-//     const products = await productService.findAll();
-//     res.status(200).json(products);
-// });
+// temporary route for testing
+app.use("/api/temp", tempRouter);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Welcome to our Flower Shop!");

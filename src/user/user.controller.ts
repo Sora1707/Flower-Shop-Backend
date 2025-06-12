@@ -1,26 +1,22 @@
 import { Request, Response, NextFunction } from "express";
 import { UserModel } from "@/user/user.model"; //
-import { userService } from "./user.service";
+import userService from "./user.service";
 import crypto from "crypto"; //
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 class UserController {
-    async reloadSampleData(req: Request, res: Response, next: NextFunction) {
-        try {
-            const users = require("@/data/users.json");
-            await userService.deleteAll();
-            const newUsers = await userService.createMany(users);
-            res.status(200).json(newUsers);
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // Get all users (for admin purposes)
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            const users = await userService.findAll();
-            res.status(200).json(users);
+            // const users = await userService.findAll();
+            const filter = {};
+            const paginateOptions = {
+                page: 1,
+                limit: 10,
+            };
+            const paginateResult = await userService.paginate(filter, paginateOptions);
+            // res.status(200).json(users);
+            res.status(200).json(paginateResult);
         } catch (error) {
             next(error);
         }
@@ -31,12 +27,12 @@ class UserController {
             const { id } = req.params;
             const user = await userService.findById(id);
 
-            if(!user) {
-                return res.status(404).json({message: "User not found."});
+            if (!user) {
+                return res.status(404).json({ message: "User not found." });
             }
+
             res.status(200).json(user);
-        }
-        catch (error) {
+        } catch (error) {
             next(error);
         }
     }
@@ -47,18 +43,17 @@ class UserController {
             const update = req.body;
 
             // Prevent update 'password'
-            if ('password' in update) {
+            if ("password" in update) {
                 delete update.password;
             }
 
             const updatedUser = await userService.updateById(id, update);
 
-            if(!updatedUser) {
-                return res.status(404).json({message: "User not found."});
+            if (!updatedUser) {
+                return res.status(404).json({ message: "User not found." });
             }
             res.status(200).json({ message: "User updated", user: updatedUser });
-        }
-        catch (error) {
+        } catch (error) {
             next(error);
         }
     }
@@ -68,13 +63,12 @@ class UserController {
             const { id } = req.params;
             const deleteUser = await userService.deleteById(id);
 
-            if(!deleteUser) {
-                return res.status(404).json({message: "User not found."});
+            if (!deleteUser) {
+                return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json({message: "User deleted successfully."});
-        }
-        catch (error) {
+            res.status(200).json({ message: "User deleted successfully." });
+        } catch (error) {
             next(error);
         }
     }
@@ -91,7 +85,7 @@ class UserController {
                 phoneNumber,
                 birthdate,
                 gender,
-                avatar
+                avatar,
             } = req.body;
 
             if (!email || !password) {
@@ -113,9 +107,8 @@ class UserController {
                 phoneNumber,
                 birthdate,
                 gender,
-                avatar
+                avatar,
             });
-
 
             await newUser.save();
 
