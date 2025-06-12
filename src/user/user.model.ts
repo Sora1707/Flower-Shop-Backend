@@ -1,4 +1,6 @@
+import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Document, Schema } from "mongoose";
+import { PaginateModel } from "mongoose";
 
 import { IUser, Gender } from "./user.interface";
 
@@ -17,6 +19,8 @@ const UserSchema = new Schema<IUser>(
     { timestamps: true }
 );
 
+UserSchema.plugin(mongoosePaginate);
+
 // Hash password before saving
 UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -30,4 +34,4 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string) {
     return true;
 };
 
-export const UserModel = mongoose.model<IUser>("User", UserSchema);
+export const UserModel = mongoose.model<IUser, PaginateModel<IUser>>("User", UserSchema);

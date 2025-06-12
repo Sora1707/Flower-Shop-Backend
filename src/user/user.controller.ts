@@ -19,8 +19,15 @@ class UserController {
     // Get all users (for admin purposes)
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            const users = await userService.findAll();
-            res.status(200).json(users);
+            // const users = await userService.findAll();
+            const filter = {};
+            const paginateOptions = {
+                page: 1,
+                limit: 10,
+            };
+            const paginateResult = await userService.paginate(filter, paginateOptions);
+            // res.status(200).json(users);
+            res.status(200).json(paginateResult);
         } catch (error) {
             next(error);
         }

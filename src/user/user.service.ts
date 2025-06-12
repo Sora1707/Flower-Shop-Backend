@@ -3,9 +3,7 @@ import { IUser } from "./user.interface";
 import { UserModel } from "./user.model";
 
 class UserService extends BaseService<IUser> {
-    constructor() {
-        super(UserModel);
-    }
+    protected model = UserModel;
 }
 
 export const userService = new UserService();

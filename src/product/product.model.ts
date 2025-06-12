@@ -1,4 +1,6 @@
+import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Document, Schema } from "mongoose";
+import { PaginateModel } from "mongoose";
 
 import { IProduct, IRating, Category } from "./product.interface";
 
@@ -30,6 +32,8 @@ const ProductSchema = new Schema<IProduct>(
     { timestamps: true }
 );
 
+ProductSchema.plugin(mongoosePaginate);
+
 ProductSchema.virtual("avg_rating").get(function () {
     if (!this.ratings || this.ratings.length === 0) return 0;
     const total_score = this.ratings.reduce((sum, product) => sum + product.score, 0);
@@ -37,4 +41,7 @@ ProductSchema.virtual("avg_rating").get(function () {
     return avg_score;
 });
 
-export const ProductModel = mongoose.model<IProduct>("Product", ProductSchema);
+export const ProductModel = mongoose.model<IProduct, PaginateModel<IProduct>>(
+    "Product",
+    ProductSchema
+);

@@ -3,9 +3,7 @@ import { IProduct } from "./product.interface";
 import { ProductModel } from "./product.model";
 
 class ProductService extends BaseService<IProduct> {
-    constructor() {
-        super(ProductModel);
-    }
+    protected model = ProductModel;
 }
 
 export const productService = new ProductService();

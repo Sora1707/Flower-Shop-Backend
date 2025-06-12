@@ -1,14 +1,12 @@
+import "mongoose-paginate-v2";
 import { FilterQuery, Types, Model } from "mongoose";
+import { PaginateModel, PaginateOptions } from "mongoose";
 import { ClassDef } from "@/types/class";
 
 export type ObjectId = Types.ObjectId;
 
 export abstract class BaseService<T> {
-    protected model: Model<T>;
-
-    constructor(model: Model<T>) {
-        this.model = model;
-    }
+    protected abstract model: PaginateModel<T>;
 
     public async findAll() {
         const items = await this.model.find();
@@ -28,6 +26,11 @@ export abstract class BaseService<T> {
     public async findMany(filter: FilterQuery<T>) {
         const items = await this.model.find(filter);
         return items;
+    }
+
+    public async paginate(filter: FilterQuery<T>, options: PaginateOptions = {}) {
+        const paginateResult = await this.model.paginate(filter, options);
+        return paginateResult;
     }
 
     public async create(input: Partial<T>) {
