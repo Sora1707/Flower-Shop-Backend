@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { UserModel } from "@/user/user.model"; //
 import { userService } from "./user.service";
 import crypto from "crypto"; //
+import jwt from "jsonwebtoken";
 
 class UserController {
     async reloadSampleData(req: Request, res: Response, next: NextFunction) {
@@ -25,10 +26,70 @@ class UserController {
         }
     }
 
+    async getUserById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const user = await userService.findById(id);
+
+            if (!user) {
+                return res.status(404).json({ message: "User not found." });
+            }
+            res.status(200).json(user);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const update = req.body;
+
+            // Prevent update 'password'
+            if ("password" in update) {
+                delete update.password;
+            }
+
+            const updatedUser = await userService.updateById(id, update);
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: "User not found." });
+            }
+            res.status(200).json({ message: "User updated", user: updatedUser });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const deleteUser = await userService.deleteById(id);
+
+            if (!deleteUser) {
+                return res.status(404).json({ message: "User not found." });
+            }
+
+            res.status(200).json({ message: "User deleted successfully." });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // Register
     async register(req: Request, res: Response, next: NextFunction) {
         try {
-            const { email, password } = req.body;
+            const {
+                email,
+                password,
+                username,
+                firstName,
+                lastName,
+                phoneNumber,
+                birthdate,
+                gender,
+                avatar,
+            } = req.body;
 
             if (!email || !password) {
                 return res.status(400).json({ message: "Email and password are required" });
@@ -43,7 +104,13 @@ class UserController {
             const newUser = new UserModel({
                 email,
                 password,
-                // role: "RegisteredBuyer",
+                username,
+                firstName,
+                lastName,
+                phoneNumber,
+                birthdate,
+                gender,
+                avatar,
             });
 
             await newUser.save();
@@ -71,12 +138,12 @@ class UserController {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
 
-            if (user.password !== password) {
+            const isMatch = await user.matchPassword(password);
+            if (!isMatch) {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
 
             // Generate JWT token (using a placeholder secret for now)
-            const jwt = require("jsonwebtoken");
             const token = jwt.sign(
                 {
                     userId: user._id,
@@ -101,7 +168,7 @@ class UserController {
         }
     }
 
-    // Request Password Reset
+    // // Request Password Reset
     // async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
     //     try {
     //         const { email } = req.body;
@@ -152,8 +219,8 @@ class UserController {
 
     //         // Update password (plain text for now)
     //         user.password = newPassword;
-    //         user.resetPasswordToken = undefined;
-    //         user.resetPasswordExpires = undefined;
+    //         user.resetPasswordToken = null;
+    //         user.resetPasswordExpires = null;
     //         await user.save();
 
     //         res.status(200).json({ message: "Password reset successful" });
