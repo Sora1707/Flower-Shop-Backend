@@ -30,13 +30,6 @@ app.use(morgan("dev"));
 /* ROUTING */
 
 app.use("/api/user", userRouter);
-
-// import { productService } from "./product/product.service";
-// app.use("/api/product", async (req: Request, res: Response) => {
-//     const products = await productService.findAll();
-//     res.status(200).json(products);
-// });
-
 app.get("/", (req: Request, res: Response) => {
     res.send("Welcome to our Flower Shop!");
 });
