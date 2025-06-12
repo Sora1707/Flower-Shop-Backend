@@ -64,7 +64,7 @@ class CartController {
             const existingItem = cart.items.find((item: ICartItem) => item.product.toString() === productId);
 
             if (existingItem) {
-                existingItem.quantity += quantity;
+                existingItem.quantity += Number(quantity);
             } else {
                 const product = await productService.findById(productId);
                 const newItem = new CartItemModel({
@@ -80,6 +80,37 @@ class CartController {
             res.status(200).json(cart);
         } catch (error) {
         next(error);
+        }
+    }
+
+    // Update quantity of a cart item
+    async updateItemQuantity(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId, productId } = req.params;
+            const { quantity } = req.body;
+
+            if (!quantity || quantity < 1) {
+                return res.status(400).json({ message: "Invalid quantity value" });
+            }
+
+            const cart = await cartService.findOne({ user: userId });
+
+            if (!cart) {
+                return res.status(404).json({ message: "Cart not found" });
+            }
+
+            const existingItem = cart.items.find((item: ICartItem) => item.product.toString() === productId);
+            
+            if (!existingItem) {
+                return res.status(404).json({ message: "Item not found in the cart" });
+            }
+
+            existingItem.quantity = quantity;
+            await cart.save();
+
+            res.status(200).json(cart);
+        } catch (error) {
+            next(error);
         }
     }
 

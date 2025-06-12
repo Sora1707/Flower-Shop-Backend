@@ -12,6 +12,7 @@ router.delete("/users/:userId/carts/all", asyncHandler(cartController.deleteAllC
 
 // Cart Item
 router.put("/users/:userId/carts/items", asyncHandler(cartController.addOrUpdateItem)); 
+router.put("/users/:userId/carts/items/:productId", asyncHandler(cartController.updateItemQuantity));
 router.delete("/users/:userId/carts/items/:productId", asyncHandler(cartController.removeItem)); 
 
 export default router;
