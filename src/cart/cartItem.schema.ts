@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import { ICartItem } from "./cartItem.interface";
 
 export const CartItemSchema = new Schema<ICartItem>(
@@ -9,3 +9,5 @@ export const CartItemSchema = new Schema<ICartItem>(
     },
     { timestamps: true }
 );
+
+export const CartItemModel = model<ICartItem>("CartItem", CartItemSchema);

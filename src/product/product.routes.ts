@@ -1,6 +1,7 @@
 import express from "express";
 import asyncHandler from "@/middleware/asyncHandler";
 import productController from "./product.controller";
+import cartController from "@/cart/cart.controller";
 
 
 const router = express.Router();
@@ -12,6 +13,9 @@ router.get("/:id", asyncHandler(productController.getProductById));
 router.post("/", asyncHandler(productController.createProduct));
 router.put("/:id", asyncHandler(productController.updateProduct));
 router.delete("/:id", asyncHandler(productController.deleteProduct));
+
+// Handle adding item into cart
+router.post("/cart", asyncHandler(cartController.addOrUpdateItem));
 
 // For admin only
 // router.post("/", authenticate, authorize(["admin"]), productController.create);

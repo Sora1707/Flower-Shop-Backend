@@ -4,6 +4,7 @@ dotenv.config();
 import express, { Application, Request, Response } from "express";
 import userRouter from "@/user/user.routes";
 import productRouter from "@/product/product.routes";
+import cartRouter from "@/cart/cart.routes";
 import tempRouter from "./temp.routes";
 import bodyParser from "body-parser";
 import cors from "cors";
@@ -32,6 +33,7 @@ app.use(morgan("dev"));
 /* ROUTING */
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
+app.use("/api", cartRouter);
 
 // temporary route for testing
 app.use("/api/temp", tempRouter);
