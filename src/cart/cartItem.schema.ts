@@ -9,5 +9,3 @@ export const CartItemSchema = new Schema<ICartItem>(
     },
     { timestamps: true }
 );
-
-export const CartItemModel = model<ICartItem>("CartItem", CartItemSchema);
