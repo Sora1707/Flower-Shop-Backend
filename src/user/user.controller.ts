@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { UserModel } from "@/user/user.model"; //
-import userService from "./user.service";
 import crypto from "crypto"; //
 import jwt from "jsonwebtoken";
+
+import { userService, UserModel } from "./";
 
 class UserController {
     // Get all users (for admin purposes)

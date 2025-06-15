@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import cartService from "./cart.service";
-import { ICart } from "./cart.interface";
-import { ICartItem } from "./cartItem.interface";
-import { CartItemSchema } from "./cartItem.schema";
-import productService from "@/product/product.service";
 import { Types } from "mongoose";
+
+import productService from "@/product/product.service";
 import userService from "@/user/user.service";
+
+import { ICartItem, cartService } from "./";
 
 class CartController {
     // Create a cart for a user

@@ -1,18 +1,19 @@
 import { Request, Response, NextFunction } from "express";
-import productService from "./product.service";
+
+import { productService } from "./";
 
 class ProductController {
     async getAllProducts(req: Request, res: Response, next: NextFunction) {
         try {
-            const { 
-                page = 1, 
-                limit = 10, 
-                category, 
-                isAvailable, 
-                minPrice, 
-                maxPrice, 
+            const {
+                page = 1,
+                limit = 10,
+                category,
+                isAvailable,
+                minPrice,
+                maxPrice,
                 sortBy = "createdAt", // Default: Sort by created date
-                sortOrder = "desc"  // Default: Sort descending
+                sortOrder = "desc", // Default: Sort descending
             } = req.query;
 
             const sortField = String(sortBy);
@@ -22,7 +23,7 @@ class ProductController {
                 category: category ? (category as string).split(",") : undefined, // phai them 'as string' de k bi loi string[]
                 isAvailable: isAvailable !== undefined ? Boolean(isAvailable) : undefined,
                 minPrice: minPrice ? Number(minPrice) : undefined,
-                maxPrice: maxPrice ? Number(maxPrice) : undefined
+                maxPrice: maxPrice ? Number(maxPrice) : undefined,
             };
 
             // Prepare sorting criteria
@@ -35,15 +36,15 @@ class ProductController {
 
             // Call the service method to get filtered, sorted, and paginated products
             const products = await productService.getProductsWithFilters(
-                Number(page),  
-                Number(limit), 
-                filters,       
-                sort           
+                Number(page),
+                Number(limit),
+                filters,
+                sort
             );
 
             res.status(200).json(products);
         } catch (error) {
-            next(error);  
+            next(error);
         }
     }
 
@@ -106,8 +107,8 @@ class ProductController {
             const query = req.query.query?.toString() || "";
             const results = await productService.searchProducts(query);
             res.status(200).json(results);
-        } catch (error){
-            next(error)
+        } catch (error) {
+            next(error);
         }
     }
 }
