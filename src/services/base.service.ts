@@ -43,7 +43,7 @@ export abstract class BaseService<T> {
         return result;
     }
 
-    public async deleteOne(filter: FilterQuery<any>) {
+    public async deleteOne(filter: FilterQuery<T>) {
         const result = await this.model.deleteOne(filter);
         return result;
     }
