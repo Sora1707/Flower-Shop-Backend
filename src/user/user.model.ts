@@ -2,7 +2,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Document, Schema } from "mongoose";
 import { PaginateModel } from "mongoose";
 
-import { IUser, Gender } from "./user.interface";
+import { IUser, Gender, Role } from "./user.interface";
 
 import * as password from "./password";
 
@@ -25,6 +25,7 @@ UserSchema.plugin(mongoosePaginate);
 
 // model.save()
 UserSchema.pre("save", async function (next) {
+    console.log("Pre-save hook triggered for UserModel");
     try {
         // If the password is not modified, skip hashing
         if (!this.isModified("password")) return next();
@@ -35,17 +36,6 @@ UserSchema.pre("save", async function (next) {
     } catch (error) {
         next(error as any);
     }
-});
-
-// model.create() and model.insertMany()
-UserSchema.pre("insertMany", async function (next, docs: IUser[]) {
-    Promise.all(
-        docs.map(async doc => {
-            doc.password = await password.hash(doc.password);
-        })
-    )
-        .then(() => next())
-        .catch(next);
 });
 
 UserSchema.methods.matchPassword = async function (inputPassword: string) {
