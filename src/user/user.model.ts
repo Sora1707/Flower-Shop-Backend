@@ -17,6 +17,8 @@ const UserSchema = new Schema<IUser>(
         birthdate: { type: Date, required: true },
         gender: { type: String, enum: Object.values(Gender) },
         avatar: { type: String },
+        resetPasswordToken: { type: String },
+        resetPasswordExpires: { type: Date },
     },
     { timestamps: true }
 );

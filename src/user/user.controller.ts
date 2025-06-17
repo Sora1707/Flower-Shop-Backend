@@ -165,66 +165,68 @@ class UserController {
         }
     }
 
-    // // Request Password Reset
-    // async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
-    //     try {
-    //         const { email } = req.body;
+    // Request Password Reset
+    async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { email } = req.body;
 
-    //         if (!email) {
-    //             return res.status(400).json({ message: "Email is required" });
-    //         }
+            if (!email) {
+                return res.status(400).json({ message: "Email is required" });
+            }
 
-    //         const user = await UserModel.findOne({ email });
-    //         if (!user) {
-    //             return res.status(404).json({ message: "User not found" });
-    //         }
+            const user = await UserModel.findOne({ email });
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
 
-    //         // Generate reset token
-    //         const resetToken = crypto.randomBytes(32).toString("hex");
-    //         user.resetPasswordToken = resetToken;
-    //         user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour expiry
-    //         await user.save();
+            // Generate reset token
+            const resetToken = crypto.randomBytes(32).toString("hex");
+            user.resetPasswordToken = resetToken;
+            user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour expiry
+            await user.save();
 
-    //         // In a real app, send email with reset link (e.g., http://yourapp.com/reset?token=resetToken)
-    //         // For now, return token in response for testing
-    //         res.status(200).json({
-    //             message: "Password reset requested. Check your email.",
-    //             resetToken, // Remove in production; send via email instead
-    //         });
-    //     } catch (error) {
-    //         next(error);
-    //     }
-    // }
+            // Link to reset password -> Frontend part
+            // const resetLink = `http://localhost:8080/reset?token=${resetToken}`;
 
-    // // Reset Password
-    // async resetPassword(req: Request, res: Response, next: NextFunction) {
-    //     try {
-    //         const { token, newPassword } = req.body;
+            res.status(200).json({
+                message: "Password reset requested. Check your email.",
+                // resetLink
+                resetToken, // For testing purposes, you can return the token directly
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
 
-    //         if (!token || !newPassword) {
-    //             return res.status(400).json({ message: "Token and new password are required" });
-    //         }
+    // Reset Password
+    async resetPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { token, newPassword } = req.body;
 
-    //         const user = await UserModel.findOne({
-    //             resetPasswordToken: token,
-    //             resetPasswordExpires: { $gt: new Date() },
-    //         });
+            if (!token || !newPassword) {
+                return res.status(400).json({ message: "Token and new password are required" });
+            }
 
-    //         if (!user) {
-    //             return res.status(400).json({ message: "Invalid or expired token" });
-    //         }
+            const user = await UserModel.findOne({
+                resetPasswordToken: token,
+                resetPasswordExpires: { $gt: new Date() },
+            });
 
-    //         // Update password (plain text for now)
-    //         user.password = newPassword;
-    //         user.resetPasswordToken = null;
-    //         user.resetPasswordExpires = null;
-    //         await user.save();
+            if (!user) {
+                return res.status(400).json({ message: "Invalid or expired token" });
+            }
 
-    //         res.status(200).json({ message: "Password reset successful" });
-    //     } catch (error) {
-    //         next(error);
-    //     }
-    // }
+            // Update password (plain text for now)
+            user.password = newPassword;
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+
+            res.status(200).json({ message: "Password reset successful" });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 const userController = new UserController();

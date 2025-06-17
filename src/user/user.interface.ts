@@ -18,5 +18,7 @@ export interface IUser extends Document {
     avatar?: string;
     createdAt: Date;
     updatedAt: Date;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
     matchPassword(inputPassword: string): Promise<boolean>;
 }
