@@ -8,6 +8,11 @@ import * as password from "./password";
 
 const UserSchema = new Schema<IUser>(
     {
+        // role: {
+        //     type: String,
+        //     enum: Object.values(Role),
+        //     default: Role.User,
+        // },
         username: { type: String, required: true, unique: true },
         password: { type: String, required: true },
         firstName: { type: String, required: true },

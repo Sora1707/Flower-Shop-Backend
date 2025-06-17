@@ -1,9 +1,11 @@
 import express from "express";
 import UserController from "@/user/user.controller";
 import asyncHandler from "@/middleware/asyncHandler";
+import authenticate from "@/middleware/authenticate";
 
 const router = express.Router();
 
+router.get("/me", asyncHandler(authenticate), asyncHandler(UserController.getCurrentUser)); // Assuming getCurrentUser is defined in UserController
 router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(UserController.getAllUsers));
 

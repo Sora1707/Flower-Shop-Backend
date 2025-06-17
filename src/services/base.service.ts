@@ -36,7 +36,7 @@ export abstract class BaseService<T> {
     public async createMany(inputs: Partial<T>[]) {
         const items = await Promise.all(
             inputs.map(async input => {
-                return await this.create(input);
+                return await this.model.create(input);
             })
         );
         return items;

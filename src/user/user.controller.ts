@@ -3,8 +3,11 @@ import crypto from "crypto"; //
 import jwt from "jsonwebtoken";
 
 import { userService, UserModel } from "./";
+import { AuthRequest } from "@/types/request";
 
 // API root: /api/user
+
+const TOKEN_EXPIRATION = "1h"; // 1 hours
 
 class UserController {
     // [GET] /
@@ -40,16 +43,24 @@ class UserController {
         }
     }
 
+    async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
+        const user = req.user;
+        return res.status(200).json(user);
+    }
+
     // [POST] /login
     async login(req: Request, res: Response, next: NextFunction) {
         try {
-            const { email, password } = req.body;
+            console.log(req.body);
+            const { username, password } = req.body;
 
-            if (!email || !password) {
-                return res.status(400).json({ message: "Email and password are required" });
+            console.log(username, password);
+
+            if (!username || !password) {
+                return res.status(400).json({ message: "Username and password are required" });
             }
 
-            const user = await userService.findOne({ email });
+            const user = await userService.findOne({ username });
             if (!user) {
                 return res.status(401).json({ message: "Invalid email or password" });
             }
@@ -63,20 +74,15 @@ class UserController {
             const token = jwt.sign(
                 {
                     userId: user._id,
-                    email: user.email,
-                    // role: user.role
                 },
-                process.env.JWT_SECRET || "your_jwt_secret",
-                { expiresIn: "1h" }
+                process.env.JWT_SECRET as string,
+                { expiresIn: TOKEN_EXPIRATION }
             );
 
             res.status(200).json({
-                message: "Login successful",
                 token,
                 user: {
                     id: user._id,
-                    email: user.email,
-                    // role: user.role
                 },
             });
         } catch (error) {
@@ -103,13 +109,12 @@ class UserController {
                 return res.status(400).json({ message: "Email and password are required" });
             }
 
-            // Check if user exists
             const existingUser = await userService.findOne({ email });
             if (existingUser) {
                 return res.status(400).json({ message: "Email already registered" });
             }
 
-            const newUser = new UserModel({
+            const newUserData = {
                 email,
                 password,
                 username,
@@ -119,9 +124,8 @@ class UserController {
                 birthdate,
                 gender,
                 avatar,
-            });
-
-            await newUser.save();
+            };
+            const newUser = await userService.create(newUserData);
 
             res.status(201).json({
                 message: "User registered successfully",
