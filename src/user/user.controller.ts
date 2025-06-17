@@ -227,6 +227,29 @@ class UserController {
             next(error);
         }
     }
+
+    // async roleAssgin(req: Request, res: Response, next: NextFunction) {
+    //     try {
+    //         const { userId, role } = req.body;
+
+    //         if (!userId || !role) {
+    //             return res.status(400).json({ message: "User ID and role are required" });
+    //         }
+
+    //         const user = await UserModel.findById(userId);
+    //         if (!user) {
+    //             return res.status(404).json({ message: "User not found" });
+    //         }
+
+    //         // Assuming roles are stored in a 'role' field in the user model
+    //         user.role = role;
+    //         await user.save();
+
+    //         res.status(200).json({ message: "Role assigned successfully", user });
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // }
 }
 
 const userController = new UserController();
