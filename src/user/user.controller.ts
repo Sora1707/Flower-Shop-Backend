@@ -4,8 +4,10 @@ import jwt from "jsonwebtoken";
 
 import { userService, UserModel } from "./";
 
+// API root: /api/user
+
 class UserController {
-    // Get all users (for admin purposes)
+    // [GET] /
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
             // const users = await userService.findAll();
@@ -22,6 +24,7 @@ class UserController {
         }
     }
 
+    // [GET] /:id
     async getUserById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -37,43 +40,51 @@ class UserController {
         }
     }
 
-    async updateUser(req: Request, res: Response, next: NextFunction) {
+    // [POST] /login
+    async login(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id } = req.params;
-            const update = req.body;
+            const { email, password } = req.body;
 
-            // Prevent update 'password'
-            if ("password" in update) {
-                delete update.password;
+            if (!email || !password) {
+                return res.status(400).json({ message: "Email and password are required" });
             }
 
-            const updatedUser = await userService.updateById(id, update);
-
-            if (!updatedUser) {
-                return res.status(404).json({ message: "User not found." });
+            const user = await userService.findOne({ email });
+            if (!user) {
+                return res.status(401).json({ message: "Invalid email or password" });
             }
-            res.status(200).json({ message: "User updated", user: updatedUser });
+
+            const isMatch = await user.matchPassword(password);
+            if (!isMatch) {
+                return res.status(401).json({ message: "Invalid email or password" });
+            }
+
+            // Generate JWT token (using a placeholder secret for now)
+            const token = jwt.sign(
+                {
+                    userId: user._id,
+                    email: user.email,
+                    // role: user.role
+                },
+                process.env.JWT_SECRET || "your_jwt_secret",
+                { expiresIn: "1h" }
+            );
+
+            res.status(200).json({
+                message: "Login successful",
+                token,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    // role: user.role
+                },
+            });
         } catch (error) {
             next(error);
         }
     }
 
-    async deleteUser(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const deleteUser = await userService.deleteById(id);
-
-            if (!deleteUser) {
-                return res.status(404).json({ message: "User not found." });
-            }
-
-            res.status(200).json({ message: "User deleted successfully." });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Register
+    // [POST] /register
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const {
@@ -115,50 +126,6 @@ class UserController {
             res.status(201).json({
                 message: "User registered successfully",
                 user: newUser,
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Login
-    async login(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { email, password } = req.body;
-
-            if (!email || !password) {
-                return res.status(400).json({ message: "Email and password are required" });
-            }
-
-            const user = await userService.findOne({ email });
-            if (!user) {
-                return res.status(401).json({ message: "Invalid email or password" });
-            }
-
-            const isMatch = await user.matchPassword(password);
-            if (!isMatch) {
-                return res.status(401).json({ message: "Invalid email or password" });
-            }
-
-            // Generate JWT token (using a placeholder secret for now)
-            const token = jwt.sign(
-                {
-                    userId: user._id,
-                    email: user.email,
-                    // role: user.role
-                },
-                process.env.JWT_SECRET || "your_jwt_secret",
-                { expiresIn: "1h" }
-            );
-
-            res.status(200).json({
-                message: "Login successful",
-                token,
-                user: {
-                    id: user._id,
-                    email: user.email,
-                    // role: user.role
-                },
             });
         } catch (error) {
             next(error);
@@ -225,6 +192,44 @@ class UserController {
     //         next(error);
     //     }
     // }
+
+    // [PUT] /:id
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const update = req.body;
+
+            // Prevent update 'password'
+            if ("password" in update) {
+                delete update.password;
+            }
+
+            const updatedUser = await userService.updateById(id, update);
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: "User not found." });
+            }
+            res.status(200).json({ message: "User updated", user: updatedUser });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [DELETE] /:id
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+            const deleteUser = await userService.deleteById(id);
+
+            if (!deleteUser) {
+                return res.status(404).json({ message: "User not found." });
+            }
+
+            res.status(200).json({ message: "User deleted successfully." });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 const userController = new UserController();
