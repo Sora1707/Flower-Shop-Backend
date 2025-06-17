@@ -2,7 +2,10 @@ import { Request, Response, NextFunction } from "express";
 
 import { productService } from "./";
 
+// API root: /api/product
+
 class ProductController {
+    // [GET] /
     async getAllProducts(req: Request, res: Response, next: NextFunction) {
         try {
             const {
@@ -48,15 +51,7 @@ class ProductController {
         }
     }
 
-    async createProduct(req: Request, res: Response, next: NextFunction) {
-        try {
-            const newProduct = await productService.create(req.body);
-            res.status(201).json(newProduct);
-        } catch (error) {
-            next(error);
-        }
-    }
-
+    // [GET] /:id
     async getProductById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -71,6 +66,28 @@ class ProductController {
         }
     }
 
+    // [GET] /search
+    async searchProducts(req: Request, res: Response, next: NextFunction) {
+        try {
+            const query = req.query.query?.toString() || "";
+            const results = await productService.searchProducts(query);
+            res.status(200).json(results);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [POST] /
+    async createProduct(req: Request, res: Response, next: NextFunction) {
+        try {
+            const newProduct = await productService.create(req.body);
+            res.status(201).json(newProduct);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [PUT] /:id
     async updateProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -87,6 +104,7 @@ class ProductController {
         }
     }
 
+    // [DELETE] /:id
     async deleteProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -97,16 +115,6 @@ class ProductController {
             }
 
             res.status(200).json({ message: "Product deleted successfully." });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async searchProducts(req: Request, res: Response, next: NextFunction) {
-        try {
-            const query = req.query.query?.toString() || "";
-            const results = await productService.searchProducts(query);
-            res.status(200).json(results);
         } catch (error) {
             next(error);
         }
