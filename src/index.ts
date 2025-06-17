@@ -39,7 +39,7 @@ app.use("/api", cartRouter);
 app.use("/api/temp", tempRouter);
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Welcome to our Flower Shop!");
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
