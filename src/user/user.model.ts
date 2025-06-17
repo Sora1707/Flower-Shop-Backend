@@ -1,5 +1,5 @@
 import mongoosePaginate from "mongoose-paginate-v2";
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { PaginateModel } from "mongoose";
 
 import { IUser, Gender, Role } from "./user.interface";

@@ -2,25 +2,37 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto"; //
 import jwt from "jsonwebtoken";
 
-import { userService, UserModel } from "./";
+import { SelectedFieldsObject } from "@/services/base.service";
+import { IUser, userService } from "./";
 import { AuthRequest } from "@/types/request";
 
 // API root: /api/user
 
 const TOKEN_EXPIRATION = "1h"; // 1 hours
+const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
+    password: 0,
+};
 
 class UserController {
     // [GET] /
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            // const users = await userService.findAll();
+            const { page, limit } = req.query;
+
             const filter = {};
-            const paginateOptions = {
-                page: 1,
-                limit: 10,
+
+            const selectedFieldsObject: SelectedFieldsObject<IUser> = {
+                ...DEFAULT_SELECTED_FIELDS_OBJECT,
             };
+
+            const paginateOptions = {
+                page: page ? parseInt(page as string, 10) : 1,
+                limit: limit ? parseInt(limit as string, 10) : 10,
+                select: selectedFieldsObject,
+            };
+
             const paginateResult = await userService.paginate(filter, paginateOptions);
-            // res.status(200).json(users);
+
             res.status(200).json(paginateResult);
         } catch (error) {
             next(error);
@@ -31,7 +43,12 @@ class UserController {
     async getUserById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
-            const user = await userService.findById(id);
+
+            const selectedFieldsObject: SelectedFieldsObject<IUser> = {
+                ...DEFAULT_SELECTED_FIELDS_OBJECT,
+            };
+
+            const user = await userService.findById(id, selectedFieldsObject);
 
             if (!user) {
                 return res.status(404).json({ message: "User not found." });

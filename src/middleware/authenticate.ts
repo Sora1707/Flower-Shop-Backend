@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { UserModel } from "@/user";
+import { userService } from "@/user";
 import { AuthRequest } from "@/types/request";
 
 function validAuthenticationHeader(req: Request) {
@@ -28,7 +28,8 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
             userId: string;
         };
 
-        const user = await UserModel.findById(decodedData.userId).select("-password");
+        const user = await userService.findById(decodedData.userId, { password: 0 });
+
         if (!user) {
             return res.status(401).json({ error: "Invalid token. User not found" });
         }

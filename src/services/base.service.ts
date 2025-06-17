@@ -2,29 +2,44 @@ import "mongoose-paginate-v2";
 import { FilterQuery, Types, Model } from "mongoose";
 import { PaginateModel, PaginateOptions } from "mongoose";
 import { ClassDef } from "@/types/class";
+import { IUser } from "@/user";
 
 type ObjectId = Types.ObjectId;
+
+export type SelectedFieldsObject<T> = Partial<Record<keyof T, 1 | 0>>;
+type MongooseSelectedFieldsObject = Record<string, 1 | 0>;
 
 export abstract class BaseService<T> {
     protected abstract model: Model<T>;
 
-    public async findAll() {
-        const items = await this.model.find();
+    public async findAll(selectFieldsObject: SelectedFieldsObject<T> = {}) {
+        const items = await this.model
+            .find()
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
         return items;
     }
 
-    public async findById(id: string) {
-        const item = await this.model.findById(id);
+    public async findById(id: string, selectFieldsObject: SelectedFieldsObject<T> = {}) {
+        const item = await this.model
+            .findById(id)
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
         return item;
     }
 
-    public async findOne(filter: FilterQuery<T>) {
-        const item = await this.model.findOne(filter);
+    public async findOne(filter: FilterQuery<T>, selectFieldsObject: SelectedFieldsObject<T> = {}) {
+        const item = await this.model
+            .findOne(filter)
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
         return item;
     }
 
-    public async findMany(filter: FilterQuery<T>) {
-        const items = await this.model.find(filter);
+    public async findMany(
+        filter: FilterQuery<T>,
+        selectFieldsObject: SelectedFieldsObject<T> = {}
+    ) {
+        const items = await this.model
+            .find(filter)
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
         return items;
     }
 
@@ -62,13 +77,24 @@ export abstract class BaseService<T> {
         return result;
     }
 
-    public async updateById(id: string, update: Partial<T>): Promise<T | null> {
-        const item = await this.model.findByIdAndUpdate(id, update, { new: true });
+    public async updateById(
+        id: string,
+        update: Partial<T>,
+        selectFieldsObject: SelectedFieldsObject<T> = {}
+    ): Promise<T | null> {
+        const item = await this.model
+            .findByIdAndUpdate(id, update, { new: true })
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
         return item;
     }
 
-    public async deleteById(id: string): Promise<T | null> {
-        const item = await this.model.findByIdAndDelete(id);
+    public async deleteById(
+        id: string,
+        selectFieldsObject: SelectedFieldsObject<T> = {}
+    ): Promise<T | null> {
+        const item = await this.model
+            .findByIdAndDelete(id)
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
         return item;
     }
 }
