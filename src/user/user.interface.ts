@@ -6,7 +6,13 @@ export enum Gender {
     Other = "other",
 }
 
+export enum Role {
+    User = "user",
+    Admin = "admin",
+}
+
 export interface IUser extends Document {
+    // role: Role;
     username: string;
     password: string;
     firstName: string;

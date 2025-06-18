@@ -1,7 +1,9 @@
-import { BasePaginateService } from "@/services/base.service";
+import { FilterQuery } from "mongoose";
+
 import { IProduct } from "./product.interface";
 import { ProductModel } from "./product.model";
-import { FilterQuery } from "mongoose";
+
+import { BasePaginateService } from "@/services/base.service";
 
 class ProductService extends BasePaginateService<IProduct> {
     protected model = ProductModel;
@@ -10,7 +12,7 @@ class ProductService extends BasePaginateService<IProduct> {
         page: number = 1,
         limit: number = 10,
         filters: any = {},
-        sort: any = { createdAt: -1 }  // Default: sort by latest products (descending order by createdAt)
+        sort: any = { createdAt: -1 } // Default: sort by latest products (descending order by createdAt)
     ) {
         const query: FilterQuery<IProduct> = {};
 
@@ -24,7 +26,7 @@ class ProductService extends BasePaginateService<IProduct> {
             query.price = { $gte: filters.minPrice, $lte: filters.maxPrice };
         }
 
-        return await ProductModel.paginate(query, {
+        return await this.model.paginate(query, {
             page,
             limit,
             sort,
@@ -32,10 +34,12 @@ class ProductService extends BasePaginateService<IProduct> {
     }
 
     // Method to search products with autocomplete
-    async searchProducts(query: string) {
-        return ProductModel.find({
-            name: { $regex: query, $options: "i" },  // case-insensitive search
-        }).limit(10); // Limit to 10 results
+    async searchProducts(query: string, limit: number = 10) {
+        return this.model
+            .find({
+                name: { $regex: query, $options: "i" }, // case-insensitive search
+            })
+            .limit(limit); // Limit to 10 results
     }
 }
 

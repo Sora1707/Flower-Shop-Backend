@@ -1,62 +1,25 @@
 import { Request, Response, NextFunction } from "express";
 
 import { productService } from "./";
+import { extractProductOptionsFromRequest, getFilters } from "./requestQuery";
+
+// API root: /api/product
 
 class ProductController {
+    // [GET] /
     async getAllProducts(req: Request, res: Response, next: NextFunction) {
         try {
-            const {
-                page = 1,
-                limit = 10,
-                category,
-                isAvailable,
-                minPrice,
-                maxPrice,
-                sortBy = "createdAt", // Default: Sort by created date
-                sortOrder = "desc", // Default: Sort descending
-            } = req.query;
+            const { filters, paginateOptions } = extractProductOptionsFromRequest(req);
 
-            const sortField = String(sortBy);
+            const result = await productService.paginate(filters, paginateOptions);
 
-            // Prepare filters for category, price range, and availability
-            const filters: any = {
-                category: category ? (category as string).split(",") : undefined, // phai them 'as string' de k bi loi string[]
-                isAvailable: isAvailable !== undefined ? Boolean(isAvailable) : undefined,
-                minPrice: minPrice ? Number(minPrice) : undefined,
-                maxPrice: maxPrice ? Number(maxPrice) : undefined,
-            };
-
-            // Prepare sorting criteria
-            const sort: any = {};
-            if (sortOrder === "asc") {
-                sort[sortField] = 1; // Ascending order
-            } else {
-                sort[sortField] = -1; // Descending order
-            }
-
-            // Call the service method to get filtered, sorted, and paginated products
-            const products = await productService.getProductsWithFilters(
-                Number(page),
-                Number(limit),
-                filters,
-                sort
-            );
-
-            res.status(200).json(products);
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }
     }
 
-    async createProduct(req: Request, res: Response, next: NextFunction) {
-        try {
-            const newProduct = await productService.create(req.body);
-            res.status(201).json(newProduct);
-        } catch (error) {
-            next(error);
-        }
-    }
-
+    // [GET] /:id
     async getProductById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -71,6 +34,51 @@ class ProductController {
         }
     }
 
+    // [GET] /search
+    async searchProducts(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { filters, paginateOptions } = extractProductOptionsFromRequest(req);
+
+            const result = await productService.paginate(filters, paginateOptions);
+
+            res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [GET] /autocomplete
+    async autoCompleteSearchQuery(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { query } = req.query;
+            const filters = getFilters({ query });
+            console.log(filters);
+            const paginateOptions = { page: 1, limit: 5 };
+
+            const result = await productService.paginate(filters, paginateOptions);
+
+            const productNames = [];
+            for (const product of result.docs) {
+                productNames.push(product.name);
+            }
+
+            res.status(200).json(productNames);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [POST] /
+    async createProduct(req: Request, res: Response, next: NextFunction) {
+        try {
+            const newProduct = await productService.create(req.body);
+            res.status(201).json(newProduct);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [PUT] /:id
     async updateProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -87,6 +95,7 @@ class ProductController {
         }
     }
 
+    // [DELETE] /:id
     async deleteProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -97,16 +106,6 @@ class ProductController {
             }
 
             res.status(200).json({ message: "Product deleted successfully." });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async searchProducts(req: Request, res: Response, next: NextFunction) {
-        try {
-            const query = req.query.query?.toString() || "";
-            const results = await productService.searchProducts(query);
-            res.status(200).json(results);
         } catch (error) {
             next(error);
         }
