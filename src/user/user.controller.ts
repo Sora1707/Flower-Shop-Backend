@@ -68,10 +68,7 @@ class UserController {
     // [POST] /login
     async login(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log(req.body);
             const { username, password } = req.body;
-
-            console.log(username, password);
 
             if (!username || !password) {
                 return res.status(400).json({ message: "Username and password are required" });
@@ -122,13 +119,17 @@ class UserController {
                 avatar,
             } = req.body;
 
-            if (!email || !password) {
-                return res.status(400).json({ message: "Email and password are required" });
+            if (!username || !password) {
+                return res.status(400).json({ message: "Username and password are required" });
             }
 
-            const existingUser = await userService.findOne({ email });
+            const selectedFieldsObject: SelectedFieldsObject<IUser> = {
+                ...DEFAULT_SELECTED_FIELDS_OBJECT,
+            };
+
+            const existingUser = await userService.findOne({ username }, selectedFieldsObject);
             if (existingUser) {
-                return res.status(400).json({ message: "Email already registered" });
+                return res.status(400).json({ message: "Username already registered" });
             }
 
             const newUserData = {

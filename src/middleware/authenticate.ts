@@ -17,7 +17,7 @@ function extractTokenFromHeader(req: Request): string {
 
 async function authenticate(req: Request, res: Response, next: NextFunction) {
     if (!validAuthenticationHeader(req)) {
-        return res.status(401).json({ error: "Not authorized, no token provided" });
+        return res.status(401).json({ error: "Not authenticated, no token provided" });
     }
 
     const token = extractTokenFromHeader(req);
@@ -36,7 +36,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
         (req as AuthRequest).user = user;
         next();
     } catch (error) {
-        res.status(401).json({ error: "Not authorized, invalid token" });
+        res.status(401).json({ error: "Not authenticated, invalid token" });
         next();
     }
 }

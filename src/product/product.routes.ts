@@ -5,9 +5,9 @@ import cartController from "@/cart/cart.controller";
 
 const router = express.Router();
 
-router.get("/", asyncHandler(productController.getAllProducts));
 router.get("/search", asyncHandler(productController.searchProducts)); // before getProductId
 router.get("/:id", asyncHandler(productController.getProductById));
+router.get("/", asyncHandler(productController.getAllProducts));
 
 // For tetsing only, need to be updated later
 router.post("/", asyncHandler(productController.createProduct));
