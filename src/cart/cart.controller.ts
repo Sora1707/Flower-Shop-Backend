@@ -7,7 +7,6 @@ import userService from "@/user/user.service";
 import { ICartItem, cartService } from "./";
 
 class CartController {
-    // Create a cart for a user
     async create(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params;
@@ -18,6 +17,9 @@ class CartController {
             const user = await userService.findById(userId);
             const existingCart = await cartService.findOne({ user: userId });
 
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
             let newCart;
             if (existingCart) {
                 newCart = existingCart;
@@ -58,7 +60,6 @@ class CartController {
                 cart = await cartService.create({ user: userId, items: [] });
             }
 
-            // Check if the item already exists
             const existingItem = cart.items.find(
                 (item: ICartItem) => item.product.toString() === productId
             );
@@ -138,24 +139,10 @@ class CartController {
     }
 
     // Delete cart
-    async deleteOneCart(req: Request, res: Response, next: NextFunction) {
+    async deleteCart(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params;
             const deletedCart = await cartService.deleteOne({ user: userId });
-            if (!deletedCart) {
-                res.status(404).json({ message: "Cart not found" });
-            }
-            res.status(200).json({ message: "Cart deleted successfully" });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Delete all carts of an user
-    async deleteAllCarts(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { userId } = req.params;
-            const deletedCart = await cartService.deleteAll();
             if (!deletedCart) {
                 res.status(404).json({ message: "Cart not found" });
             }
