@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import { productService } from "./";
-import { extractProductOptionsFromRequest } from "./requestQuery";
+import { extractProductOptionsFromRequest, getFilters } from "./requestQuery";
 
 // API root: /api/product
 
@@ -42,6 +42,27 @@ class ProductController {
             const result = await productService.paginate(filters, paginateOptions);
 
             res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [GET] /autocomplete
+    async autoCompleteSearchQuery(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { query } = req.query;
+            const filters = getFilters({ query });
+            console.log(filters);
+            const paginateOptions = { page: 1, limit: 5 };
+
+            const result = await productService.paginate(filters, paginateOptions);
+
+            const productNames = [];
+            for (const product of result.docs) {
+                productNames.push(product.name);
+            }
+
+            res.status(200).json(productNames);
         } catch (error) {
             next(error);
         }

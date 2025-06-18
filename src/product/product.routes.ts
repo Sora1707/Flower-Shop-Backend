@@ -5,6 +5,7 @@ import cartController from "@/cart/cart.controller";
 
 const router = express.Router();
 
+router.get("/autocomplete", asyncHandler(productController.autoCompleteSearchQuery));
 router.get("/search", asyncHandler(productController.searchProducts)); // before getProductId
 router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));

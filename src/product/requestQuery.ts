@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, PaginateOptions } from "mongoose";
 
 import { IProduct } from "./product.interface";
 
@@ -53,7 +53,7 @@ export function getFilters(filterQueries: any) {
 export function getPaginateOptions(paginateQueries: any) {
     const { page, limit, ...sortOptions } = paginateQueries;
 
-    const paginateOptions = {
+    const paginateOptions: PaginateOptions = {
         page: page ? Number(page) : 1,
         limit: limit ? Number(limit) : 10,
         sort: modifySortOptions(sortOptions),
