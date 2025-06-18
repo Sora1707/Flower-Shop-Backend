@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import cartService from "./cart.service";
-import { ICart } from "./cart.interface";
-import { ICartItem } from "./cartItem.interface";
-import { CartItemModel, CartItemSchema } from "./cartItem.schema";
-import productService from "@/product/product.service";
 import { Types } from "mongoose";
+
+import productService from "@/product/product.service";
 import userService from "@/user/user.service";
+
+import { ICartItem, cartService } from "./";
 
 class CartController {
     // Create a cart for a user
@@ -36,14 +35,13 @@ class CartController {
     // Get user's cart
     async getCart(req: Request, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.params
+            const { userId } = req.params;
             const cart = await cartService.findOne({ user: userId });
             if (!cart) {
                 return res.status(404).json({ message: "Cart not found" });
             }
 
             res.status(200).json(cart);
-
         } catch (error) {
             next(error);
         }
@@ -61,17 +59,19 @@ class CartController {
             }
 
             // Check if the item already exists
-            const existingItem = cart.items.find((item: ICartItem) => item.product.toString() === productId);
+            const existingItem = cart.items.find(
+                (item: ICartItem) => item.product.toString() === productId
+            );
 
             if (existingItem) {
                 existingItem.quantity += Number(quantity);
             } else {
                 const product = await productService.findById(productId);
-                const newItem = new CartItemModel({
+                const newItem = {
                     product: productId,
                     quantity,
-                    priceAtAddTime: product?.price
-                })
+                    priceAtAddTime: product?.price,
+                } as ICartItem;
 
                 cart.items.push(newItem);
             }
@@ -79,7 +79,7 @@ class CartController {
             await cart.save();
             res.status(200).json(cart);
         } catch (error) {
-        next(error);
+            next(error);
         }
     }
 
@@ -99,8 +99,10 @@ class CartController {
                 return res.status(404).json({ message: "Cart not found" });
             }
 
-            const existingItem = cart.items.find((item: ICartItem) => item.product.toString() === productId);
-            
+            const existingItem = cart.items.find(
+                (item: ICartItem) => item.product.toString() === productId
+            );
+
             if (!existingItem) {
                 return res.status(404).json({ message: "Item not found in the cart" });
             }
@@ -124,7 +126,9 @@ class CartController {
                 return res.status(404).json({ message: "Cart not found" });
             }
 
-            cart.items = cart.items.filter((item: ICartItem) => item.product.toString() !== productId);
+            cart.items = cart.items.filter(
+                (item: ICartItem) => item.product.toString() !== productId
+            );
             await cart.save();
 
             res.status(200).json({ message: "Item removed from cart" });
@@ -137,7 +141,7 @@ class CartController {
     async deleteOneCart(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params;
-            const deletedCart = await cartService.deleteOne({user: userId});
+            const deletedCart = await cartService.deleteOne({ user: userId });
             if (!deletedCart) {
                 res.status(404).json({ message: "Cart not found" });
             }

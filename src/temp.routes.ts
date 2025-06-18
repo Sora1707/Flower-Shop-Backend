@@ -7,6 +7,7 @@ import { randomInt } from "./utils/number";
 import cartService from "./cart/cart.service";
 import { Types } from "mongoose";
 import { ICart } from "./cart/cart.interface";
+import orderService from "./order/order.service";
 
 async function reloadSampleUsers() {
     try {
@@ -64,6 +65,21 @@ router.get("/reload_sample_data", async (req: Request, res: Response, next: Next
         await reloadSampleProducts();
         await createSampleCart();
         res.status(200).json({ message: "Successfully reloaded sample data." });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.get("/get_all", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const users = await userService.findAll();
+        const products = await productService.findAll();
+        const carts = await cartService.findAll();
+        const orders = await orderService.findAll();
+
+        res.status(200).json({
+            message: "Successfully retrieved all data.",
+        });
     } catch (error) {
         next(error);
     }
