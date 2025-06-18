@@ -1,7 +1,10 @@
 import express from "express";
-import asyncHandler from "@/middleware/asyncHandler";
+
 import productController from "./product.controller";
 import cartController from "@/cart/cart.controller";
+
+import asyncHandler from "@/middleware/asyncHandler";
+import authenticate from "@/middleware/authenticate";
 
 const router = express.Router();
 
@@ -11,12 +14,12 @@ router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 
 // For tetsing only, need to be updated later
-router.post("/", asyncHandler(productController.createProduct));
-router.post("/cart", asyncHandler(cartController.addOrUpdateItem));
+router.post("/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
+router.post("/", asyncHandler(authenticate), asyncHandler(productController.createProduct));
 
-router.put("/:id", asyncHandler(productController.updateProduct));
+router.put("/:id", asyncHandler(authenticate), asyncHandler(productController.updateProduct));
 
-router.delete("/:id", asyncHandler(productController.deleteProduct));
+router.delete("/:id", asyncHandler(authenticate), asyncHandler(productController.deleteProduct));
 
 // Handle adding item into cart
 
