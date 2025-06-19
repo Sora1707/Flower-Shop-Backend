@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 
-import { orderService } from "./";
+import { IOrderItem, orderService } from "./";
 import { cartService } from "@/cart";
 import { Types } from "mongoose";
 import { create } from "domain";
+import { ContactInfo, OrderStatus } from "./order.interface";
+import { userService } from "@/user";
 
 // API root: /api/order
 
@@ -35,7 +37,7 @@ class OrderController {
         }
     }
 
-    // [POST] /
+    // [POST] /:userId
     async createOrder(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params; 
@@ -45,19 +47,37 @@ class OrderController {
                 return res.status(404).json({ message: "Cart is empty" });
             }
 
-            const orderItems = cart.items.map(item => ({
-                product: item.product,
-                quantity: item.quantity,
-                priceAtAddTime: item.priceAtAddTime,
-                createdAt: item.createdAt,
-                updatedAt: item.updatedAt
-            }));
+            const user = await userService.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: "User not found." });
+            }
+            const contactInfo: ContactInfo = {
+                name: user.firstName + " " + user.lastName,    
+                email: user.email,
+                phone: user.phoneNumber,
+                address: "No address provided",
+            };
+
+            let totalPrice = 0;
+            const orderItems: IOrderItem[] = [];
+            for (const item of cart.items) {
+                const newItem = {
+                    product: item.product,
+                    quantity: item.quantity,
+                    priceAtAddTime: item.priceAtAddTime,
+                } as IOrderItem;
+                orderItems.push(newItem);
+
+                totalPrice += newItem.quantity * (newItem.priceAtAddTime || 0);
+            }
 
             const userObjectId = new Types.ObjectId(userId);
             const order = await orderService.create({
                 user: userObjectId,   
-                // items: orderItems,
-                // totalAmount:
+                items: orderItems,
+                contactInfo: contactInfo,
+                status: OrderStatus.PENDING,
+                totalPrice: totalPrice || 0,
             });
 
             cart.items = [];
