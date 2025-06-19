@@ -157,21 +157,19 @@ class UserController {
     // // Request Password Reset
     // async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
     //     try {
-    //         const { email } = req.body;
+    //         const { userId, role } = req.body;
 
-    //         if (!email) {
-    //             return res.status(400).json({ message: "Email is required" });
+    //         if (!userId || !role) {
+    //             return res.status(400).json({ message: "User ID and role are required" });
     //         }
 
-    //         const user = await UserModel.findOne({ email });
+    //         const user = await UserModel.findById(userId);
     //         if (!user) {
     //             return res.status(404).json({ message: "User not found" });
     //         }
 
-    //         // Generate reset token
-    //         const resetToken = crypto.randomBytes(32).toString("hex");
-    //         user.resetPasswordToken = resetToken;
-    //         user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour expiry
+    //         // Assuming roles are stored in a 'role' field in the user model
+    //         user.role = role;
     //         await user.save();
 
     //         // In a real app, send email with reset link (e.g., http://yourapp.com/reset?token=resetToken)
