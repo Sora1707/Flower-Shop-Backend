@@ -7,8 +7,7 @@ const router = Router();
 // Cart
 router.post("/users/:userId/carts", asyncHandler(cartController.create));
 router.get("/users/:userId/carts", asyncHandler(cartController.getCart)); 
-router.delete("/users/:userId/carts", asyncHandler(cartController.deleteOneCart)); 
-router.delete("/users/:userId/carts/all", asyncHandler(cartController.deleteAllCarts)); 
+router.delete("/users/:userId/carts", asyncHandler(cartController.deleteCart)); 
 
 // Cart Item
 router.put("/users/:userId/carts/items", asyncHandler(cartController.addOrUpdateItem)); 
