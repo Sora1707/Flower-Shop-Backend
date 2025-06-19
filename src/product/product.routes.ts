@@ -5,6 +5,7 @@ import cartController from "@/cart/cart.controller";
 
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
+import { isAdmin } from "@/middleware/authorize";
 
 const router = express.Router();
 
@@ -15,11 +16,26 @@ router.get("/", asyncHandler(productController.getAllProducts));
 
 // For tetsing only, need to be updated later
 router.post("/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
-router.post("/", asyncHandler(authenticate), asyncHandler(productController.createProduct));
+router.post(
+    "/",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.createProduct)
+);
 
-router.put("/:id", asyncHandler(authenticate), asyncHandler(productController.updateProduct));
+router.put(
+    "/:id",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.updateProduct)
+);
 
-router.delete("/:id", asyncHandler(authenticate), asyncHandler(productController.deleteProduct));
+router.delete(
+    "/:id",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.deleteProduct)
+);
 
 // Handle adding item into cart
 

@@ -2,12 +2,13 @@ import express from "express";
 import UserController from "@/user/user.controller";
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
+import { isAdmin } from "@/middleware/authorize";
 
 const router = express.Router();
 
 router.get("/me", asyncHandler(authenticate), asyncHandler(UserController.getCurrentUser)); // Assuming getCurrentUser is defined in UserController
 router.get("/:id", asyncHandler(UserController.getUserById));
-router.get("/", asyncHandler(UserController.getAllUsers));
+router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
 router.post("/login", asyncHandler(UserController.login));
 router.post("/register", asyncHandler(UserController.register));
@@ -16,6 +17,6 @@ router.post("/register", asyncHandler(UserController.register));
 
 router.put("/:id", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
 
-router.delete("/:id", asyncHandler(authenticate), asyncHandler(UserController.deleteUser));
+router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));
 
 export default router;
