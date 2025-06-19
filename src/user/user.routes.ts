@@ -11,7 +11,7 @@ router.get("/", asyncHandler(UserController.getAllUsers));
 
 router.post("/login", asyncHandler(UserController.login));
 router.post("/register", asyncHandler(UserController.register));
-router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
+router.post("/:id/request-password-reset", asyncHandler(UserController.requestPasswordReset));
 router.post("/reset-password", asyncHandler(UserController.resetPassword));
 
 router.put("/:id", asyncHandler(authenticate), asyncHandler(UserController.updateUser));

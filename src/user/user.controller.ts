@@ -203,16 +203,16 @@ class UserController {
         }
     }
 
-    // POST /request-password-reset
+    // POST /:id/request-password-reset
     async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
         try {
-            const { userId, role } = req.body;
+            const { id } = req.params;
 
-            if (!userId || !role) {
-                return res.status(400).json({ message: "User ID and role are required" });
+            if (!id) {
+                return res.status(400).json({ message: "User ID are required" });
             }
 
-            const user = await userService.findById(userId);
+            const user = await userService.findById(id);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
