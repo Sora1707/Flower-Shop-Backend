@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from "express";
+
 import crypto from "crypto"; //
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer"
+import bcrypt from "bcryptjs";
 
 import { SelectedFieldsObject } from "@/services/base.service";
 import { IUser, userService } from "./";
 import { AuthRequest } from "@/types/request";
+import mongoose from "mongoose";
 
 // API root: /api/user
 
@@ -12,6 +16,13 @@ const TOKEN_EXPIRATION = "1h"; // 1 hours
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
 };
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 class UserController {
     // [GET] /
@@ -154,65 +165,6 @@ class UserController {
         }
     }
 
-    // // Request Password Reset
-    // async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
-    //     try {
-    //         const { userId, role } = req.body;
-
-    //         if (!userId || !role) {
-    //             return res.status(400).json({ message: "User ID and role are required" });
-    //         }
-
-    //         const user = await UserModel.findById(userId);
-    //         if (!user) {
-    //             return res.status(404).json({ message: "User not found" });
-    //         }
-
-    //         // Assuming roles are stored in a 'role' field in the user model
-    //         user.role = role;
-    //         await user.save();
-
-    //         // In a real app, send email with reset link (e.g., http://yourapp.com/reset?token=resetToken)
-    //         // For now, return token in response for testing
-    //         res.status(200).json({
-    //             message: "Password reset requested. Check your email.",
-    //             resetToken, // Remove in production; send via email instead
-    //         });
-    //     } catch (error) {
-    //         next(error);
-    //     }
-    // }
-
-    // // Reset Password
-    // async resetPassword(req: Request, res: Response, next: NextFunction) {
-    //     try {
-    //         const { token, newPassword } = req.body;
-
-    //         if (!token || !newPassword) {
-    //             return res.status(400).json({ message: "Token and new password are required" });
-    //         }
-
-    //         const user = await UserModel.findOne({
-    //             resetPasswordToken: token,
-    //             resetPasswordExpires: { $gt: new Date() },
-    //         });
-
-    //         if (!user) {
-    //             return res.status(400).json({ message: "Invalid or expired token" });
-    //         }
-
-    //         // Update password (plain text for now)
-    //         user.password = newPassword;
-    //         user.resetPasswordToken = null;
-    //         user.resetPasswordExpires = null;
-    //         await user.save();
-
-    //         res.status(200).json({ message: "Password reset successful" });
-    //     } catch (error) {
-    //         next(error);
-    //     }
-    // }
-
     // [PUT] /:id
     async updateUser(req: Request, res: Response, next: NextFunction) {
         try {
@@ -246,6 +198,82 @@ class UserController {
             }
 
             res.status(200).json({ message: "User deleted successfully." });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // POST /:id/request-password-reset
+    async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params;
+
+            if (!id) {
+                return res.status(400).json({ message: "User ID are required" });
+            }
+
+            const user = await userService.findById(id);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            const resetToken = crypto.randomBytes(20).toString("hex");
+            const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+            user.resetPasswordToken = hashedToken;
+            user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+            await user.save();
+
+            const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
+            await transporter.sendMail({
+                to: user.email,
+                subject: "Password Reset Request",
+                html: `Click ${resetLink} to reset your password. This link expires in 1 hour.`,
+            });
+
+            res.status(200).json({
+                message: "Password reset requested. Check your email.",
+                // resetToken,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // POST /reset-password
+    async resetPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { token, newPassword } = req.body;
+
+            if (!token || !newPassword) {
+                return res.status(400).json({ message: "Token and new password are required" });
+            }
+
+            const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+            const user = await userService.findOne({
+                resetPasswordToken: hashedToken,
+                resetPasswordExpires: { $gt: new Date() },
+            });
+
+            if (!user) {
+                return res.status(400).json({ message: "Invalid or expired token" });
+            }
+
+            const session = await mongoose.startSession();
+            session.startTransaction();
+            try {
+                user.password = await bcrypt.hash(newPassword, 10);
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
+                await user.save({ session });
+                await session.commitTransaction();
+            } catch (error) {
+                await session.abortTransaction();
+                throw error;
+            } finally {
+                session.endSession();
+            }
+
+            res.status(200).json({ message: "Password reset successful" });
         } catch (error) {
             next(error);
         }

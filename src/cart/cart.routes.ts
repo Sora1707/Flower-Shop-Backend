@@ -5,6 +5,7 @@ import authenticate from "@/middleware/authenticate";
 
 const router = Router();
 
+
 router.get("/", asyncHandler(authenticate), asyncHandler(cartController.getCart)); 
 router.get("/all", asyncHandler(authenticate), asyncHandler(cartController.getAllCart)); // update isAdmin
 router.get("/:userId", asyncHandler(cartController.getCartByUserId)); // update isAdmin
