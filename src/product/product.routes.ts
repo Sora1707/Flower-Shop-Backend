@@ -14,7 +14,7 @@ router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 
 // For tetsing only, need to be updated later
-router.post("/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
+router.post("/:productId/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
 router.post("/", asyncHandler(authenticate), asyncHandler(productController.createProduct));
 
 router.put("/:id", asyncHandler(authenticate), asyncHandler(productController.updateProduct));
