@@ -67,7 +67,7 @@ export abstract class BaseService<T> {
         return result;
     }
 
-    public async deleteMany(filter: Partial<T> & { id: ObjectId }) {
+    public async deleteMany(filter: FilterQuery<T>) {
         const result = await this.model.deleteMany(filter);
         return result;
     }

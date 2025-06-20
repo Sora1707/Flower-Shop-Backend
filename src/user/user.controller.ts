@@ -62,7 +62,7 @@ class UserController {
 
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         const user = req.user;
-        return res.status(200).json(user);
+        return res.status(200).json(user?._id);
     }
 
     // [POST] /login
