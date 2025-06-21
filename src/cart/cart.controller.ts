@@ -9,28 +9,10 @@ import cartService from "./cart.service";
 import { ICartItem } from "./cartItem.interface";
 
 class CartController {
-    // [GET] /cart
-    async getCart(req: AuthRequest, res: Response, next: NextFunction) {
-        try {
-            const userId = req.user?._id;
-            const cart = await cartService.findOne({ user: userId });
-            if (!cart) {
-                return res.status(404).json({ message: "Cart not found" });
-            }
-
-            res.status(200).json(cart);
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // [GET] /cart/all
-    async getAllCart(req: Request, res: Response, next: NextFunction) {
+    async getAllCarts(req: Request, res: Response, next: NextFunction) {
         try {
             const carts = await cartService.findAll();
-            if (!carts || carts.length === 0) {
-                return res.status(404).json({ message: "Cart not found" });
-            }
 
             res.status(200).json(carts);
         } catch (error) {
@@ -44,6 +26,21 @@ class CartController {
             const { userId } = req.params;
             const cart = await cartService.findOne({ user: userId });
 
+            if (!cart) {
+                return res.status(404).json({ message: "Cart not found" });
+            }
+
+            res.status(200).json(cart);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [GET] /cart
+    async getUserCart(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?._id;
+            const cart = await cartService.findOne({ user: userId });
             if (!cart) {
                 return res.status(404).json({ message: "Cart not found" });
             }

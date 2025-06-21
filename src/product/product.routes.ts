@@ -11,16 +11,46 @@ import productController from "./product.controller";
 const router = express.Router();
 
 router.get("/autocomplete", asyncHandler(productController.autoCompleteSearchQuery));
-router.get("/search", asyncHandler(productController.searchProducts)); // before getProductId
+router.get("/search", asyncHandler(productController.searchProducts));
 router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 
-// For tetsing only, need to be updated later
-router.post("/:productId/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
-router.post("/", asyncHandler(authenticate), asyncHandler(productController.createProduct));
+router.post("/:id/review", asyncHandler(authenticate), asyncHandler(reviewController.createReview));
 
-router.put("/:id", asyncHandler(authenticate), asyncHandler(productController.updateProduct));
+router.post(
+    "/",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.createProduct)
+);
 
-router.delete("/:id", asyncHandler(authenticate), asyncHandler(productController.deleteProduct));
+router.put("/:id/review", asyncHandler(authenticate), asyncHandler(reviewController.updateReview));
+
+router.put(
+    "/:id",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.updateProduct)
+);
+
+router.patch(
+    "/:id/review",
+    asyncHandler(authenticate),
+    asyncHandler(reviewController.updateReview)
+);
+
+router.patch(
+    "/:id",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.updateProduct)
+);
+
+router.delete(
+    "/:id",
+    asyncHandler(authenticate),
+    isAdmin,
+    asyncHandler(productController.deleteProduct)
+);
 
 export default router;

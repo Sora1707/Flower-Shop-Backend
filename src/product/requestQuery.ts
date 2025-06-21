@@ -3,6 +3,9 @@ import { FilterQuery, PaginateOptions } from "mongoose";
 
 import { IProduct } from "./product.interface";
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+
 export function extractProductOptionsFromRequest(req: Request) {
     const { query, category, isAvailable, minPrice, maxPrice, ...paginateQueries } = req.query;
 
@@ -54,8 +57,8 @@ export function getPaginateOptions(paginateQueries: any) {
     const { page, limit, ...sortOptions } = paginateQueries;
 
     const paginateOptions: PaginateOptions = {
-        page: page ? Number(page) : 1,
-        limit: limit ? Number(limit) : 10,
+        page: page ? Number(page) : DEFAULT_PAGE,
+        limit: limit ? Number(limit) : DEFAULT_LIMIT,
         sort: modifySortOptions(sortOptions),
     };
 

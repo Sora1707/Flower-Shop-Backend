@@ -4,19 +4,14 @@ import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
 import { isAdmin } from "@/middleware/authorize";
 
-import OrderController from "./order.controller";
+import { orderController } from "@/order";
 
 const router = Router();
 
 // Order
-router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(OrderController.getAllOrders));
-router.get("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(OrderController.getOrderById));
-router.patch(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(OrderController.updateOrder)
-);
+router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(orderController.getAllOrders));
+router.get("/:id", asyncHandler(authenticate), asyncHandler(orderController.getOrderById));
+router.patch("/:id", asyncHandler(authenticate), asyncHandler(orderController.updateOrder));
 
 // router.delete(
 //     "/:userId",

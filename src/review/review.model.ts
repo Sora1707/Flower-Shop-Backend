@@ -13,7 +13,7 @@ const ReviewSchema = new Schema<IReview>(
     { timestamps: true }
 );
 
-ReviewSchema.index({ userId: 1, productId: 1 }, { unique: true });
+ReviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
 ReviewSchema.plugin(mongoosePaginate);
 

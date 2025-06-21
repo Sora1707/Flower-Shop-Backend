@@ -51,9 +51,9 @@ class ProductController {
     async autoCompleteSearchQuery(req: Request, res: Response, next: NextFunction) {
         try {
             const { query } = req.query;
+
             const filters = getFilters({ query });
-            console.log(filters);
-            const paginateOptions = { page: 1, limit: 5 };
+            const paginateOptions = { page: 1, limit: 10 };
 
             const result = await productService.paginate(filters, paginateOptions);
 

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import crypto from "crypto"; //
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer"
+import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 
 import { SelectedFieldsObject } from "@/services";
@@ -15,15 +15,18 @@ import userService from "./user.service";
 // API root: /api/user
 
 const TOKEN_EXPIRATION = "1h"; // 1 hours
+
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
+    role: 0,
 };
+
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    service: "Gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
 });
 
 class UserController {
@@ -75,7 +78,7 @@ class UserController {
 
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         const user = req.user;
-        return res.status(200).json(user?._id);
+        return res.status(200).json(user);
     }
 
     // [POST] /login
@@ -89,12 +92,12 @@ class UserController {
 
             const user = await userService.findOne({ username });
             if (!user) {
-                return res.status(401).json({ message: "Invalid email or password" });
+                return res.status(401).json({ message: "Invalid username or password" });
             }
 
             const isMatch = await user.matchPassword(password);
             if (!isMatch) {
-                return res.status(401).json({ message: "Invalid email or password" });
+                return res.status(401).json({ message: "Invalid username or password" });
             }
 
             // Generate JWT token (using a placeholder secret for now)
@@ -133,13 +136,21 @@ class UserController {
                 return res.status(400).json({ message: "Username and password are required" });
             }
 
-            const selectedFieldsObject: SelectedFieldsObject<IUser> = {
-                ...DEFAULT_SELECTED_FIELDS_OBJECT,
-            };
-
-            const existingUser = await userService.findOne({ username }, selectedFieldsObject);
+            const existingUser = await userService.findOne({ username });
             if (existingUser) {
                 return res.status(400).json({ message: "Username already registered" });
+            }
+
+            if (!firstName || !lastName) {
+                return res.status(400).json({ message: "First name and last name are required" });
+            }
+
+            if (!email) {
+                return res.status(400).json({ message: "Email is required" });
+            }
+
+            if (!phoneNumber) {
+                return res.status(400).json({ message: "Phone number is required" });
             }
 
             const newUserData = {
@@ -155,9 +166,11 @@ class UserController {
             };
             const newUser = await userService.create(newUserData);
 
+            const { password: _pw, role, ...safeUser } = newUser.toObject();
+
             res.status(201).json({
                 message: "User registered successfully",
-                user: newUser,
+                user: safeUser,
             });
         } catch (error) {
             next(error);
@@ -165,21 +178,19 @@ class UserController {
     }
 
     // [PUT] /:id
-    async updateUser(req: Request, res: Response, next: NextFunction) {
+    async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { id } = req.params;
-            const update = req.body;
-
-            // Prevent update 'password'
-            if ("password" in update) {
-                delete update.password;
+            if (!req.user) {
+                return res.status(401).json({ message: "Unauthorized" });
             }
 
-            const updatedUser = await userService.updateById(id, update);
+            const updatedUserData = req.body;
 
-            if (!updatedUser) {
-                return res.status(404).json({ message: "User not found." });
-            }
+            delete updatedUserData.password;
+            delete updatedUserData.role;
+
+            const updatedUser = await userService.updateById(req.user.id, updatedUserData);
+
             res.status(200).json({ message: "User updated", user: updatedUser });
         } catch (error) {
             next(error);

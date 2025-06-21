@@ -17,8 +17,7 @@ class OrderController {
         try {
             const orders = await orderService.findAll();
             res.status(200).json(orders);
-        }
-        catch (error) {
+        } catch (error) {
             next(error);
         }
     }
@@ -33,14 +32,13 @@ class OrderController {
                 return res.status(404).json({ message: "Order not found." });
             }
             res.status(200).json(order);
-        }
-        catch (error) {
+        } catch (error) {
             next(error);
         }
     }
 
     // [GET] /user/orders (in UserRoutes)
-    async getOrdersOfUser(req: AuthRequest, res: Response, next: NextFunction) {
+    async getUserOrders(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const userId = req.user?._id;
             // return res.status(400).json({ userId });
@@ -50,13 +48,38 @@ class OrderController {
                 return res.status(404).json({ message: "No orders found for this user." });
             }
             res.status(200).json(orders);
-        }
-        catch (error) {
+        } catch (error) {
             next(error);
         }
     }
 
-    // [POST] / 
+    async getUserOrderById(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return res.status(401).json({ message: "User not authenticated." });
+            }
+            const userId = req.user.id;
+            const orderId = req.params.orderId;
+
+            const order = await orderService.findById(orderId);
+
+            if (!order) {
+                return res.status(404).json({ message: "Order not found." });
+            }
+
+            if (order.user != userId) {
+                return res
+                    .status(403)
+                    .json({ message: "You are not authorized to view this order." });
+            }
+
+            res.status(200).json(order);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [POST] /
     async createOrder(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const authUser = req.user;
@@ -73,7 +96,7 @@ class OrderController {
                 return res.status(404).json({ message: "Cart is empty" });
             }
 
-            const selectedCartItems = cart.items.filter((item) =>
+            const selectedCartItems = cart.items.filter(item =>
                 selectedItems.includes(item.product.toString())
             );
 
@@ -90,7 +113,7 @@ class OrderController {
                 name: `${user.firstName} ${user.lastName}`,
                 email: user.email,
                 phone: user.phoneNumber,
-                address: address, 
+                address: address,
             };
 
             let totalPrice = 0;
@@ -115,9 +138,8 @@ class OrderController {
                 totalPrice,
             });
 
-            
             cart.items = cart.items.filter(
-                (item) => !selectedItems.includes(item.product.toString())
+                item => !selectedItems.includes(item.product.toString())
             );
             await cart.save();
 
@@ -127,6 +149,7 @@ class OrderController {
         }
     }
 
+    async updateOrder(req: Request, res: Response, next: NextFunction) {}
 
     // [DELETE] /:id
     async deleteOrderById(req: Request, res: Response, next: NextFunction) {
@@ -147,7 +170,7 @@ class OrderController {
     // [DELETE] /:userId
     async deleteOrderByUserId(req: Request, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.params; 
+            const { userId } = req.params;
             const deletedOrders = await orderService.deleteMany({ user: userId });
 
             if (deletedOrders.deletedCount === 0) {

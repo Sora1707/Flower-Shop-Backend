@@ -33,8 +33,8 @@ app.use(morgan("dev"));
 
 /* ROUTING */
 app.use("/api/user", userRouter);
-app.use("/api/product", productRouter);
-app.use("/api/cart", cartRouter);
+// app.use("/api/product", productRouter);
+// app.use("/api/cart", cartRouter);
 
 // temporary route for testing
 app.use("/api/temp", tempRouter);

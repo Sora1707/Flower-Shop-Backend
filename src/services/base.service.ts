@@ -44,7 +44,8 @@ export abstract class BaseService<T> {
     }
 
     public async checkExistsById(id: string) {
-        return await this.model.exists({ _id: id });
+        const exists = await this.model.exists({ _id: id });
+        return !!exists;
     }
 
     public async checkExists(filter: FilterQuery<T>) {
@@ -80,9 +81,20 @@ export abstract class BaseService<T> {
         return result;
     }
 
-    public async updateMany(filter: Partial<T> & { id: ObjectId }, input: Partial<T>) {
+    public async updateMany(filter: Partial<T> & { id?: ObjectId }, input: Partial<T>) {
         const result = await this.model.updateMany(filter, input, { new: true });
         return result;
+    }
+
+    public async updateOne(
+        filter: Partial<T> & { id?: ObjectId },
+        input: Partial<T>,
+        selectFieldsObject: SelectedFieldsObject<T> = {}
+    ) {
+        const item = await this.model
+            .findOneAndUpdate(filter, input, { new: true })
+            .select(selectFieldsObject as MongooseSelectedFieldsObject);
+        return item;
     }
 
     public async updateById(

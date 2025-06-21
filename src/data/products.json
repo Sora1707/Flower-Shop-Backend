@@ -7,7 +7,10 @@
         "images": ["red-rose-1.jpg", "red-rose-2.jpg"],
         "stock": 15,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-11T08:00:00Z",
         "updatedAt": "2025-06-11T08:00:00Z"
     },
@@ -19,7 +22,10 @@
         "images": ["tulips-yellow-1.jpg", "tulips-yellow-2.jpg"],
         "stock": 25,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-10T10:00:00Z",
         "updatedAt": "2025-06-10T10:00:00Z"
     },
@@ -31,7 +37,10 @@
         "images": ["lilies-white-1.jpg", "lilies-white-2.jpg"],
         "stock": 10,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-09T12:30:00Z",
         "updatedAt": "2025-06-09T12:30:00Z"
     },
@@ -43,7 +52,10 @@
         "images": ["peony-pink-1.jpg"],
         "stock": 8,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-08T11:00:00Z",
         "updatedAt": "2025-06-08T11:00:00Z"
     },
@@ -55,7 +67,10 @@
         "images": ["wildflower-1.jpg"],
         "stock": 20,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-07T14:00:00Z",
         "updatedAt": "2025-06-07T14:00:00Z"
     },
@@ -67,7 +82,10 @@
         "images": ["rose-lily-1.jpg"],
         "stock": 12,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-06T09:00:00Z",
         "updatedAt": "2025-06-06T09:00:00Z"
     },
@@ -79,7 +97,10 @@
         "images": ["hydrangea-1.jpg"],
         "stock": 9,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-05T08:30:00Z",
         "updatedAt": "2025-06-05T08:30:00Z"
     },
@@ -91,7 +112,10 @@
         "images": ["daisies-1.jpg"],
         "stock": 30,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-04T13:45:00Z",
         "updatedAt": "2025-06-04T13:45:00Z"
     },
@@ -103,7 +127,10 @@
         "images": ["lavender-1.jpg"],
         "stock": 14,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-03T11:15:00Z",
         "updatedAt": "2025-06-03T11:15:00Z"
     },
@@ -115,7 +142,10 @@
         "images": ["mixed-roses-1.jpg"],
         "stock": 18,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-02T10:10:00Z",
         "updatedAt": "2025-06-02T10:10:00Z"
     },
@@ -127,7 +157,10 @@
         "images": ["orchid-1.jpg"],
         "stock": 6,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-06-01T12:00:00Z",
         "updatedAt": "2025-06-01T12:00:00Z"
     },
@@ -139,7 +172,10 @@
         "images": ["wreath-rose-1.jpg"],
         "stock": 4,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-31T09:20:00Z",
         "updatedAt": "2025-05-31T09:20:00Z"
     },
@@ -151,7 +187,10 @@
         "images": ["rose-peach-1.jpg"],
         "stock": 13,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-30T07:30:00Z",
         "updatedAt": "2025-05-30T07:30:00Z"
     },
@@ -163,7 +202,10 @@
         "images": ["tulips-purple-1.jpg"],
         "stock": 16,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-29T15:00:00Z",
         "updatedAt": "2025-05-29T15:00:00Z"
     },
@@ -175,7 +217,10 @@
         "images": ["succulents-1.jpg"],
         "stock": 22,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-28T16:00:00Z",
         "updatedAt": "2025-05-28T16:00:00Z"
     },
@@ -187,7 +232,10 @@
         "images": ["spring-flowers-1.jpg"],
         "stock": 19,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-27T08:00:00Z",
         "updatedAt": "2025-05-27T08:00:00Z"
     },
@@ -199,7 +247,10 @@
         "images": ["garden-basket-1.jpg"],
         "stock": 7,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-26T10:00:00Z",
         "updatedAt": "2025-05-26T10:00:00Z"
     },
@@ -211,7 +262,10 @@
         "images": ["pink-mix-1.jpg"],
         "stock": 11,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-25T12:00:00Z",
         "updatedAt": "2025-05-25T12:00:00Z"
     },
@@ -223,7 +277,10 @@
         "images": ["sympathy-cross-1.jpg"],
         "stock": 3,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-24T14:00:00Z",
         "updatedAt": "2025-05-24T14:00:00Z"
     },
@@ -235,7 +292,10 @@
         "images": ["valentine-package-1.jpg"],
         "stock": 5,
         "isAvailable": true,
-        "ratings": [],
+        "rating": {
+            "count": 0,
+            "average": 0
+        },
         "createdAt": "2025-05-23T17:00:00Z",
         "updatedAt": "2025-05-23T17:00:00Z"
     }

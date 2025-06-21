@@ -1,10 +1,19 @@
 import { BaseService } from "@/services";
 
-import { IOrder } from "./order.interface";
+import { IOrder, OrderStatus } from "./order.interface";
 import { OrderModel } from "./order.model";
 
 class OrderService extends BaseService<IOrder> {
     protected model = OrderModel;
+
+    public async checkUserHasPurchasedProduct(userId: string, productId: string) {
+        const exists = await this.model.exists({
+            user: userId,
+            "items.product": productId,
+            status: OrderStatus.COMPLETED,
+        });
+        return !!exists;
+    }
 }
 
 const orderService = new OrderService();
