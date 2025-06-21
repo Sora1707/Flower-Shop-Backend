@@ -1,4 +1,4 @@
-import { BasePaginateService } from "@/services/base.service";
+import { BasePaginateService } from "@/services";
 import { IUser } from "./user.interface";
 import { UserModel } from "./user.model";
 

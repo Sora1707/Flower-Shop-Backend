@@ -5,10 +5,12 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer"
 import bcrypt from "bcryptjs";
 
-import { SelectedFieldsObject } from "@/services/base.service";
-import { IUser, userService } from "./";
+import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
 import mongoose from "mongoose";
+
+import { IUser } from "./user.interface";
+import userService from "./user.service";
 
 // API root: /api/user
 
@@ -106,9 +108,6 @@ class UserController {
 
             res.status(200).json({
                 token,
-                user: {
-                    id: user._id,
-                },
             });
         } catch (error) {
             next(error);

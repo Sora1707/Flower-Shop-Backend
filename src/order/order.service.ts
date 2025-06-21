@@ -1,4 +1,5 @@
-import { BaseService } from "@/services/base.service";
+import { BaseService } from "@/services";
+
 import { IOrder } from "./order.interface";
 import { OrderModel } from "./order.model";
 

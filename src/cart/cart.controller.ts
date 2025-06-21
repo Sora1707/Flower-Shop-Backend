@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { Types } from "mongoose";
 
+import { AuthRequest } from "@/types/request";
 import productService from "@/product/product.service";
 import userService from "@/user/user.service";
 
-import { ICartItem, cartService } from "./";
-import { AuthRequest } from "@/types/request";
+import cartService from "./cart.service";
+import { ICartItem } from "./cartItem.interface";
 
 class CartController {
     // [GET] /cart

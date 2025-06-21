@@ -1,10 +1,11 @@
 import { Router } from "express";
+
 import asyncHandler from "@/middleware/asyncHandler";
-import cartController from "./cart.controller";
 import authenticate from "@/middleware/authenticate";
 
-const router = Router();
+import cartController from "./cart.controller";
 
+const router = Router();
 
 router.get("/", asyncHandler(authenticate), asyncHandler(cartController.getCart)); 
 router.get("/all", asyncHandler(authenticate), asyncHandler(cartController.getAllCart)); // update isAdmin

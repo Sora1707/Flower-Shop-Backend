@@ -1,10 +1,12 @@
 import express from "express";
 
-import productController from "./product.controller";
-import cartController from "@/cart/cart.controller";
-
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
+import { isAdmin } from "@/middleware/authorize";
+
+import { reviewController } from "@/review";
+
+import productController from "./product.controller";
 
 const router = express.Router();
 
@@ -20,12 +22,5 @@ router.post("/", asyncHandler(authenticate), asyncHandler(productController.crea
 router.put("/:id", asyncHandler(authenticate), asyncHandler(productController.updateProduct));
 
 router.delete("/:id", asyncHandler(authenticate), asyncHandler(productController.deleteProduct));
-
-// Handle adding item into cart
-
-// For admin only
-// router.post("/", authenticate, authorize(["admin"]), productController.create);
-// router.put("/:id", authenticate, authorize(["admin"]), productController.updateProduct);
-// router.delete("/:id", authenticate, authorize(["admin"]), productController.deleteProduct);
 
 export default router;

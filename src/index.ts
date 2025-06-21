@@ -11,6 +11,7 @@ import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 import { connectDB } from "./config/db";
+import errorHandler from "./middleware/errorHandler";
 
 // Database connection
 connectDB();
@@ -41,6 +42,9 @@ app.use("/api/temp", tempRouter);
 app.get("/", (req: Request, res: Response) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
+// Error Handler Must be at last
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

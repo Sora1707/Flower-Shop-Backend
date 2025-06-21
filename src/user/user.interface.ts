@@ -12,7 +12,7 @@ export enum Role {
 }
 
 export interface IUser extends Document {
-    // role: Role;
+    role: Role;
     username: string;
     password: string;
     firstName: string;

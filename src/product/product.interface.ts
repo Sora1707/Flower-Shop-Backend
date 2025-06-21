@@ -1,5 +1,4 @@
 import { Document } from "mongoose";
-import { IRating } from "./rating.interface";
 
 export enum Category {
     Bouquet = "bouquet",
@@ -18,7 +17,10 @@ export interface IProduct extends Document {
     images: string[];
     stock: number;
     isAvailable: boolean;
-    ratings: IRating[];
+    rating: {
+        average: number;
+        count: number;
+    };
     createdAt: Date;
     updatedAt: Date;
 }

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import { productService } from "./";
+import productService from "./product.service";
 import { extractProductOptionsFromRequest, getFilters } from "./requestQuery";
 
 // API root: /api/product
