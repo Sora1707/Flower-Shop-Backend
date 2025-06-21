@@ -1,4 +1,5 @@
-import { BaseService } from "@/services/base.service";
+import { BaseService } from "@/services";
+
 import { ICart } from "./cart.interface";
 import { CartModel } from "./cart.model";
 

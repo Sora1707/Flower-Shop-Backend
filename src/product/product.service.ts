@@ -3,7 +3,7 @@ import { FilterQuery } from "mongoose";
 import { IProduct } from "./product.interface";
 import { ProductModel } from "./product.model";
 
-import { BasePaginateService } from "@/services/base.service";
+import { BasePaginateService } from "@/services";
 
 class ProductService extends BasePaginateService<IProduct> {
     protected model = ProductModel;

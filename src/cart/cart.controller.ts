@@ -4,7 +4,8 @@ import { Types } from "mongoose";
 import productService from "@/product/product.service";
 import userService from "@/user/user.service";
 
-import { ICartItem, cartService } from "./";
+import cartService from "./cart.service";
+import { ICartItem } from "./cartItem.interface";
 
 class CartController {
     // Create a cart for a user

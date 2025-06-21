@@ -1,11 +1,12 @@
 import express from "express";
 
-import productController from "./product.controller";
-import cartController from "@/cart/cart.controller";
-
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
 import { isAdmin } from "@/middleware/authorize";
+
+import { reviewController } from "@/review";
+
+import productController from "./product.controller";
 
 const router = express.Router();
 
@@ -14,8 +15,7 @@ router.get("/search", asyncHandler(productController.searchProducts)); // before
 router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 
-// For tetsing only, need to be updated later
-router.post("/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
+router.post("/:id/review", asyncHandler(authenticate), asyncHandler(reviewController.createReview));
 router.post(
     "/",
     asyncHandler(authenticate),

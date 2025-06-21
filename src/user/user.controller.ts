@@ -2,9 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import crypto from "crypto"; //
 import jwt from "jsonwebtoken";
 
-import { SelectedFieldsObject } from "@/services/base.service";
-import { IUser, userService } from "./";
+import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
+
+import { IUser } from "./user.interface";
+import userService from "./user.service";
 
 // API root: /api/user
 
@@ -95,9 +97,6 @@ class UserController {
 
             res.status(200).json({
                 token,
-                user: {
-                    id: user._id,
-                },
             });
         } catch (error) {
             next(error);

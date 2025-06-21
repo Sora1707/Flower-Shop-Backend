@@ -1,4 +1,5 @@
-import { Schema, model } from "mongoose";
+import { Schema } from "mongoose";
+
 import { IOrderItem } from "./orderItem.interface";
 
 export const OrderItemSchema = new Schema<IOrderItem>(

@@ -29,7 +29,6 @@ UserSchema.plugin(mongoosePaginate);
 
 // model.save()
 UserSchema.pre("save", async function (next) {
-    console.log("Pre-save hook triggered for UserModel");
     try {
         // If the password is not modified, skip hashing
         if (!this.isModified("password")) return next();

@@ -43,6 +43,14 @@ export abstract class BaseService<T> {
         return items;
     }
 
+    public async checkExistsById(id: string) {
+        return await this.model.exists({ _id: id });
+    }
+
+    public async checkExists(filter: FilterQuery<T>) {
+        return await this.model.exists(filter);
+    }
+
     public async create(input: Partial<T>) {
         const item = await this.model.create(input);
         return item;
