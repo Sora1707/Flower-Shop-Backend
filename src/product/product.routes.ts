@@ -7,6 +7,7 @@ import { isAdmin } from "@/middleware/authorize";
 import { reviewController } from "@/review";
 
 import productController from "./product.controller";
+import cartController from "@/cart/cart.controller";
 
 const router = express.Router();
 
