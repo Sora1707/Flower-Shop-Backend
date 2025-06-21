@@ -1,5 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-
+import mongoosePaginate from "mongoose-paginate-v2";
+import mongoose, { PaginateModel, Schema } from "mongoose";
 import { OrderItemSchema } from "./orderItem.schema";
 import { IOrder, OrderStatus, ContactInfo } from "./order.interface";
 
@@ -26,4 +26,6 @@ const OrderSchema = new Schema<IOrder>(
     { timestamps: true }
 );
 
-export const OrderModel = mongoose.model<IOrder>("Order", OrderSchema);
+OrderSchema.plugin(mongoosePaginate);
+
+export const OrderModel = mongoose.model<IOrder, PaginateModel<IOrder>>("Order", OrderSchema);

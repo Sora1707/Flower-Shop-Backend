@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.get("/autocomplete", asyncHandler(productController.autoCompleteSearchQuery));
 router.get("/search", asyncHandler(productController.searchProducts));
+router.get("/:id/review", asyncHandler(reviewController.getProductReviews));
 router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 

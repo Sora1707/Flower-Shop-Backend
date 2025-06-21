@@ -11,6 +11,7 @@ import mongoose from "mongoose";
 
 import { IUser } from "./user.interface";
 import userService from "./user.service";
+import { cartService } from "@/cart";
 
 // API root: /api/user
 
@@ -166,6 +167,8 @@ class UserController {
             };
             const newUser = await userService.create(newUserData);
 
+            await cartService.create({ user: newUser.id });
+
             const { password: _pw, role, ...safeUser } = newUser.toObject();
 
             res.status(201).json({
@@ -191,7 +194,13 @@ class UserController {
 
             const updatedUser = await userService.updateById(req.user.id, updatedUserData);
 
-            res.status(200).json({ message: "User updated", user: updatedUser });
+            if (!updatedUser) {
+                return res.status(404).json({ message: "User not found." });
+            }
+
+            const { password: _pw, role, ...safeUser } = updatedUser.toObject();
+
+            res.status(200).json({ message: "User updated", user: safeUser });
         } catch (error) {
             next(error);
         }
@@ -227,11 +236,9 @@ class UserController {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            const resetToken = jwt.sign(
-                { userId: user._id },
-                process.env.RESET_PASSWORD_SECRET!,
-                { expiresIn: '1h' }
-            );
+            const resetToken = jwt.sign({ userId: user._id }, process.env.RESET_PASSWORD_SECRET!, {
+                expiresIn: "1h",
+            });
 
             const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
             await transporter.sendMail({
@@ -247,7 +254,6 @@ class UserController {
             next(error);
         }
     }
-
 
     // POST /reset-password
     async resetPassword(req: Request, res: Response, next: NextFunction) {
@@ -287,7 +293,9 @@ class UserController {
             const user = req.user;
 
             if (!currentPassword || !newPassword) {
-                return res.status(400).json({ message: "Current password and new password are required" });
+                return res
+                    .status(400)
+                    .json({ message: "Current password and new password are required" });
             }
 
             if (!user) {

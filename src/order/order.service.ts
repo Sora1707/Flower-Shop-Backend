@@ -1,9 +1,9 @@
-import { BaseService } from "@/services";
+import { BasePaginateService } from "@/services";
 
 import { IOrder, OrderStatus } from "./order.interface";
 import { OrderModel } from "./order.model";
 
-class OrderService extends BaseService<IOrder> {
+class OrderService extends BasePaginateService<IOrder> {
     protected model = OrderModel;
 
     public async checkUserHasPurchasedProduct(userId: string, productId: string) {

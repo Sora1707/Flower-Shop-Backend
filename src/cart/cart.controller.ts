@@ -61,8 +61,7 @@ class CartController {
             let cart = await cartService.findOne({ user: userId });
 
             if (!cart) {
-                const ObjectId = new Types.ObjectId(userId as string);
-                cart = await cartService.create({ user: ObjectId, items: [] });
+                return res.status(404).json({ message: "Cart not found" });
             }
 
             const existingItem = cart.items.find(

@@ -2,16 +2,20 @@ import * as dotenv from "./dotenv";
 dotenv.config();
 
 import express, { Application, Request, Response } from "express";
-import userRouter from "@/user/user.routes";
-import productRouter from "@/product/product.routes";
-import cartRouter from "@/cart/cart.routes";
-import tempRouter from "./temp.routes";
 import bodyParser from "body-parser";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
+
 import { connectDB } from "./config/db";
 import errorHandler from "./middleware/errorHandler";
+
+import userRouter from "@/user/user.routes";
+import productRouter from "@/product/product.routes";
+import cartRouter from "@/cart/cart.routes";
+import orderRouter from "@/order/order.routes";
+import reviewRouter from "@/review/review.routes";
+import tempRouter from "./temp.routes";
 
 // Database connection
 connectDB();
@@ -33,8 +37,10 @@ app.use(morgan("dev"));
 
 /* ROUTING */
 app.use("/api/user", userRouter);
-// app.use("/api/product", productRouter);
-// app.use("/api/cart", cartRouter);
+app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/order", orderRouter);
+app.use("/api/review", reviewRouter);
 
 // temporary route for testing
 app.use("/api/temp", tempRouter);

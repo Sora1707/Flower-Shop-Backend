@@ -40,9 +40,17 @@ class OrderController {
     // [GET] /user/orders (in UserRoutes)
     async getUserOrders(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const userId = req.user?._id;
-            // return res.status(400).json({ userId });
-            const orders = await orderService.findMany({ user: userId });
+            if (!req.user) {
+                return res.status(401).json({ message: "User not authenticated." });
+            }
+
+            const userId = req.user.id;
+            const { page, limit } = req.query;
+            const paginateOptions = {
+                page: page ? parseInt(page as string, 10) : 1,
+                limit: limit ? parseInt(limit as string, 10) : 10,
+            };
+            const orders = await orderService.paginate({ user: userId }, paginateOptions);
 
             if (!orders || orders.length === 0) {
                 return res.status(404).json({ message: "No orders found for this user." });

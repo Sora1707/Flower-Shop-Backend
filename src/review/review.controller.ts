@@ -147,7 +147,12 @@ class ReviewController {
                 return res.status(401).json({ message: "User not authenticated." });
             }
             const userId = req.user.id;
-            const reviews = await reviewService.findMany({ user: userId });
+            const { page, limit } = req.query;
+            const paginateOptions = {
+                page: page ? parseInt(page as string, 10) : 1,
+                limit: limit ? parseInt(limit as string, 10) : 10,
+            };
+            const reviews = await reviewService.paginate({ user: userId }, paginateOptions);
             res.status(200).json(reviews);
         } catch (error) {
             next(error);
@@ -161,7 +166,27 @@ class ReviewController {
             }
             const userId = req.user.id;
             const productId = req.params.productId;
-            const reviews = await reviewService.findOne({ user: userId, product: productId });
+            const review = await reviewService.findOne({ user: userId, product: productId });
+
+            if (!review) {
+                return res.status(404).json({ message: "User has not reviewed this product yet." });
+            }
+
+            res.status(200).json(review);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getProductReviews(req: Request, res: Response, next: NextFunction) {
+        try {
+            const productId = req.params.id;
+            const { page, limit } = req.query;
+            const paginateOptions = {
+                page: page ? parseInt(page as string, 10) : 1,
+                limit: limit ? parseInt(limit as string, 10) : 10,
+            };
+            const reviews = await reviewService.paginate({ product: productId }, paginateOptions);
             res.status(200).json(reviews);
         } catch (error) {
             next(error);

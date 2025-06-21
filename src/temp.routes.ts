@@ -15,7 +15,7 @@ async function reloadSampleUsers() {
     try {
         const users = require("@/data/users.json");
         await userService.deleteAll();
-        const newUsers = await userService.createMany(users);
+        await userService.createMany(users);
     } catch (error) {
         console.error("Error reloading sample users:", error);
     }
@@ -25,7 +25,7 @@ async function reloadSampleProducts() {
     try {
         const products = require("@/data/products.json");
         await productService.deleteAll();
-        const newProducts = await productService.createMany(products);
+        await productService.createMany(products);
     } catch (error) {
         console.error("Error reloading sample products:", error);
     }
@@ -38,13 +38,7 @@ async function createSampleCart() {
         const products = await productService.findAll();
         const slicedProducts = products.slice(0, 3);
 
-        if (!user) {
-            console.error("No user found to create a sample cart for.");
-            return;
-        }
-
         const cartData = {
-            user: user.id as Types.ObjectId,
             items: slicedProducts.map(product => {
                 const quantity = randomInt(1, 3);
                 return {
@@ -54,7 +48,11 @@ async function createSampleCart() {
                 };
             }),
         };
-        const newCart = await cartService.create(cartData as Partial<ICart>);
+
+        await cartService.updateOne(
+            { user: user!.id as Types.ObjectId },
+            cartData as Partial<ICart>
+        );
     } catch (error) {
         console.error("Error creating sample cart:", error);
     }
@@ -109,6 +107,7 @@ router.post("/reload_sample_data", async (req: Request, res: Response, next: Nex
         await reloadSampleProducts();
         await createSampleCart();
         await createSampleOrder();
+        await reviewService.deleteAll();
         res.status(200).json({ message: "Successfully reloaded sample data." });
     } catch (error) {
         next(error);
@@ -121,8 +120,6 @@ router.get("/get_all", async (req: Request, res: Response, next: NextFunction) =
         const products = await productService.findAll();
         const carts = await cartService.findAll();
         const orders = await orderService.findAll();
-        await ReviewModel.collection.dropIndex("userId_1_productId_1");
-        await reviewService.deleteAll();
 
         res.status(200).json({
             message: "Successfully retrieved all data.",

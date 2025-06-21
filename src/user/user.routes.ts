@@ -37,7 +37,6 @@ router.post(
     asyncHandler(UserController.changePassword)
 );
 
-router.put("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
 router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
 
 router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));
