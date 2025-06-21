@@ -17,8 +17,9 @@ router.post("/login", asyncHandler(UserController.login));
 router.post("/register", asyncHandler(UserController.register));
 router.post("/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
 router.post("/checkout", asyncHandler(authenticate), asyncHandler(OrderController.createOrder)); 
-// router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
-// router.post("/reset-password", asyncHandler(UserController.resetPassword));
+router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
+router.post("/reset-password", asyncHandler(UserController.resetPassword));
+router.post("/change-password", asyncHandler(authenticate), asyncHandler(UserController.changePassword));
 
 router.put("/:id", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
 

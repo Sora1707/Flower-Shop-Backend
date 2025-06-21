@@ -202,41 +202,41 @@ class UserController {
         }
     }
 
-    // POST /:id/request-password-reset
+    // POST /request-password-reset
     async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id } = req.params;
+            const { email } = req.body;
 
-            if (!id) {
-                return res.status(400).json({ message: "User ID are required" });
+            if (!email) {
+                return res.status(400).json({ message: "Email is required" });
             }
 
-            const user = await userService.findById(id);
+            const user = await userService.findOne({ email });
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            const resetToken = crypto.randomBytes(20).toString("hex");
-            const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-            user.resetPasswordToken = hashedToken;
-            user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
-            await user.save();
+            const resetToken = jwt.sign(
+                { userId: user._id },
+                process.env.RESET_PASSWORD_SECRET!,
+                { expiresIn: '1h' }
+            );
 
             const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
             await transporter.sendMail({
-                to: user.email,
+                to: email,
                 subject: "Password Reset Request",
-                html: `Click ${resetLink} to reset your password. This link expires in 1 hour.`,
+                html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
             });
 
             res.status(200).json({
                 message: "Password reset requested. Check your email.",
-                // resetToken,
             });
         } catch (error) {
             next(error);
         }
     }
+
 
     // POST /reset-password
     async resetPassword(req: Request, res: Response, next: NextFunction) {
@@ -247,34 +247,53 @@ class UserController {
                 return res.status(400).json({ message: "Token and new password are required" });
             }
 
-            const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-            const user = await userService.findOne({
-                resetPasswordToken: hashedToken,
-                resetPasswordExpires: { $gt: new Date() },
-            });
-
-            if (!user) {
+            let payload;
+            try {
+                payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET!);
+            } catch (err) {
                 return res.status(400).json({ message: "Invalid or expired token" });
             }
 
-            const session = await mongoose.startSession();
-            session.startTransaction();
-            try {
-                user.password = await bcrypt.hash(newPassword, 10);
-                user.resetPasswordToken = undefined;
-                user.resetPasswordExpires = undefined;
-                await user.save({ session });
-                await session.commitTransaction();
-            } catch (error) {
-                await session.abortTransaction();
-                throw error;
-            } finally {
-                session.endSession();
+            const { userId } = payload as { userId: string };
+            const user = await userService.findById(userId);
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
             }
+
+            user.password = await bcrypt.hash(newPassword, 10);
+            await user.save();
 
             res.status(200).json({ message: "Password reset successful" });
         } catch (error) {
             next(error);
+        }
+    }
+
+    // [PUT] /change-password
+    async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const { currentPassword, newPassword } = req.body;
+            const user = req.user;
+
+            if (!currentPassword || !newPassword) {
+                return res.status(400).json({ message: "Current password and new password are required" });
+            }
+
+            if (!user) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
+            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ message: "Current password is incorrect" });
+            }
+
+            user.password = await bcrypt.hash(newPassword, 10);
+            await user.save();
+
+            res.status(200).json({ message: "Password changed successfully" });
+        } catch (err) {
+            next(err);
         }
     }
 }
