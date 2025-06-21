@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Request, Response, NextFunction } from "express";
 
 import crypto from "crypto"; //
@@ -5,15 +6,12 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 
+import { cartService } from "@/cart";
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
-import mongoose from "mongoose";
 
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { cartService } from "@/cart";
-
-// API root: /api/user
 
 const TOKEN_EXPIRATION = "1h"; // 1 hours
 
@@ -31,7 +29,7 @@ const transporter = nodemailer.createTransport({
 });
 
 class UserController {
-    // [GET] /
+    // [GET] /user/
     async getAllUsers(req: Request, res: Response, next: NextFunction) {
         try {
             const { page, limit } = req.query;
@@ -56,7 +54,7 @@ class UserController {
         }
     }
 
-    // [GET] /:id
+    // [GET] /user/:id
     async getUserById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -77,12 +75,13 @@ class UserController {
         }
     }
 
+    // [GET] /user/me
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         const user = req.user;
         return res.status(200).json(user);
     }
 
-    // [POST] /login
+    // [POST] /user/login
     async login(req: Request, res: Response, next: NextFunction) {
         try {
             const { username, password } = req.body;
@@ -118,7 +117,7 @@ class UserController {
         }
     }
 
-    // [POST] /register
+    // [POST] /user/register
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const {
@@ -180,7 +179,7 @@ class UserController {
         }
     }
 
-    // [PUT] /:id
+    // [PUT] /user/:id
     async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -206,7 +205,7 @@ class UserController {
         }
     }
 
-    // [DELETE] /:id
+    // [DELETE] /user/:id
     async deleteUser(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -222,7 +221,7 @@ class UserController {
         }
     }
 
-    // POST /request-password-reset
+    // POST user/request-password-reset
     async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
         try {
             const { email } = req.body;
@@ -255,7 +254,7 @@ class UserController {
         }
     }
 
-    // POST /reset-password
+    // POST user/reset-password
     async resetPassword(req: Request, res: Response, next: NextFunction) {
         try {
             const { token, newPassword } = req.body;
@@ -286,7 +285,7 @@ class UserController {
         }
     }
 
-    // [PUT] /change-password
+    // [PUT] user/change-password
     async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const { currentPassword, newPassword } = req.body;

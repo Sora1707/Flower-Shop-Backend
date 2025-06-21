@@ -3,10 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import productService from "./product.service";
 import { extractProductOptionsFromRequest, getFilters } from "./requestQuery";
 
-// API root: /api/product
-
 class ProductController {
-    // [GET] /
+    // [GET] /product/
     async getAllProducts(req: Request, res: Response, next: NextFunction) {
         try {
             const { filters, paginateOptions } = extractProductOptionsFromRequest(req);
@@ -19,7 +17,7 @@ class ProductController {
         }
     }
 
-    // [GET] /:id
+    // [GET] /product/:id
     async getProductById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -34,7 +32,7 @@ class ProductController {
         }
     }
 
-    // [GET] /search
+    // [GET] /product/search
     async searchProducts(req: Request, res: Response, next: NextFunction) {
         try {
             const { filters, paginateOptions } = extractProductOptionsFromRequest(req);
@@ -47,7 +45,7 @@ class ProductController {
         }
     }
 
-    // [GET] /autocomplete
+    // [GET] /product/autocomplete
     async autoCompleteSearchQuery(req: Request, res: Response, next: NextFunction) {
         try {
             const { query } = req.query;
@@ -68,7 +66,7 @@ class ProductController {
         }
     }
 
-    // [POST] /
+    // [POST] /product
     async createProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const newProduct = await productService.create(req.body);
@@ -78,7 +76,7 @@ class ProductController {
         }
     }
 
-    // [PUT] /:id
+    // [PUT] /product/:id
     async updateProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -95,7 +93,7 @@ class ProductController {
         }
     }
 
-    // [DELETE] /:id
+    // [DELETE] /product/:id
     async deleteProduct(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;

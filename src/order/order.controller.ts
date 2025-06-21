@@ -7,12 +7,9 @@ import { create } from "domain";
 import { ContactInfo, OrderStatus } from "./order.interface";
 import { userService } from "@/user";
 import { AuthRequest } from "@/types/request";
-import { SelectedFieldsObject } from "@/services/base.service";
-
-// API root: /api/order
 
 class OrderController {
-    // [GET] /
+    // [GET] /order
     async getAllOrders(req: Request, res: Response, next: NextFunction) {
         try {
             const orders = await orderService.findAll();
@@ -22,7 +19,7 @@ class OrderController {
         }
     }
 
-    // [GET] /:id
+    // [GET] /order/:id
     async getOrderById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -37,7 +34,7 @@ class OrderController {
         }
     }
 
-    // [GET] /user/orders (in UserRoutes)
+    // [GET] /user/order
     async getUserOrders(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -61,6 +58,7 @@ class OrderController {
         }
     }
 
+    // [GET] /user/order/:orderId
     async getUserOrderById(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -87,7 +85,7 @@ class OrderController {
         }
     }
 
-    // [POST] /
+    // [POST] /order/
     async createOrder(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const authUser = req.user;
@@ -159,7 +157,7 @@ class OrderController {
 
     async updateOrder(req: Request, res: Response, next: NextFunction) {}
 
-    // [DELETE] /:id
+    // [DELETE] /order/:id
     async deleteOrderById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
@@ -175,7 +173,7 @@ class OrderController {
         }
     }
 
-    // [DELETE] /:userId
+    // [DELETE] /order/:userId
     async deleteOrderByUserId(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params;
@@ -191,7 +189,7 @@ class OrderController {
         }
     }
 
-    // [DELETE] /
+    // [DELETE] /order/
     async deleteAllOrders(req: Request, res: Response, next: NextFunction) {
         try {
             const deletedOrders = await orderService.deleteAll();

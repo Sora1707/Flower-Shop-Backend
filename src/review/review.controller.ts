@@ -8,6 +8,7 @@ import { orderService } from "@/order";
 import { productService } from "@/product";
 
 class ReviewController {
+    // [GET] /review/
     async getAllReviews(req: Request, res: Response, next: NextFunction) {
         try {
             const reviews = await reviewService.findAll();
@@ -17,7 +18,7 @@ class ReviewController {
         }
     }
 
-    // POST /products/:id/review
+    // [POST] /products/:id/review
     async createReview(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -78,6 +79,7 @@ class ReviewController {
         }
     }
 
+    // [PUT, PATCH] /products/:id/review
     async updateReview(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -141,6 +143,7 @@ class ReviewController {
         }
     }
 
+    // [GET] /user/review
     async getUserReviews(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -159,6 +162,7 @@ class ReviewController {
         }
     }
 
+    // [GET] /user/review/:productId
     async getUserReviewForProduct(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
@@ -178,6 +182,7 @@ class ReviewController {
         }
     }
 
+    // [GET] /products/:id/reviews
     async getProductReviews(req: Request, res: Response, next: NextFunction) {
         try {
             const productId = req.params.id;
