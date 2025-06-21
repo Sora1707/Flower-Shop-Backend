@@ -28,8 +28,14 @@ router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController
 
 router.post("/login", asyncHandler(UserController.login));
 router.post("/register", asyncHandler(UserController.register));
-// router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
-// router.post("/reset-password", asyncHandler(UserController.resetPassword));
+
+router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
+router.post("/reset-password", asyncHandler(UserController.resetPassword));
+router.post(
+    "/change-password",
+    asyncHandler(authenticate),
+    asyncHandler(UserController.changePassword)
+);
 
 router.put("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
 router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
