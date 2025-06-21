@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Types } from "mongoose";
 
+import { AuthRequest } from "@/types/request";
 import productService from "@/product/product.service";
 import userService from "@/user/user.service";
 
@@ -8,35 +9,10 @@ import cartService from "./cart.service";
 import { ICartItem } from "./cartItem.interface";
 
 class CartController {
-    // Create a cart for a user
-    async create(req: Request, res: Response, next: NextFunction) {
+    // [GET] /cart
+    async getCart(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.params;
-            if (!userId) {
-                return res.status(400).json({ message: "User ID is required" });
-            }
-
-            const user = await userService.findById(userId);
-            const existingCart = await cartService.findOne({ user: userId });
-
-            let newCart;
-            if (existingCart) {
-                newCart = existingCart;
-            } else {
-                const userObjectId = new Types.ObjectId(userId);
-                newCart = await cartService.create({ user: userObjectId, items: [] });
-            }
-
-            res.status(201).json(newCart);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // Get user's cart
-    async getCart(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { userId } = req.params;
+            const userId = req.user?._id;
             const cart = await cartService.findOne({ user: userId });
             if (!cart) {
                 return res.status(404).json({ message: "Cart not found" });
@@ -48,18 +24,50 @@ class CartController {
         }
     }
 
-    // Add or update cart item
-    async addOrUpdateItem(req: Request, res: Response, next: NextFunction) {
+    // [GET] /cart/all
+    async getAllCart(req: Request, res: Response, next: NextFunction) {
         try {
-            const { userId, productId, quantity } = req.body;
+            const carts = await cartService.findAll();
+            if (!carts || carts.length === 0) {
+                return res.status(404).json({ message: "Cart not found" });
+            }
+
+            res.status(200).json(carts);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [GET] /cart/:userId
+    async getCartByUserId(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req.params;
+            const cart = await cartService.findOne({ user: userId });
+
+            if (!cart) {
+                return res.status(404).json({ message: "Cart not found" });
+            }
+
+            res.status(200).json(cart);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [POST] /:productId/cart (in ProductRoutes)
+    async addOrUpdateItem(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const { productId } = req.params;
+            const userId = req.user?._id;
+            const { quantity } = req.body;
 
             let cart = await cartService.findOne({ user: userId });
 
             if (!cart) {
-                cart = await cartService.create({ user: userId, items: [] });
+                const ObjectId = new Types.ObjectId(userId as string);
+                cart = await cartService.create({ user: ObjectId, items: [] });
             }
 
-            // Check if the item already exists
             const existingItem = cart.items.find(
                 (item: ICartItem) => item.product.toString() === productId
             );
@@ -69,7 +77,7 @@ class CartController {
             } else {
                 const product = await productService.findById(productId);
                 const newItem = {
-                    product: productId,
+                    product: product?._id,
                     quantity,
                     priceAtAddTime: product?.price,
                 } as ICartItem;
@@ -84,11 +92,11 @@ class CartController {
         }
     }
 
-    // Update quantity of a cart item
-    async updateItemQuantity(req: Request, res: Response, next: NextFunction) {
+    // [PUT] /cart
+    async updateItemQuantity(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { userId, productId } = req.params;
-            const { quantity } = req.body;
+            const userId = req.user?._id;
+            const { productId, quantity } = req.body;
 
             if (!quantity || quantity < 1) {
                 return res.status(400).json({ message: "Invalid quantity value" });
@@ -117,10 +125,11 @@ class CartController {
         }
     }
 
-    // Remove item from cart
-    async removeItem(req: Request, res: Response, next: NextFunction) {
+    // [DELETE] /cart/:productId
+    async removeItem(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { userId, productId } = req.params;
+            const userId = req.user?._id;
+            const { productId } = req.params;
             const cart = await cartService.findOne({ user: userId });
 
             if (!cart) {
@@ -138,25 +147,25 @@ class CartController {
         }
     }
 
-    // Delete cart
-    async deleteOneCart(req: Request, res: Response, next: NextFunction) {
+    // [DELETE] /cart
+    async clearCart(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { userId } = req.params;
-            const deletedCart = await cartService.deleteOne({ user: userId });
-            if (!deletedCart) {
+            const userId = req.user?._id;
+            const clearedCart = await cartService.deleteOne({ user: userId });
+            if (!clearedCart) {
                 res.status(404).json({ message: "Cart not found" });
             }
-            res.status(200).json({ message: "Cart deleted successfully" });
+            res.status(200).json({ message: "Cart cleared successfully" });
         } catch (error) {
             next(error);
         }
     }
 
-    // Delete all carts of an user
-    async deleteAllCarts(req: Request, res: Response, next: NextFunction) {
+    // [DELETE] /cart/:userId
+    async deleteCartByUserId(req: Request, res: Response, next: NextFunction) {
         try {
             const { userId } = req.params;
-            const deletedCart = await cartService.deleteAll();
+            const deletedCart = await cartService.deleteOne({ user: userId });
             if (!deletedCart) {
                 res.status(404).json({ message: "Cart not found" });
             }

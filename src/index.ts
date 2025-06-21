@@ -34,13 +34,13 @@ app.use(morgan("dev"));
 /* ROUTING */
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
-app.use("/api", cartRouter);
+app.use("/api/cart", cartRouter);
 
 // temporary route for testing
 app.use("/api/temp", tempRouter);
 
 app.get("/", (req: Request, res: Response) => {
-    res.send("Welcome to our Flower Shop!");
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // Error Handler Must be at last

@@ -15,33 +15,12 @@ router.get("/search", asyncHandler(productController.searchProducts)); // before
 router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 
-router.post("/:id/review", asyncHandler(authenticate), asyncHandler(reviewController.createReview));
-router.post(
-    "/",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(productController.createProduct)
-);
+// For tetsing only, need to be updated later
+router.post("/:productId/cart", asyncHandler(authenticate), asyncHandler(cartController.addOrUpdateItem));
+router.post("/", asyncHandler(authenticate), asyncHandler(productController.createProduct));
 
-router.put(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(productController.updateProduct)
-);
+router.put("/:id", asyncHandler(authenticate), asyncHandler(productController.updateProduct));
 
-router.delete(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(productController.deleteProduct)
-);
-
-// Handle adding item into cart
-
-// For admin only
-// router.post("/", authenticate, authorize(["admin"]), productController.create);
-// router.put("/:id", authenticate, authorize(["admin"]), productController.updateProduct);
-// router.delete("/:id", authenticate, authorize(["admin"]), productController.deleteProduct);
+router.delete("/:id", asyncHandler(authenticate), asyncHandler(productController.deleteProduct));
 
 export default router;

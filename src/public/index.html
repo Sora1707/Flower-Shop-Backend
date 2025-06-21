@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Buttons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        button {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Test API Endpoints</h1>
+
+    <!-- User Routes Section -->
+    <div class="section">
+        <h2>User Routes</h2>
+        <button onclick="handleRequest('POST', '/api/user/register')">POST /api/user/register</button>
+        <button onclick="handleRequest('POST', '/api/user/login')">POST /api/user/login</button>
+        <button onclick="handleRequest('POST', '/api/user/request-password-reset')">POST /api/user/request-password-reset</button>
+        <button onclick="handleRequest('POST', '/api/user/reset-password')">POST /api/user/reset-password</button>
+        <button onclick="handleRequest('GET', '/api/user/1')">GET /api/user/:id</button>
+        <button onclick="handleRequest('PUT', '/api/user/1')">PUT /api/user/:id</button>
+        <button onclick="handleRequest('DELETE', '/api/user/1')">DELETE /api/user/:id</button>
+        <button onclick="handleRequest('GET', '/api/user')">GET /api/user</button>
+    </div>
+
+    <!-- Product Routes Section -->
+    <div class="section">
+        <h2>Product Routes</h2>
+        <button onclick="handleRequest('GET', '/api/product')">GET /api/product</button>
+        <button onclick="handleRequest('GET', '/api/product/search')">GET /api/product/search</button>
+        <button onclick="handleRequest('GET', '/api/product/1')">GET /api/product/:id</button>
+        <button onclick="handleRequest('POST', '/api/product')">POST /api/product</button>
+        <button onclick="handleRequest('PUT', '/api/product/1')">PUT /api/product/:id</button>
+        <button onclick="handleRequest('DELETE', '/api/product/1')">DELETE /api/product/:id</button>
+        <button onclick="handleRequest('POST', '/api/product/cart')">POST /api/product/cart</button>
+    </div>
+
+    <!-- Cart Routes Section -->
+    <div class="section">
+        <h2>Cart Routes</h2>
+        <button onclick="handleRequest('POST', '/api/cart/users/1/carts')">POST /api/cart/users/:userId/carts</button>
+        <button onclick="handleRequest('GET', '/api/cart/users/1/carts')">GET /api/cart/users/:userId/carts</button>
+        <button onclick="handleRequest('DELETE', '/api/cart/users/1/carts')">DELETE /api/cart/users/:userId/carts</button>
+        <button onclick="handleRequest('DELETE', '/api/cart/users/1/carts/all')">DELETE /api/cart/users/:userId/carts/all</button>
+        <button onclick="handleRequest('PUT', '/api/cart/users/1/carts/items')">PUT /api/cart/users/:userId/carts/items</button>
+        <button onclick="handleRequest('PUT', '/api/cart/users/1/carts/items/1')">PUT /api/cart/users/:userId/carts/items/:productId</button>
+        <button onclick="handleRequest('DELETE', '/api/cart/users/1/carts/items/1')">DELETE /api/cart/users/:userId/carts/items/:productId</button>
+    </div>
+
+    <script>
+        // Helper function to handle the requests based on button clicks
+        function handleRequest(method, url) {
+            const options = {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                    // Add your authorization headers here if needed
+                    // "Authorization": "Bearer YOUR_JWT_TOKEN"
+                },
+                body: method === 'POST' || method === 'PUT' ? JSON.stringify({}) : null // You can add data for POST/PUT requests
+            };
+
+            fetch(url, options)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Request Success: ' + JSON.stringify(data));
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Request Error: ' + error.message);
+                });
+        }
+    </script>
+
+</body>
+</html>
