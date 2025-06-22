@@ -136,6 +136,7 @@ class OrderController {
                 totalPrice += newItem.quantity * (newItem.priceAtAddTime || 0);
             }
 
+            totalPrice = Math.round(totalPrice * 100) / 100;
             const order = await orderService.create({
                 user: new Types.ObjectId(userId as string),
                 items: orderItems,
