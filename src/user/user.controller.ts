@@ -6,12 +6,12 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 
-import { cartService } from "@/cart";
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
 
 import { IUser } from "./user.interface";
 import userService from "./user.service";
+import { cartService, ICartItem } from "@/cart";
 
 const TOKEN_EXPIRATION = "1h"; // 1 hours
 
@@ -164,7 +164,14 @@ class UserController {
                 gender,
                 avatar,
             };
+
             const newUser = await userService.create(newUserData);
+            const ObjectId = new mongoose.Types.ObjectId(newUser._id as string);
+
+            await cartService.create({
+                user: ObjectId,
+                items: [] as ICartItem[],
+            });
 
             await cartService.create({ user: newUser.id });
 
@@ -221,7 +228,23 @@ class UserController {
         }
     }
 
-    // POST user/request-password-reset
+    // [DELETE] /me
+    async deleteCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const id = req.user?._id;
+            const deleteUser = await userService.deleteById(id as string);
+
+            if (!deleteUser) {
+                return res.status(404).json({ message: "User not found." });
+            }
+
+            res.status(200).json({ message: "User deleted successfully." });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // POST /request-password-reset
     async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
         try {
             const { email } = req.body;

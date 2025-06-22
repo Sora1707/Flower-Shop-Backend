@@ -19,10 +19,9 @@ router.get(
 router.get("/", asyncHandler(authenticate), asyncHandler(cartController.getUserCart));
 
 router.post("/checkout", asyncHandler(authenticate), asyncHandler(orderController.createOrder));
+router.put("/", asyncHandler(authenticate), asyncHandler(cartController.addItem));
 
-router.put("/", asyncHandler(authenticate), asyncHandler(cartController.updateItemQuantity));
-
-router.patch("/", asyncHandler(authenticate), asyncHandler(cartController.updateItemQuantity));
+router.patch("/", asyncHandler(authenticate), asyncHandler(cartController.updateItemQuantity)); // Frontend
 // router.delete("/:productId", asyncHandler(authenticate), asyncHandler(cartController.removeItem));
 // router.delete("/", asyncHandler(authenticate), asyncHandler(cartController.clearCart));
 // router.delete(

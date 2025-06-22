@@ -39,6 +39,7 @@ router.post(
 
 router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
 
+router.delete("/me", asyncHandler(authenticate), asyncHandler(UserController.deleteCurrentUser));
 router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));
 
 export default router;

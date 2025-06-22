@@ -54,9 +54,23 @@ class CartController {
     // [POST] /:productId/cart (in ProductRoutes)
     async addOrUpdateItem(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const { productId } = req.params;
             const userId = req.user?._id;
-            const { quantity } = req.body;
+            const cart = await cartService.findOne({ user: userId });
+            if (!cart) {
+                return res.status(404).json({ message: "Cart not found" });
+            }
+
+            res.status(200).json(cart);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [PUT] /cart
+    async addItem(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user?._id;
+            const { productId, quantity } = req.body;
 
             let cart = await cartService.findOne({ user: userId });
 
@@ -88,7 +102,7 @@ class CartController {
         }
     }
 
-    // [PUT] /cart
+    // [PATCH] /cart
     async updateItemQuantity(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const userId = req.user?._id;
@@ -121,11 +135,11 @@ class CartController {
         }
     }
 
-    // [DELETE] /cart/:productId
+    // [DELETE] /cart
     async removeItem(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             const userId = req.user?._id;
-            const { productId } = req.params;
+            const { productId } = req.body;
             const cart = await cartService.findOne({ user: userId });
 
             if (!cart) {
