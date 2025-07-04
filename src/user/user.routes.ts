@@ -3,10 +3,12 @@ import express from "express";
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
 import { isAdmin } from "@/middleware/authorize";
+import { validateBody } from "@/middleware/validate";
 
-import UserController from "@/user/user.controller";
 import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
+import UserController from "@/user/user.controller";
+import { UserLoginValidation } from "./user.validation";
 
 const router = express.Router();
 
@@ -26,7 +28,7 @@ router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.
 router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
-router.post("/login", asyncHandler(UserController.login));
+router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
 router.post("/register", asyncHandler(UserController.register));
 
 router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));

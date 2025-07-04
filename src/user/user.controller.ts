@@ -1,19 +1,21 @@
+import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { Request, Response, NextFunction } from "express";
 
-import crypto from "crypto"; //
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
 
+import { cartService, ICartItem } from "@/cart";
+import {
+    generateLoginToken,
+    generatePasswordResetToken,
+    getPasswordResetPayload,
+} from "@/utils/token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { cartService, ICartItem } from "@/cart";
-
-const TOKEN_EXPIRATION = "1h"; // 1 hours
+import { UserLoginInput } from "./user.validation";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -82,32 +84,21 @@ class UserController {
     }
 
     // [POST] /user/login
-    async login(req: Request, res: Response, next: NextFunction) {
+    async login(req: Request<{}, {}, UserLoginInput>, res: Response, next: NextFunction) {
         try {
             const { username, password } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ message: "Username and password are required" });
-            }
-
             const user = await userService.findOne({ username });
             if (!user) {
-                return res.status(401).json({ message: "Invalid username or password" });
+                return res.status(400).json({ message: "This user does not exist" });
             }
 
             const isMatch = await user.matchPassword(password);
             if (!isMatch) {
-                return res.status(401).json({ message: "Invalid username or password" });
+                return res.status(400).json({ message: "Wrong password" });
             }
 
-            // Generate JWT token (using a placeholder secret for now)
-            const token = jwt.sign(
-                {
-                    userId: user._id,
-                },
-                process.env.JWT_SECRET as string,
-                { expiresIn: TOKEN_EXPIRATION }
-            );
+            const token = generateLoginToken(user.id);
 
             res.status(200).json({
                 token,
@@ -258,9 +249,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found" });
             }
 
-            const resetToken = jwt.sign({ userId: user._id }, process.env.RESET_PASSWORD_SECRET!, {
-                expiresIn: "1h",
-            });
+            const resetToken = generatePasswordResetToken(user.id);
 
             const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
             await transporter.sendMail({
@@ -288,12 +277,12 @@ class UserController {
 
             let payload;
             try {
-                payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET!);
+                payload = getPasswordResetPayload(token);
             } catch (err) {
                 return res.status(400).json({ message: "Invalid or expired token" });
             }
 
-            const { userId } = payload as { userId: string };
+            const { userId } = payload;
             const user = await userService.findById(userId);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });

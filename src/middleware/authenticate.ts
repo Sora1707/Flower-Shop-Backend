@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
-import { userService } from "@/user";
 import { AuthRequest } from "@/types/request";
+import { userService } from "@/user";
+import { getLoginPayload } from "@/utils/token";
+import { NextFunction, Request, Response } from "express";
 
 function validAuthenticationHeader(req: Request) {
     return req.headers.authorization && req.headers.authorization.startsWith("Bearer ");
@@ -21,14 +21,11 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
     }
 
     const token = extractTokenFromHeader(req);
-    const decodeKey = process.env.JWT_SECRET as string;
 
     try {
-        const decodedData = jwt.verify(token, decodeKey) as {
-            userId: string;
-        };
+        const payload = getLoginPayload(token);
 
-        const user = await userService.findById(decodedData.userId, { password: 0 });
+        const user = await userService.findById(payload.userId, { password: 0 });
 
         if (!user) {
             return res.status(401).json({ error: "Invalid token. User not found" });
