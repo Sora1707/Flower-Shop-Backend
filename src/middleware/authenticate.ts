@@ -31,12 +31,12 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
         const user = await userService.findById(payload.userId, { password: 0 });
 
         if (!user) {
-            return ResponseHandler.error(res, "Invalid token. User not found", 401);
+            return ResponseHandler.error(res, "Invalid token", 401);
         }
         (req as AuthRequest).user = user;
         next();
     } catch (error) {
-        ResponseHandler.error(res, "Not authenticated, invalid token", 401);
+        ResponseHandler.error(res, "Invalid token", 401);
         next();
     }
 }

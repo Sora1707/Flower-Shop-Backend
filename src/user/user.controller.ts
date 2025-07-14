@@ -126,6 +126,8 @@ class UserController {
                 avatar,
             } = req.body;
 
+            console.log(req.body);
+
             const existingUser = await userService.findOne({ username });
             if (existingUser) {
                 return res.status(400).json({ message: "Username already registered" });
