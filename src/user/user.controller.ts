@@ -6,6 +6,7 @@ import nodemailer from "nodemailer";
 
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
+import ResponseHandler from "@/utils/ResponseHandler";
 
 import { cartService, ICartItem } from "@/cart";
 import {
@@ -50,7 +51,7 @@ class UserController {
 
             const paginateResult = await userService.paginate(filter, paginateOptions);
 
-            res.status(200).json(paginateResult);
+            ResponseHandler.success(res, paginateResult);
         } catch (error) {
             next(error);
         }
@@ -71,7 +72,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json(user);
+            ResponseHandler.success(res, user);
         } catch (error) {
             next(error);
         }
@@ -90,19 +91,21 @@ class UserController {
 
             const user = await userService.findOne({ username });
             if (!user) {
-                return res.status(400).json({ message: "This user does not exist" });
+                return ResponseHandler.error(res, "This user does not exist", 404);
             }
 
             const isMatch = await user.matchPassword(password);
             if (!isMatch) {
-                return res.status(400).json({ message: "Wrong password" });
+                return ResponseHandler.error(res, "Wrong password", 400);
             }
 
             const token = generateLoginToken(user.id);
 
-            res.status(200).json({
-                token,
-            });
+            ResponseHandler.success(
+                res,
+                { token, user: { id: user.id, username: user.username } },
+                "Successfully logged in"
+            );
         } catch (error) {
             next(error);
         }
@@ -123,25 +126,9 @@ class UserController {
                 avatar,
             } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ message: "Username and password are required" });
-            }
-
             const existingUser = await userService.findOne({ username });
             if (existingUser) {
                 return res.status(400).json({ message: "Username already registered" });
-            }
-
-            if (!firstName || !lastName) {
-                return res.status(400).json({ message: "First name and last name are required" });
-            }
-
-            if (!email) {
-                return res.status(400).json({ message: "Email is required" });
-            }
-
-            if (!phoneNumber) {
-                return res.status(400).json({ message: "Phone number is required" });
             }
 
             const newUserData = {
@@ -157,10 +144,9 @@ class UserController {
             };
 
             const newUser = await userService.create(newUserData);
-            const ObjectId = new mongoose.Types.ObjectId(newUser._id as string);
 
             await cartService.create({
-                user: ObjectId,
+                user: new mongoose.Types.ObjectId(newUser._id as string),
                 items: [] as ICartItem[],
             });
 
@@ -168,10 +154,7 @@ class UserController {
 
             const { password: _pw, role, ...safeUser } = newUser.toObject();
 
-            res.status(201).json({
-                message: "User registered successfully",
-                user: safeUser,
-            });
+            ResponseHandler.success(res, { user: safeUser }, "User registered successfully", 201);
         } catch (error) {
             next(error);
         }
@@ -197,7 +180,7 @@ class UserController {
 
             const { password: _pw, role, ...safeUser } = updatedUser.toObject();
 
-            res.status(200).json({ message: "User updated", user: safeUser });
+            ResponseHandler.success(res, { user: safeUser }, "User updated successfully");
         } catch (error) {
             next(error);
         }
@@ -213,7 +196,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json({ message: "User deleted successfully." });
+            ResponseHandler.success(res, null, "User deleted successfully");
         } catch (error) {
             next(error);
         }
@@ -229,7 +212,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json({ message: "User deleted successfully." });
+            ResponseHandler.success(res, null, "User deleted successfully");
         } catch (error) {
             next(error);
         }
@@ -241,12 +224,12 @@ class UserController {
             const { email } = req.body;
 
             if (!email) {
-                return res.status(400).json({ message: "Email is required" });
+                return ResponseHandler.error(res, "Email is required", 400);
             }
 
             const user = await userService.findOne({ email });
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return ResponseHandler.error(res, "User not found", 404);
             }
 
             const resetToken = generatePasswordResetToken(user.id);
@@ -258,9 +241,7 @@ class UserController {
                 html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
             });
 
-            res.status(200).json({
-                message: "Password reset requested. Check your email.",
-            });
+            ResponseHandler.success(res, null, "Password reset requested. Check your email.");
         } catch (error) {
             next(error);
         }
@@ -272,26 +253,26 @@ class UserController {
             const { token, newPassword } = req.body;
 
             if (!token || !newPassword) {
-                return res.status(400).json({ message: "Token and new password are required" });
+                return ResponseHandler.error(res, "Token and new password are required", 400);
             }
 
             let payload;
             try {
                 payload = getPasswordResetPayload(token);
             } catch (err) {
-                return res.status(400).json({ message: "Invalid or expired token" });
+                return ResponseHandler.error(res, "Invalid or expired token", 400);
             }
 
             const { userId } = payload;
             const user = await userService.findById(userId);
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return ResponseHandler.error(res, "User not found", 404);
             }
 
             user.password = await bcrypt.hash(newPassword, 10);
             await user.save();
 
-            res.status(200).json({ message: "Password reset successful" });
+            ResponseHandler.success(res, null, "Password reset successful");
         } catch (error) {
             next(error);
         }
@@ -321,7 +302,7 @@ class UserController {
             user.password = await bcrypt.hash(newPassword, 10);
             await user.save();
 
-            res.status(200).json({ message: "Password changed successfully" });
+            ResponseHandler.success(res, null, "Password changed successfully");
         } catch (err) {
             next(err);
         }

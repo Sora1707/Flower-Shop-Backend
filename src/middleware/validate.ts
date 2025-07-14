@@ -1,3 +1,4 @@
+import ResponseHandler from "@/utils/ResponseHandler";
 import { NextFunction, Request, Response } from "express";
 import { ZodTypeAny } from "zod";
 
@@ -5,7 +6,7 @@ export function validateBody(schema: ZodTypeAny) {
     return function (req: Request, res: Response, next: NextFunction) {
         const result = schema.safeParse(req.body);
         if (!result.success) {
-            res.status(400).json({ errors: result.error.flatten() });
+            ResponseHandler.error(res, "Validation Error", 400, result.error.flatten());
             return;
         }
 
@@ -18,7 +19,7 @@ export function validateQuery(schema: ZodTypeAny) {
     return function (req: Request, res: Response, next: NextFunction) {
         const result = schema.safeParse(req.query);
         if (!result.success) {
-            res.status(400).json({ errors: result.error.flatten() });
+            ResponseHandler.error(res, "Validation Error", 400, result.error.flatten());
             return;
         }
 
@@ -31,7 +32,7 @@ export function validateParams(schema: ZodTypeAny) {
     return function (req: Request, res: Response, next: NextFunction) {
         const result = schema.safeParse(req.params);
         if (!result.success) {
-            res.status(400).json({ errors: result.error.flatten() });
+            ResponseHandler.error(res, "Validation Error", 400, result.error.flatten());
             return;
         }
 

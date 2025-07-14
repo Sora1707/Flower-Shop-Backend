@@ -1,4 +1,7 @@
-import { Response, NextFunction } from "express";
+import { NextFunction, Response } from "express";
+
+import ResponseHandler from "@/utils/ResponseHandler";
+
 import { AuthRequest } from "@/types/request";
 import { Role } from "@/user";
 
@@ -7,7 +10,7 @@ function authorize(role: string) {
         const user = req.user;
 
         if (!user || (user.role !== Role.Admin && user.role !== role)) {
-            res.status(403).json({ message: "Access denied" });
+            ResponseHandler.error(res, "Access denied", 403);
             return;
         }
 
