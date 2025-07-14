@@ -1,7 +1,7 @@
+import mongoose, { PaginateModel, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import mongoose, { Schema, PaginateModel } from "mongoose";
 
-import { IUser, Gender, Role } from "./user.interface";
+import { Gender, IUser, Role } from "./user.interface";
 
 import * as password from "./password";
 
@@ -17,7 +17,7 @@ const UserSchema = new Schema<IUser>(
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
         email: { type: String, require: true, unique: true },
-        phoneNumber: { type: String, required: true },
+        phoneNumber: { type: String },
         birthdate: { type: Date },
         gender: { type: String, enum: Object.values(Gender) },
         avatar: { type: String },

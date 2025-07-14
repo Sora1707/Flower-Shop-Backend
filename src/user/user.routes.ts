@@ -8,7 +8,7 @@ import { validateBody } from "@/middleware/validate";
 import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
-import { UserLoginValidation } from "./user.validation";
+import { UserLoginValidation, UserRegisterValidation } from "./user.validation";
 
 const router = express.Router();
 
@@ -29,7 +29,11 @@ router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
 router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
-router.post("/register", asyncHandler(UserController.register));
+router.post(
+    "/register",
+    validateBody(UserRegisterValidation),
+    asyncHandler(UserController.register)
+);
 
 router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
 router.post("/reset-password", asyncHandler(UserController.resetPassword));
