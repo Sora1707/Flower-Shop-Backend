@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
@@ -10,7 +10,7 @@ import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
 import { UserLoginValidation, UserRegisterValidation } from "./user.validation";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/me", asyncHandler(authenticate), asyncHandler(UserController.getCurrentUser));
 router.get(
@@ -43,7 +43,8 @@ router.post(
     asyncHandler(UserController.changePassword)
 );
 
-router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
+router.put("/me", asyncHandler(authenticate), asyncHandler(UserController.updateCurrentUser));
+router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateCurrentUser));
 
 router.delete("/me", asyncHandler(authenticate), asyncHandler(UserController.deleteCurrentUser));
 router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));

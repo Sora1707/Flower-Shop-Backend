@@ -162,8 +162,9 @@ class UserController {
         }
     }
 
-    // [PUT] /user/:id
-    async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
+    // [PUT] /me
+    // [PATCH] /me
+    async updateCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
                 return res.status(401).json({ message: "Unauthorized" });
