@@ -1,19 +1,22 @@
+import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { Request, Response, NextFunction } from "express";
 
-import crypto from "crypto"; //
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
+import ResponseHandler from "@/utils/ResponseHandler";
 
+import { cartService, ICartItem } from "@/cart";
+import {
+    generateLoginToken,
+    generatePasswordResetToken,
+    getPasswordResetPayload,
+} from "@/utils/token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { cartService, ICartItem } from "@/cart";
-
-const TOKEN_EXPIRATION = "1h"; // 1 hours
+import { UserLoginInput } from "./user.validation";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -48,7 +51,7 @@ class UserController {
 
             const paginateResult = await userService.paginate(filter, paginateOptions);
 
-            res.status(200).json(paginateResult);
+            ResponseHandler.success(res, paginateResult);
         } catch (error) {
             next(error);
         }
@@ -69,7 +72,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json(user);
+            ResponseHandler.success(res, user);
         } catch (error) {
             next(error);
         }
@@ -82,36 +85,27 @@ class UserController {
     }
 
     // [POST] /user/login
-    async login(req: Request, res: Response, next: NextFunction) {
+    async login(req: Request<{}, {}, UserLoginInput>, res: Response, next: NextFunction) {
         try {
             const { username, password } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ message: "Username and password are required" });
-            }
-
             const user = await userService.findOne({ username });
             if (!user) {
-                return res.status(401).json({ message: "Invalid username or password" });
+                return ResponseHandler.error(res, "This user does not exist", 404);
             }
 
             const isMatch = await user.matchPassword(password);
             if (!isMatch) {
-                return res.status(401).json({ message: "Invalid username or password" });
+                return ResponseHandler.error(res, "Wrong password", 400);
             }
 
-            // Generate JWT token (using a placeholder secret for now)
-            const token = jwt.sign(
-                {
-                    userId: user._id,
-                },
-                process.env.JWT_SECRET as string,
-                { expiresIn: TOKEN_EXPIRATION }
-            );
+            const token = generateLoginToken(user.id);
 
-            res.status(200).json({
-                token,
-            });
+            ResponseHandler.success(
+                res,
+                { token, user: { id: user.id, username: user.username } },
+                "Successfully logged in"
+            );
         } catch (error) {
             next(error);
         }
@@ -132,25 +126,11 @@ class UserController {
                 avatar,
             } = req.body;
 
-            if (!username || !password) {
-                return res.status(400).json({ message: "Username and password are required" });
-            }
+            console.log(req.body);
 
             const existingUser = await userService.findOne({ username });
             if (existingUser) {
                 return res.status(400).json({ message: "Username already registered" });
-            }
-
-            if (!firstName || !lastName) {
-                return res.status(400).json({ message: "First name and last name are required" });
-            }
-
-            if (!email) {
-                return res.status(400).json({ message: "Email is required" });
-            }
-
-            if (!phoneNumber) {
-                return res.status(400).json({ message: "Phone number is required" });
             }
 
             const newUserData = {
@@ -166,10 +146,9 @@ class UserController {
             };
 
             const newUser = await userService.create(newUserData);
-            const ObjectId = new mongoose.Types.ObjectId(newUser._id as string);
 
             await cartService.create({
-                user: ObjectId,
+                user: new mongoose.Types.ObjectId(newUser._id as string),
                 items: [] as ICartItem[],
             });
 
@@ -177,17 +156,15 @@ class UserController {
 
             const { password: _pw, role, ...safeUser } = newUser.toObject();
 
-            res.status(201).json({
-                message: "User registered successfully",
-                user: safeUser,
-            });
+            ResponseHandler.success(res, { user: safeUser }, "User registered successfully", 201);
         } catch (error) {
             next(error);
         }
     }
 
-    // [PUT] /user/:id
-    async updateUser(req: AuthRequest, res: Response, next: NextFunction) {
+    // [PUT] /me
+    // [PATCH] /me
+    async updateCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         try {
             if (!req.user) {
                 return res.status(401).json({ message: "Unauthorized" });
@@ -206,7 +183,7 @@ class UserController {
 
             const { password: _pw, role, ...safeUser } = updatedUser.toObject();
 
-            res.status(200).json({ message: "User updated", user: safeUser });
+            ResponseHandler.success(res, { user: safeUser }, "User updated successfully");
         } catch (error) {
             next(error);
         }
@@ -222,7 +199,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json({ message: "User deleted successfully." });
+            ResponseHandler.success(res, null, "User deleted successfully");
         } catch (error) {
             next(error);
         }
@@ -238,7 +215,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            res.status(200).json({ message: "User deleted successfully." });
+            ResponseHandler.success(res, null, "User deleted successfully");
         } catch (error) {
             next(error);
         }
@@ -250,17 +227,15 @@ class UserController {
             const { email } = req.body;
 
             if (!email) {
-                return res.status(400).json({ message: "Email is required" });
+                return ResponseHandler.error(res, "Email is required", 400);
             }
 
             const user = await userService.findOne({ email });
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return ResponseHandler.error(res, "User not found", 404);
             }
 
-            const resetToken = jwt.sign({ userId: user._id }, process.env.RESET_PASSWORD_SECRET!, {
-                expiresIn: "1h",
-            });
+            const resetToken = generatePasswordResetToken(user.id);
 
             const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
             await transporter.sendMail({
@@ -269,9 +244,7 @@ class UserController {
                 html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
             });
 
-            res.status(200).json({
-                message: "Password reset requested. Check your email.",
-            });
+            ResponseHandler.success(res, null, "Password reset requested. Check your email.");
         } catch (error) {
             next(error);
         }
@@ -283,26 +256,26 @@ class UserController {
             const { token, newPassword } = req.body;
 
             if (!token || !newPassword) {
-                return res.status(400).json({ message: "Token and new password are required" });
+                return ResponseHandler.error(res, "Token and new password are required", 400);
             }
 
             let payload;
             try {
-                payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET!);
+                payload = getPasswordResetPayload(token);
             } catch (err) {
-                return res.status(400).json({ message: "Invalid or expired token" });
+                return ResponseHandler.error(res, "Invalid or expired token", 400);
             }
 
-            const { userId } = payload as { userId: string };
+            const { userId } = payload;
             const user = await userService.findById(userId);
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return ResponseHandler.error(res, "User not found", 404);
             }
 
             user.password = await bcrypt.hash(newPassword, 10);
             await user.save();
 
-            res.status(200).json({ message: "Password reset successful" });
+            ResponseHandler.success(res, null, "Password reset successful");
         } catch (error) {
             next(error);
         }
@@ -332,7 +305,7 @@ class UserController {
             user.password = await bcrypt.hash(newPassword, 10);
             await user.save();
 
-            res.status(200).json({ message: "Password changed successfully" });
+            ResponseHandler.success(res, null, "Password changed successfully");
         } catch (err) {
             next(err);
         }

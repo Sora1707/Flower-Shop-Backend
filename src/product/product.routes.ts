@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
@@ -8,7 +8,7 @@ import { reviewController } from "@/review";
 
 import productController from "./product.controller";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/autocomplete", asyncHandler(productController.autoCompleteSearchQuery));
 router.get("/search", asyncHandler(productController.searchProducts));
@@ -53,6 +53,5 @@ router.delete(
     isAdmin,
     asyncHandler(productController.deleteProduct)
 );
-
 
 export default router;

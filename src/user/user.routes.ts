@@ -1,14 +1,16 @@
-import express from "express";
+import { Router } from "express";
 
 import asyncHandler from "@/middleware/asyncHandler";
 import authenticate from "@/middleware/authenticate";
 import { isAdmin } from "@/middleware/authorize";
+import { validateBody } from "@/middleware/validate";
 
-import UserController from "@/user/user.controller";
 import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
+import UserController from "@/user/user.controller";
+import { UserLoginValidation, UserRegisterValidation } from "./user.validation";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/me", asyncHandler(authenticate), asyncHandler(UserController.getCurrentUser));
 router.get(
@@ -26,8 +28,12 @@ router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.
 router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
-router.post("/login", asyncHandler(UserController.login));
-router.post("/register", asyncHandler(UserController.register));
+router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
+router.post(
+    "/register",
+    validateBody(UserRegisterValidation),
+    asyncHandler(UserController.register)
+);
 
 router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
 router.post("/reset-password", asyncHandler(UserController.resetPassword));
@@ -37,7 +43,8 @@ router.post(
     asyncHandler(UserController.changePassword)
 );
 
-router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateUser));
+router.put("/me", asyncHandler(authenticate), asyncHandler(UserController.updateCurrentUser));
+router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateCurrentUser));
 
 router.delete("/me", asyncHandler(authenticate), asyncHandler(UserController.deleteCurrentUser));
 router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));

@@ -1,7 +1,10 @@
-import jwt from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
-import { userService } from "@/user";
+import { NextFunction, Request, Response } from "express";
+
+import ResponseHandler from "@/utils/ResponseHandler";
+import { getLoginPayload } from "@/utils/token";
+
 import { AuthRequest } from "@/types/request";
+import { userService } from "@/user";
 
 function validAuthenticationHeader(req: Request) {
     return req.headers.authorization && req.headers.authorization.startsWith("Bearer ");
@@ -17,26 +20,23 @@ function extractTokenFromHeader(req: Request): string {
 
 async function authenticate(req: Request, res: Response, next: NextFunction) {
     if (!validAuthenticationHeader(req)) {
-        return res.status(401).json({ error: "Not authenticated, no token provided" });
+        return ResponseHandler.error(res, "Not authenticated, no token provided", 401);
     }
 
     const token = extractTokenFromHeader(req);
-    const decodeKey = process.env.JWT_SECRET as string;
 
     try {
-        const decodedData = jwt.verify(token, decodeKey) as {
-            userId: string;
-        };
+        const payload = getLoginPayload(token);
 
-        const user = await userService.findById(decodedData.userId, { password: 0 });
+        const user = await userService.findById(payload.userId, { password: 0 });
 
         if (!user) {
-            return res.status(401).json({ error: "Invalid token. User not found" });
+            return ResponseHandler.error(res, "Invalid token", 401);
         }
         (req as AuthRequest).user = user;
         next();
     } catch (error) {
-        res.status(401).json({ error: "Not authenticated, invalid token" });
+        ResponseHandler.error(res, "Invalid token", 401);
         next();
     }
 }

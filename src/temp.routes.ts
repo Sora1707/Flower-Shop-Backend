@@ -1,15 +1,12 @@
-import express from "express";
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import { Types } from "mongoose";
 
-import asyncHandler from "@/middleware/asyncHandler";
-
-import { randomInt } from "./utils/number";
-import { userService } from "@/user";
-import { productService } from "@/product";
 import { cartService, ICart } from "@/cart";
-import { IOrder, OrderStatus, orderService } from "@/order";
-import { ReviewModel, reviewService } from "@/review";
+import { IOrder, orderService, OrderStatus } from "@/order";
+import { productService } from "@/product";
+import { reviewService } from "@/review";
+import { userService } from "@/user";
+import { randomInt } from "./utils/number";
 
 async function reloadSampleUsers() {
     try {
@@ -99,7 +96,7 @@ async function createSampleOrder() {
     }
 }
 
-const router = express.Router();
+const router = Router();
 
 router.post("/reload_sample_data", async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -128,5 +125,7 @@ router.get("/get_all", async (req: Request, res: Response, next: NextFunction) =
         next(error);
     }
 });
+
+// IMAGE UPLOAD
 
 export default router;
