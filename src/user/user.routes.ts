@@ -5,6 +5,8 @@ import authenticate from "@/middleware/authenticate";
 import { isAdmin } from "@/middleware/authorize";
 import { validateBody } from "@/middleware/validate";
 
+import { uploadAvatar } from "@/config/upload";
+
 import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
@@ -43,8 +45,18 @@ router.post(
     asyncHandler(UserController.changePassword)
 );
 
-router.put("/me", asyncHandler(authenticate), asyncHandler(UserController.updateCurrentUser));
-router.patch("/me", asyncHandler(authenticate), asyncHandler(UserController.updateCurrentUser));
+router.put(
+    "/me",
+    asyncHandler(authenticate),
+    uploadAvatar.single("avatar"),
+    asyncHandler(UserController.updateCurrentUser)
+);
+router.patch(
+    "/me",
+    asyncHandler(authenticate),
+    uploadAvatar.single("avatar"),
+    asyncHandler(UserController.updateCurrentUser)
+);
 
 router.delete("/me", asyncHandler(authenticate), asyncHandler(UserController.deleteCurrentUser));
 router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));

@@ -21,7 +21,7 @@ export interface IUser extends Document {
     phoneNumber: string;
     birthdate: Date;
     gender?: Gender;
-    avatar?: string;
+    avatar?: string | null;
     createdAt: Date;
     updatedAt: Date;
     resetPasswordToken?: string;

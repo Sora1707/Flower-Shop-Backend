@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-
+import path from "path";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 
@@ -17,6 +17,7 @@ import {
 import { IUser } from "./user.interface";
 import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
+import { generateNewAvatarFilename } from "@/utils/upload";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -174,6 +175,12 @@ class UserController {
 
             delete updatedUserData.password;
             delete updatedUserData.role;
+
+            if (req.file) {
+                const filename = generateNewAvatarFilename(req, req.file);
+                const filePath = path.join();
+                updatedUserData.avatar = filename;
+            }
 
             const updatedUser = await userService.updateById(req.user.id, updatedUserData);
 
