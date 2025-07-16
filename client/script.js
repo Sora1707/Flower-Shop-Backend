@@ -1,10 +1,8 @@
 console.log("Client script loaded");
-const HOST_URL = "http://localhost:8080/";
-const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODc0Yjc3Y2Y3NTU2ZDAzOTkzNWJkNmIiLCJpYXQiOjE3NTI2NTQzNjEsImV4cCI6MTc1MjY1Nzk2MX0.4kXYIBRex41r_Cig3NiTraxYyUeRQprp6Yfh1CsUxfU";
+const HOST_URL = "http://localhost:8080";
 
-// const token =
-//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODc0Yjc3Y2Y3NTU2ZDAzOTkzNWJkNmMiLCJpYXQiOjE3NTI2NTY5MjIsImV4cCI6MTc1MjY2MDUyMn0.IlUeTDe4q0x60VfzBWT3jplmbSe0Jsu45GesVA9xHlM";
+const loginForm = document.getElementById("loginForm");
+const userInfo = document.getElementById("userInfo");
 
 async function uploadAvatar() {
     const fileInput = document.getElementById("avatarInput");
@@ -14,6 +12,8 @@ async function uploadAvatar() {
 
     const formData = new FormData();
     formData.append("avatar", file);
+
+    const token = localStorage.getItem("token");
 
     try {
         const res = await fetch("http://localhost:8080/api/user/me", {
@@ -34,6 +34,7 @@ async function uploadAvatar() {
 
 async function getUserInfo() {
     try {
+        const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:8080/api/user/me", {
             method: "GET",
             headers: {
@@ -42,21 +43,91 @@ async function getUserInfo() {
         });
 
         if (!res.ok) throw new Error("Failed to fetch user info");
-        const userInfo = await res.json();
+        const userInfo = (await res.json()).data.user;
+
+        console.log(userInfo);
 
         const avatarPreview = document.getElementById("avatarPreview");
-        avatarPreview.src = HOST_URL + userInfo.avatar || "";
-        avatarPreview.style.display = userInfo.avatar !== HOST_URL ? "block" : "none";
+        avatarPreview.src = HOST_URL + "/" + userInfo.avatar || "";
 
-        const userIdElement = document.getElementById("user-id");
+        const userIdElement = document.getElementById("userid");
         userIdElement.innerText = `User ID: ${userInfo._id}`;
 
         const usernameElement = document.getElementById("username");
         usernameElement.innerText = `Username: ${userInfo.username}`;
 
-        // avatarPreview.style.display = userInfo.imagePath ? "block" : "none";
+        const fullnameElement = document.getElementById("fullname");
+        fullnameElement.innerText = `Full Name: ${userInfo.firstName} ${userInfo.lastName}`;
     } catch (err) {
         console.error("Error fetching user info:", err);
         document.getElementById("response").innerText = "Error fetching user info.";
     }
 }
+
+function login() {
+    loginForm.classList.add("invisible");
+    userInfo.classList.remove("invisible");
+    getUserInfo();
+}
+
+function logout() {
+    loginForm.classList.remove("invisible");
+    userInfo.classList.add("invisible");
+    localStorage.removeItem("token");
+}
+
+async function checkToken() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        logout();
+        alert("Please log in to continue.");
+        return;
+    }
+    const res = await fetch("http://localhost:8080/api/user/me", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (res.status === 200) {
+        login();
+    } else {
+        logout();
+        alert("Token expired. Please log in.");
+    }
+}
+
+loginForm.addEventListener("submit", async e => {
+    e.preventDefault();
+    const username = document.getElementById("usernameInput").value;
+    const password = document.getElementById("passwordInput").value;
+
+    try {
+        const res = await fetch(`${HOST_URL}/api/user/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+
+        if (data.status === "error") {
+            alert(data.message || "Login failed");
+            return;
+        }
+        token = data.data.token;
+
+        localStorage.setItem("token", token);
+        login();
+        alert("Login successful!");
+    } catch (err) {
+        console.error("Login error:", err);
+        alert("Login failed. Please check your credentials.");
+    }
+});
+
+checkToken();

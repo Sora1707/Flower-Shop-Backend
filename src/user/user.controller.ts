@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import path from "path";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 
@@ -18,7 +17,7 @@ import { IUser } from "./user.interface";
 import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
 import { generateNewAvatarFilename } from "@/utils/upload";
-import { AVATAR_FOLDER_PATH } from "@/config/constants";
+import { AVATAR_FOLDER_PATH } from "@/config/url";
 import { getSafeUser } from "./util";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
@@ -87,7 +86,7 @@ class UserController {
             return res.status(401).json({ message: "Unauthorized" });
         }
         const safeUser = getSafeUser(req.user.toObject());
-        return res.status(200).json(safeUser);
+        ResponseHandler.success(res, { user: safeUser });
     }
 
     // [POST] /user/login

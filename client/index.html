@@ -4,22 +4,42 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
+        <style>
+            .invisible {
+                display: none;
+            }
+        </style>
     </head>
     <body>
-        <h1>Upload Avatar</h1>
+        <form id="loginForm" class="invisible">
+            <label>
+                Username:
+                <input type="text" id="usernameInput" required />
+            </label>
+            <br />
 
-        <input type="file" id="avatarInput" name="avatar" />
-        <button onclick="uploadAvatar()">Upload</button>
-        <image
-            id="avatarPreview"
-            src=""
-            alt="Avatar Preview"
-            style="display: none; width: 100px; height: 100px"
-        />
-        <p id="user-id"></p>
-        <p id="username"></p>
+            <label>
+                Password:
+                <input type="password" id="passwordInput" required />
+            </label>
+            <br />
 
-        <button onclick="getUserInfo()">Get User Info</button>
+            <button type="submit">Log In</button>
+        </form>
+
+        <div id="userInfo" class="invisible">
+            <input type="file" id="avatarInput" name="avatar" />
+            <button onclick="uploadAvatar()">Upload</button>
+            <image
+                id="avatarPreview"
+                src=""
+                alt="Avatar Preview"
+                style="width: 100px; height: 100px"
+            />
+            <p id="userid"></p>
+            <p id="username"></p>
+            <p id="fullname"></p>
+        </div>
 
         <script src="script.js"></script>
     </body>

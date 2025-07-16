@@ -1,2 +1,1 @@
-export const AVATAR_FOLDER_PATH = "uploads/users/";
-export const DEFAULT_AVATAR_PATH = "uploads/defaults/avatar.jpg";
+export const TOKEN_EXPIRATION: string = "1m";

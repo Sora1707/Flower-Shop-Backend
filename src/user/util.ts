@@ -1,4 +1,4 @@
-import { DEFAULT_AVATAR_PATH } from "@/config/constants";
+import { DEFAULT_AVATAR_PATH } from "@/config/url";
 import { IUser } from "./user.interface";
 
 export function getSafeUser(user: IUser) {
