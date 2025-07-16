@@ -10,7 +10,6 @@ export function generateNewAvatarFilename(req: AuthRequest, file: Express.Multer
         throw new Error("Unauthenticated");
     }
     const userId = req.user.id;
-    const timestamp = Date.now();
     const ext = path.extname(file.originalname);
-    return `${userId}-${timestamp}${ext}`;
+    return `${userId}${ext}`;
 }

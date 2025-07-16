@@ -10,10 +10,16 @@
 
         <input type="file" id="avatarInput" name="avatar" />
         <button onclick="uploadAvatar()">Upload</button>
+        <image
+            id="avatarPreview"
+            src=""
+            alt="Avatar Preview"
+            style="display: none; width: 100px; height: 100px"
+        />
+        <p id="user-id"></p>
+        <p id="username"></p>
 
         <button onclick="getUserInfo()">Get User Info</button>
-
-        <p id="response"></p>
 
         <script src="script.js"></script>
     </body>

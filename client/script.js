@@ -1,6 +1,10 @@
 console.log("Client script loaded");
+const HOST_URL = "http://localhost:8080/";
 const token =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODc0Yjc3Y2Y3NTU2ZDAzOTkzNWJkNmIiLCJpYXQiOjE3NTI2NTQzNjEsImV4cCI6MTc1MjY1Nzk2MX0.4kXYIBRex41r_Cig3NiTraxYyUeRQprp6Yfh1CsUxfU";
+
+// const token =
+//     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODc0Yjc3Y2Y3NTU2ZDAzOTkzNWJkNmMiLCJpYXQiOjE3NTI2NTY5MjIsImV4cCI6MTc1MjY2MDUyMn0.IlUeTDe4q0x60VfzBWT3jplmbSe0Jsu45GesVA9xHlM";
 
 async function uploadAvatar() {
     const fileInput = document.getElementById("avatarInput");
@@ -39,8 +43,18 @@ async function getUserInfo() {
 
         if (!res.ok) throw new Error("Failed to fetch user info");
         const userInfo = await res.json();
-        console.log("User Info:", userInfo);
-        // document.getElementById("response").innerText = JSON.stringify(userInfo, null, 2);
+
+        const avatarPreview = document.getElementById("avatarPreview");
+        avatarPreview.src = HOST_URL + userInfo.avatar || "";
+        avatarPreview.style.display = userInfo.avatar !== HOST_URL ? "block" : "none";
+
+        const userIdElement = document.getElementById("user-id");
+        userIdElement.innerText = `User ID: ${userInfo._id}`;
+
+        const usernameElement = document.getElementById("username");
+        usernameElement.innerText = `Username: ${userInfo.username}`;
+
+        // avatarPreview.style.display = userInfo.imagePath ? "block" : "none";
     } catch (err) {
         console.error("Error fetching user info:", err);
         document.getElementById("response").innerText = "Error fetching user info.";

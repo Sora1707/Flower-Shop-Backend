@@ -18,6 +18,8 @@ import { IUser } from "./user.interface";
 import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
 import { generateNewAvatarFilename } from "@/utils/upload";
+import { AVATAR_FOLDER_PATH } from "@/config/constants";
+import { getSafeUser } from "./util";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -81,8 +83,11 @@ class UserController {
 
     // [GET] /user/me
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
-        const user = req.user;
-        return res.status(200).json(user);
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const safeUser = getSafeUser(req.user.toObject());
+        return res.status(200).json(safeUser);
     }
 
     // [POST] /user/login
@@ -178,8 +183,8 @@ class UserController {
 
             if (req.file) {
                 const filename = generateNewAvatarFilename(req, req.file);
-                const filePath = path.join();
-                updatedUserData.avatar = filename;
+                const filePath = `${AVATAR_FOLDER_PATH}${filename}`;
+                updatedUserData.avatar = filePath;
             }
 
             const updatedUser = await userService.updateById(req.user.id, updatedUserData);
@@ -188,7 +193,7 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            const { password: _pw, role, ...safeUser } = updatedUser.toObject();
+            const safeUser = getSafeUser(updatedUser.toObject());
 
             ResponseHandler.success(res, { user: safeUser }, "User updated successfully");
         } catch (error) {
