@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { Filter } from "bad-words";
+import  Filter  from "bad-words";
 
 const filter = new Filter();
 
