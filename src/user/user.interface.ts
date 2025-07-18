@@ -21,7 +21,11 @@ export interface IUser extends Document {
     phoneNumber: string;
     birthdate: Date;
     gender?: Gender;
-    avatar?: string | null;
+    avatar?: {
+        small: string;
+        medium: string;
+        large: string;
+    } | null;
     createdAt: Date;
     updatedAt: Date;
     matchPassword(inputPassword: string): Promise<boolean>;

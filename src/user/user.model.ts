@@ -20,7 +20,11 @@ const UserSchema = new Schema<IUser>(
         phoneNumber: { type: String },
         birthdate: { type: Date },
         gender: { type: String, enum: Object.values(Gender) },
-        avatar: { type: String, default: null },
+        avatar: {
+            small: { type: String },
+            medium: { type: String },
+            large: { type: String },
+        },
     },
     { timestamps: true }
 );

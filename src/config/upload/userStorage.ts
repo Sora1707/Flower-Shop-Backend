@@ -2,7 +2,7 @@ import multer, { StorageEngine } from "multer";
 import fs from "fs";
 
 import { AuthRequest } from "@/types/request";
-import { generateNewAvatarFilename } from "@/utils/upload";
+import { generateNewAvatarFilename } from "@/user/avatar";
 
 const FOLDER_PATH = "src/uploads/users";
 

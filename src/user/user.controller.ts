@@ -8,16 +8,11 @@ import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 
 import { cartService, ICartItem } from "@/cart";
-import {
-    generateLoginToken,
-    generatePasswordResetToken,
-    getPasswordResetPayload,
-} from "@/utils/token";
+import { generateLoginToken, generatePasswordResetToken, getPasswordResetPayload } from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
-import { generateNewAvatarFilename } from "@/utils/upload";
-import { AVATAR_FOLDER_PATH } from "@/config/url";
+import { processAvatar } from "./avatar";
 import { getSafeUser } from "./util";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
@@ -181,9 +176,8 @@ class UserController {
             delete updatedUserData.role;
 
             if (req.file) {
-                const filename = generateNewAvatarFilename(req, req.file);
-                const filePath = `${AVATAR_FOLDER_PATH}${filename}`;
-                updatedUserData.avatar = filePath;
+                const avatarPaths = await processAvatar(req.file, req.user.id);
+                updatedUserData.avatar = avatarPaths;
             }
 
             const updatedUser = await userService.updateById(req.user.id, updatedUserData);

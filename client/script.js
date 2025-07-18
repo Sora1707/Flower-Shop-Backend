@@ -3,6 +3,11 @@ const HOST_URL = "http://localhost:8080";
 
 const loginForm = document.getElementById("loginForm");
 const userInfo = document.getElementById("userInfo");
+const avatarInput = document.getElementById("avatarInput");
+const preview = document.getElementById("preview");
+const cropBtn = document.getElementById("cropBtn");
+
+let cropper = null;
 
 async function uploadAvatar() {
     const fileInput = document.getElementById("avatarInput");
@@ -45,10 +50,8 @@ async function getUserInfo() {
         if (!res.ok) throw new Error("Failed to fetch user info");
         const userInfo = (await res.json()).data.user;
 
-        console.log(userInfo);
-
-        const avatarPreview = document.getElementById("avatarPreview");
-        avatarPreview.src = HOST_URL + "/" + userInfo.avatar || "";
+        const avatar = document.getElementById("avatar");
+        avatar.src = HOST_URL + "/" + userInfo.avatar.medium || "";
 
         const userIdElement = document.getElementById("userid");
         userIdElement.innerText = `User ID: ${userInfo._id}`;
@@ -128,6 +131,58 @@ loginForm.addEventListener("submit", async e => {
         console.error("Login error:", err);
         alert("Login failed. Please check your credentials.");
     }
+});
+
+avatarInput.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    preview.src = url;
+    preview.style.display = "block";
+
+    if (cropper) {
+        cropper.destroy();
+    }
+
+    preview.onemptied = function () {
+        cropBtn.disabled = true;
+    };
+
+    preview.onload = function () {
+        cropper = new window.Cropper(preview, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCrop: true,
+            autoCropArea: 1,
+        });
+        cropBtn.disabled = false;
+    };
+});
+
+cropBtn.addEventListener("click", () => {
+    if (!cropper) return;
+
+    cropper.getCroppedCanvas({ width: 512, height: 512 }).toBlob(async blob => {
+        const file = new File([blob], "avatar.jpg", { type: "image/jpeg" });
+
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("http://localhost:8080/api/user/me", {
+            method: "PATCH",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        const data = await res.json();
+        console.log(data.message);
+        alert("Here");
+    }, "image/png");
 });
 
 checkToken();

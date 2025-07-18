@@ -9,6 +9,11 @@
                 display: none;
             }
         </style>
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     </head>
     <body>
         <form id="loginForm" class="invisible">
@@ -28,14 +33,14 @@
         </form>
 
         <div id="userInfo" class="invisible">
-            <input type="file" id="avatarInput" name="avatar" />
-            <button onclick="uploadAvatar()">Upload</button>
-            <image
-                id="avatarPreview"
-                src=""
-                alt="Avatar Preview"
-                style="width: 100px; height: 100px"
-            />
+            <input type="file" id="avatarInput" accept="image/*" />
+            <br />
+            <img id="preview" style="width: 300px; max-width: 100%; display: none" />
+            <br />
+            <button id="cropBtn" disabled>Crop & Upload</button>
+
+            <br />
+            <img id="avatar" src="" alt="Avatar" style="max-width: 100px; max-height: 100px" />
             <p id="userid"></p>
             <p id="username"></p>
             <p id="fullname"></p>
