@@ -51,7 +51,7 @@ async function getUserInfo() {
         if (!res.ok) throw new Error("Failed to fetch user info");
         const userInfo = (await res.json()).data.user;
 
-        // console.log(userInfo);
+        console.log(userInfo);
 
         const avatar = document.getElementById("avatar");
         avatar.src = HOST_URL + "/" + userInfo.avatar.medium || "";
@@ -187,8 +187,6 @@ cropBtn.addEventListener("click", () => {
         });
 
         const data = await res.json();
-        console.log(data.message);
-        alert("Here");
     }, "image/png");
 });
 

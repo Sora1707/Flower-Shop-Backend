@@ -3,7 +3,7 @@ import { Response } from "express";
 class ResponseHandler {
     static success<T>(res: Response, data: T, message = "Success", statusCode = 200) {
         const payload = {
-            status: "success",
+            success: true,
             message,
             data,
         };
@@ -12,7 +12,7 @@ class ResponseHandler {
 
     static error(res: Response, message = "Error occurred", statusCode = 400, errors?: any) {
         const payload = {
-            status: "error",
+            success: false,
             message,
             ...(errors ? { errors } : {}),
         };

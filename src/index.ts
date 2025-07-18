@@ -1,4 +1,4 @@
-import * as dotenv from "./dotenv";
+import * as dotenv from "./config/dotenv";
 dotenv.config();
 
 import bodyParser from "body-parser";
@@ -6,6 +6,10 @@ import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import morgan from "morgan";
 import path from "path";
+
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
+import { swaggerOptions } from "./config/swagger";
 
 import { connectDB } from "./config/db";
 import errorHandler from "./middleware/errorHandler";
@@ -24,6 +28,10 @@ connectDB();
 const app: Application = express();
 
 /* GLOBAL MIDDLEWARES */
+// Swagger
+const specs = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
 // Body parser
 app.use(bodyParser.urlencoded({ extended: false }));
 
