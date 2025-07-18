@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { userUpload } from "@/config/upload";
+import { uploadAvatar } from "@/config/upload";
 
 const router = Router();
 
 router.post(
     "/avatar/:id",
-    userUpload.single("avatar"),
+    uploadAvatar.single("avatar"),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const file = req.file; // typed as Express.Multer.File

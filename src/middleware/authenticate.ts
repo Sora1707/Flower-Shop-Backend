@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import ResponseHandler from "@/utils/ResponseHandler";
-import { getLoginPayload } from "@/utils/token";
+import { getLoginPayload } from "@/user/token";
 
 import { AuthRequest } from "@/types/request";
 import { userService } from "@/user";

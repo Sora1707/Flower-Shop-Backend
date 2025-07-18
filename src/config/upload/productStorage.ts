@@ -1,7 +1,7 @@
 import multer, { StorageEngine } from "multer";
 import fs from "fs";
 
-const FOLDER_PATH = "uploads/products";
+const FOLDER_PATH = "src/uploads/products";
 
 function ensureFolder(folderPath: string) {
     if (!fs.existsSync(folderPath)) {

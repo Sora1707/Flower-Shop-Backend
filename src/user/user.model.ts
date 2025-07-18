@@ -20,9 +20,11 @@ const UserSchema = new Schema<IUser>(
         phoneNumber: { type: String },
         birthdate: { type: Date },
         gender: { type: String, enum: Object.values(Gender) },
-        avatar: { type: String },
-        resetPasswordToken: { type: String },
-        resetPasswordExpires: { type: Date },
+        avatar: {
+            small: { type: String },
+            medium: { type: String },
+            large: { type: String },
+        },
     },
     { timestamps: true }
 );

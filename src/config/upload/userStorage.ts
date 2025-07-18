@@ -1,7 +1,10 @@
 import multer, { StorageEngine } from "multer";
 import fs from "fs";
 
-const FOLDER_PATH = "uploads/users";
+import { AuthRequest } from "@/types/request";
+import { generateNewAvatarFilename } from "@/user/avatar";
+
+const FOLDER_PATH = "src/uploads/users";
 
 function ensureFolder(folderPath: string) {
     if (!fs.existsSync(folderPath)) {
@@ -10,16 +13,24 @@ function ensureFolder(folderPath: string) {
 }
 
 const storage: StorageEngine = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (req: AuthRequest, file, cb) => {
         const uploadPath = FOLDER_PATH;
 
         ensureFolder(uploadPath);
 
         cb(null, uploadPath);
     },
-    filename: (req, file, cb) => {
-        const uniqueName = Date.now() + "-" + file.originalname;
-        cb(null, uniqueName);
+    filename: (req: AuthRequest, file, cb) => {
+        if (!file || !file.originalname) {
+            return cb(new Error("File name is required"), "filename-required");
+        }
+        if (!req.user) {
+            return cb(new Error("User ID is required"), "user-id-required");
+        }
+
+        const filename = generateNewAvatarFilename(req, file);
+
+        cb(null, filename);
     },
 });
 

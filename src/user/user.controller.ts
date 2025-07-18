@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 
@@ -9,14 +8,12 @@ import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 
 import { cartService, ICartItem } from "@/cart";
-import {
-    generateLoginToken,
-    generatePasswordResetToken,
-    getPasswordResetPayload,
-} from "@/utils/token";
+import { generateLoginToken, generatePasswordResetToken, getPasswordResetPayload } from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
+import { processAvatar } from "./avatar";
+import { getSafeUser } from "./util";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -80,8 +77,11 @@ class UserController {
 
     // [GET] /user/me
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
-        const user = req.user;
-        return res.status(200).json(user);
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const safeUser = getSafeUser(req.user.toObject());
+        ResponseHandler.success(res, { user: safeUser });
     }
 
     // [POST] /user/login
@@ -175,13 +175,18 @@ class UserController {
             delete updatedUserData.password;
             delete updatedUserData.role;
 
+            if (req.file) {
+                const avatarPaths = await processAvatar(req.file, req.user.id);
+                updatedUserData.avatar = avatarPaths;
+            }
+
             const updatedUser = await userService.updateById(req.user.id, updatedUserData);
 
             if (!updatedUser) {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            const { password: _pw, role, ...safeUser } = updatedUser.toObject();
+            const safeUser = getSafeUser(updatedUser.toObject());
 
             ResponseHandler.success(res, { user: safeUser }, "User updated successfully");
         } catch (error) {

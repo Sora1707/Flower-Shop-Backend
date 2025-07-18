@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const TOKEN_EXPIRATION = "1h"; // 1 hours
+const TOKEN_EXPIRATION = "10m"; // 1 hour
 
 function generateToken(secretKey: string) {
     return function (userId: string) {
