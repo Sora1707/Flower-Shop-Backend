@@ -6,7 +6,7 @@ import { AuthRequest } from "@/types/request";
 
 export const AVATAR_EXTENSION = "jpg";
 export const AVATAR_FOLDER_PATH = path.join("src", "uploads", "users");
-const AVATAR_DEFAULT_URL = "/uploads/defaults/avatar";
+const AVATAR_DEFAULT_URL = "uploads/defaults/avatar";
 export const AVATAR_SIZE = {
     small: 64,
     medium: 128,
@@ -42,7 +42,7 @@ export async function processAvatar(file: Express.Multer.File, userId: string) {
     return filePaths; // return { small: "...", medium: "...", large: "..." }
 }
 
-export async function getDefaultAvatar() {
+export function getDefaultAvatarPaths() {
     return {
         small: `${AVATAR_DEFAULT_URL}-small.jpg`,
         medium: `${AVATAR_DEFAULT_URL}-medium.jpg`,

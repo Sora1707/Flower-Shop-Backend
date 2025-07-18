@@ -6,6 +6,7 @@ const userInfo = document.getElementById("userInfo");
 const avatarInput = document.getElementById("avatarInput");
 const preview = document.getElementById("preview");
 const cropBtn = document.getElementById("cropBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let cropper = null;
 
@@ -49,6 +50,8 @@ async function getUserInfo() {
 
         if (!res.ok) throw new Error("Failed to fetch user info");
         const userInfo = (await res.json()).data.user;
+
+        // console.log(userInfo);
 
         const avatar = document.getElementById("avatar");
         avatar.src = HOST_URL + "/" + userInfo.avatar.medium || "";
@@ -131,6 +134,10 @@ loginForm.addEventListener("submit", async e => {
         console.error("Login error:", err);
         alert("Login failed. Please check your credentials.");
     }
+});
+
+logoutBtn.addEventListener("click", () => {
+    logout();
 });
 
 avatarInput.addEventListener("change", e => {
