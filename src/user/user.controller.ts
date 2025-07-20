@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
 
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
@@ -19,19 +18,12 @@ import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
 import { processAvatar } from "./avatar";
 import { getSafeUser } from "./util";
+import { sendResetPasswordEmail } from "@/utils/mailer";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
     role: 0,
 };
-
-const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
 
 class UserController {
     // [GET] /user/
@@ -249,14 +241,11 @@ class UserController {
 
             const frontEndURL = `${process.env.FRONT_END_IP}:${process.env.FRONT_END_PORT}`;
             const resetLink = `${frontEndURL}/reset-password?token=${resetToken}`;
-            // await transporter.sendMail({
-            //     to: email,
-            //     subject: "Password Reset Request",
-            //     html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
-            // });
 
-            ResponseHandler.success(res, { resetLink }, "Password reset requested");
-            // ResponseHandler.success(res, null, "Password reset requested. Check your email.");
+            await sendResetPasswordEmail(email, resetLink);
+
+            // ResponseHandler.success(res, { resetLink }, "Password reset requested");
+            ResponseHandler.success(res, null, "Password reset requested. Check your email.");
         } catch (error) {
             next(error);
         }
