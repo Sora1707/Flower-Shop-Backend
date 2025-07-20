@@ -28,5 +28,6 @@ export interface IUser extends Document {
     } | null;
     createdAt: Date;
     updatedAt: Date;
+    passwordChangedAt: Date;
     matchPassword(inputPassword: string): Promise<boolean>;
 }

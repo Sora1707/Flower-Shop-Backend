@@ -8,7 +8,12 @@ import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 
 import { cartService, ICartItem } from "@/cart";
-import { generateLoginToken, generatePasswordResetToken, getPasswordResetPayload } from "./token";
+import {
+    checkPayloadBeforePasswordReset,
+    generateLoginToken,
+    generatePasswordResetToken,
+    getPasswordResetPayload,
+} from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
 import { UserLoginInput } from "./user.validation";
@@ -278,11 +283,19 @@ class UserController {
             if (!user) {
                 return ResponseHandler.error(res, "User not found", 404);
             }
+            if (checkPayloadBeforePasswordReset(payload, user)) {
+                return ResponseHandler.error(
+                    res,
+                    "Token is outdated due to recent password change",
+                    400
+                );
+            }
 
             user.password = newPassword;
+            user.passwordChangedAt = new Date();
             await user.save();
 
-            ResponseHandler.success(res, null, "Password reset successful");
+            ResponseHandler.success(res, null, "Password reset successfully");
         } catch (error) {
             next(error);
         }

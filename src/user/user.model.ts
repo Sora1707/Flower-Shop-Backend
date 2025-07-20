@@ -25,6 +25,7 @@ const UserSchema = new Schema<IUser>(
             medium: { type: String },
             large: { type: String },
         },
+        passwordChangedAt: { type: Date, default: Date.now },
     },
     { timestamps: true }
 );

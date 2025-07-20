@@ -1,5 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { StringValue } from "ms";
+import { IUser } from "./user.interface";
 
 const LOGIN_EXPIRATION = "10m";
 const RESET_PASSWORD_EXPIRATION = "15m";
@@ -34,3 +35,10 @@ export const getLoginPayload = getPayload<JwtPayload & { userId: string }>(proce
 export const getPasswordResetPayload = getPayload<JwtPayload & { userId: string }>(
     process.env.RESET_PASSWORD_SECRET!
 );
+
+export function checkPayloadBeforePasswordReset(payload: JwtPayload, user: IUser) {
+    if (!(typeof payload.iat === "number")) return true;
+    const requestIssuedAt = payload.iat * 1000;
+    const passwordChangedAt = user.passwordChangedAt.getTime();
+    return requestIssuedAt <= passwordChangedAt;
+}
