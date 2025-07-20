@@ -1,4 +1,5 @@
 import { Document } from "mongoose";
+import { IAddress } from "./address.interface";
 
 export enum Gender {
     Male = "Male",
@@ -26,6 +27,7 @@ export interface IUser extends Document {
         medium: string;
         large: string;
     } | null;
+    addresses: IAddress[];
     createdAt: Date;
     updatedAt: Date;
     passwordChangedAt: Date;
