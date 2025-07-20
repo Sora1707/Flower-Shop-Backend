@@ -49,7 +49,7 @@ app.use(morgan("dev"));
 app.use(
     cors({
         origin: [
-            `http://localhost:${process.env.FRONT_END_PORT}`,
+            `${process.env.FRONT_END_IP}:${process.env.FRONT_END_PORT}`,
             `http://127.0.0.1:${process.env.FRONT_END_PORT}`,
         ],
         credentials: true,

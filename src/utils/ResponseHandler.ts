@@ -5,7 +5,7 @@ class ResponseHandler {
         const payload = {
             success: true,
             message,
-            data,
+            ...(data ? { data } : {}),
         };
         return res.status(statusCode).json(payload);
     }
