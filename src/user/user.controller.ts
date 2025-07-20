@@ -78,7 +78,7 @@ class UserController {
     // [GET] /user/me
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
-            return res.status(401).json({ message: "Unauthorized" });
+            return;
         }
         const safeUser = getSafeUser(req.user.toObject());
         ResponseHandler.success(res, { user: safeUser });
@@ -237,19 +237,21 @@ class UserController {
 
             const user = await userService.findOne({ email });
             if (!user) {
-                return ResponseHandler.error(res, "User not found", 404);
+                return ResponseHandler.error(res, "This email is not registered", 404);
             }
 
             const resetToken = generatePasswordResetToken(user.id);
 
-            const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
-            await transporter.sendMail({
-                to: email,
-                subject: "Password Reset Request",
-                html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
-            });
+            const frontEndURL = `${process.env.FRONT_END_IP}:${process.env.FRONT_END_PORT}`;
+            const resetLink = `${frontEndURL}/reset-password?token=${resetToken}`;
+            // await transporter.sendMail({
+            //     to: email,
+            //     subject: "Password Reset Request",
+            //     html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
+            // });
 
-            ResponseHandler.success(res, null, "Password reset requested. Check your email.");
+            ResponseHandler.success(res, { resetLink }, "Password reset requested");
+            // ResponseHandler.success(res, null, "Password reset requested. Check your email.");
         } catch (error) {
             next(error);
         }
@@ -277,7 +279,7 @@ class UserController {
                 return ResponseHandler.error(res, "User not found", 404);
             }
 
-            user.password = await bcrypt.hash(newPassword, 10);
+            user.password = newPassword;
             await user.save();
 
             ResponseHandler.success(res, null, "Password reset successful");
