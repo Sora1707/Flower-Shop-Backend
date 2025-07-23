@@ -7,6 +7,8 @@ const ProductSchema = new Schema<IProduct>(
     {
         name: { type: String, required: true },
         price: { type: Number, required: true },
+        dailyRuleId: { type: String, required: true, ref: "DailyRule"},
+        promotionId: [{ type: String}],
         description: { type: String, required: true },
         categories: [
             {

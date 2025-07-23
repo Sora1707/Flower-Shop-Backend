@@ -12,6 +12,8 @@ export enum Category {
 export interface IProduct extends Document {
     name: string;
     price: number;
+    dailyRuleId: string;
+    promotionId?: string[];
     description: string;
     categories: Category[];
     images: string[];
