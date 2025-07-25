@@ -15,10 +15,11 @@ import {
 } from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { UserLoginInput } from "./user.validation";
+import { UserAddressInput, UserLoginInput } from "./user.validation";
 import { processAvatar } from "./avatar";
-import { getSafeUser } from "./util";
+import { getSafeUser, getSafeUserProfile } from "./util";
 import { sendResetPasswordEmail } from "@/utils/mailer";
+import { IAddress } from "./address.interface";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -81,6 +82,23 @@ class UserController {
         ResponseHandler.success(res, { user: safeUser });
     }
 
+    // [GET] /user/profile
+    async getUserProfile(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) {
+            return;
+        }
+        const safeUserProfile = getSafeUserProfile(req.user.toObject());
+        ResponseHandler.success(res, { user: safeUserProfile });
+    }
+
+    async getUserAddresses(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) {
+            return;
+        }
+        const safeUser = getSafeUser(req.user.toObject());
+        ResponseHandler.success(res, { addresses: safeUser.addresses });
+    }
+
     // [POST] /user/login
     async login(req: Request<{}, {}, UserLoginInput>, res: Response, next: NextFunction) {
         try {
@@ -123,8 +141,6 @@ class UserController {
                 avatar,
             } = req.body;
 
-            console.log(req.body);
-
             const existingUser = await userService.findOne({ username });
             if (existingUser) {
                 return res.status(400).json({ message: "Username already registered" });
@@ -154,6 +170,34 @@ class UserController {
             const { password: _pw, role, ...safeUser } = newUser.toObject();
 
             ResponseHandler.success(res, { user: safeUser }, "User registered successfully", 201);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async addUserAddress(
+        req: AuthRequest<{}, {}, UserAddressInput>,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const newAddress = req.body as UserAddressInput;
+
+            user.addresses.push(newAddress as IAddress);
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: user.addresses },
+                "Address added successfully",
+                201
+            );
         } catch (error) {
             next(error);
         }

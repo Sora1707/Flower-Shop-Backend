@@ -10,11 +10,32 @@ import { uploadAvatar } from "@/config/upload";
 import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
-import { UserLoginValidation, UserRegisterValidation } from "./user.validation";
+import {
+    UserAddressValidation,
+    UserLoginValidation,
+    UserRegisterValidation,
+} from "./user.validation";
 
 const router = Router();
 
 router.get("/me", asyncHandler(authenticate), asyncHandler(UserController.getCurrentUser));
+
+router.get("/profile", asyncHandler(authenticate), asyncHandler(UserController.getUserProfile));
+router.get("/address", asyncHandler(authenticate), asyncHandler(UserController.getUserAddresses));
+// router.get("/payment", asyncHandler(authenticate), asyncHandler(UserController.getUserPayment));
+
+router.post(
+    "/address",
+    asyncHandler(authenticate),
+    validateBody(UserAddressValidation),
+    asyncHandler(UserController.addUserAddress)
+);
+// router.delete(
+//     "/address/:id",
+//     asyncHandler(authenticate),
+//     asyncHandler(UserController.deleteAddress)
+// );
+
 router.get(
     "/order/:orderId",
     asyncHandler(authenticate),

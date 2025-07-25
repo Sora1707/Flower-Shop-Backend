@@ -126,6 +126,15 @@ router.get("/get_all", async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
+router.get("/user/:username", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const username = req.params.username;
+        const user = await userService.findOne({ username });
+        res.status(200).json(user);
+    } catch (error) {
+        next(error);
+    }
+});
 // IMAGE UPLOAD
 
 export default router;

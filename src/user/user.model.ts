@@ -44,7 +44,7 @@ const UserSchema = new Schema<IUser>(
                     validator: function (addresses: IAddress[]) {
                         return addresses.length <= MAX_ADDRESSES;
                     },
-                    message: `A user can have up to ${MAX_ADDRESSES} addresses only.`,
+                    message: `A user can have up to ${MAX_ADDRESSES} addresses only. Please remove an address to add a new one.`,
                 },
             ],
         },
@@ -59,7 +59,17 @@ UserSchema.plugin(mongoosePaginate);
 UserSchema.pre("save", async function (next) {
     try {
         if (this.isModified("addresses")) {
-            if (this.addresses.length === 1) this.addresses[0].isDefault = true;
+            let hasDefaultAddress = false;
+            for (const address of this.addresses) {
+                if (address.isDefault) {
+                    hasDefaultAddress = true;
+                    break;
+                }
+            }
+
+            if (!hasDefaultAddress) {
+                this.addresses[0].isDefault = true;
+            }
         }
         if (this.isModified("password")) {
             this.password = await password.hash(this.password);
