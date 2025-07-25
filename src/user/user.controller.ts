@@ -175,6 +175,7 @@ class UserController {
         }
     }
 
+    // [POST] /user/address
     async addUserAddress(
         req: AuthRequest<{}, {}, UserAddressInput>,
         res: Response,
@@ -197,6 +198,36 @@ class UserController {
                 { addresses: user.addresses },
                 "Address added successfully",
                 201
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [DELETE] /user/address/:id
+    async deleteUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const addressId = req.params.id;
+
+            const addressIndex = user.addresses.findIndex(address => address.id === addressId);
+
+            if (addressIndex === -1) {
+                ResponseHandler.error(res, "Address not found", 404);
+            }
+
+            const removedAddress = user.addresses.splice(addressIndex, 1)[0];
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: removedAddress },
+                "Address deleted successfully"
             );
         } catch (error) {
             next(error);

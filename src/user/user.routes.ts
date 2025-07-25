@@ -30,11 +30,11 @@ router.post(
     validateBody(UserAddressValidation),
     asyncHandler(UserController.addUserAddress)
 );
-// router.delete(
-//     "/address/:id",
-//     asyncHandler(authenticate),
-//     asyncHandler(UserController.deleteAddress)
-// );
+router.delete(
+    "/address/:id",
+    asyncHandler(authenticate),
+    asyncHandler(UserController.deleteUserAddress)
+);
 
 router.get(
     "/order/:orderId",
