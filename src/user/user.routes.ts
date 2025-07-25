@@ -13,6 +13,7 @@ import UserController from "@/user/user.controller";
 import {
     UserAddressValidation,
     UserLoginValidation,
+    UserPasswordChangeValidaton,
     UserRegisterValidation,
 } from "./user.validation";
 
@@ -77,6 +78,12 @@ router.post(
     asyncHandler(UserController.register)
 );
 
+router.post(
+    "/change-password",
+    asyncHandler(authenticate),
+    validateBody(UserPasswordChangeValidaton),
+    asyncHandler(UserController.changePassword)
+);
 router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
 router.post("/reset-password", asyncHandler(UserController.resetPassword));
 router.post(

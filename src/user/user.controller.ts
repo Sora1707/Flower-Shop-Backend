@@ -15,7 +15,7 @@ import {
 } from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { UserAddressInput, UserLoginInput } from "./user.validation";
+import { UserAddressInput, UserLoginInput, UserPasswordChangeInput } from "./user.validation";
 import { processAvatar } from "./avatar";
 import { getSafeUser, getSafeUserProfile } from "./util";
 import { sendResetPasswordEmail } from "@/utils/mailer";
@@ -425,28 +425,27 @@ class UserController {
         }
     }
 
-    // [PUT] user/change-password
-    async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+    // [POST] user/change-password
+    async changePassword(
+        req: AuthRequest<{}, {}, UserPasswordChangeInput>,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
+            if (!req.user) {
+                return;
+            }
+
             const { currentPassword, newPassword } = req.body;
             const user = req.user;
 
-            if (!currentPassword || !newPassword) {
-                return res
-                    .status(400)
-                    .json({ message: "Current password and new password are required" });
-            }
-
-            if (!user) {
-                return res.status(401).json({ message: "Unauthorized" });
-            }
-
-            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            const isMatch = await user.matchPassword(currentPassword);
             if (!isMatch) {
-                return res.status(400).json({ message: "Current password is incorrect" });
+                ResponseHandler.error(res, "Wrong password", 400);
             }
 
-            user.password = await bcrypt.hash(newPassword, 10);
+            user.password = newPassword;
+            user.passwordChangedAt = new Date();
             await user.save();
 
             ResponseHandler.success(res, null, "Password changed successfully");

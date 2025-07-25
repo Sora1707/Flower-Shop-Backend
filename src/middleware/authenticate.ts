@@ -28,7 +28,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
     try {
         const payload = getLoginPayload(token);
 
-        const user = await userService.findById(payload.userId, { password: 0 });
+        const user = await userService.findById(payload.userId);
 
         if (!user) {
             return ResponseHandler.error(res, "Invalid token", 401);
