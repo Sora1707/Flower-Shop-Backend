@@ -37,6 +37,18 @@ router.patch(
     asyncHandler(UserController.setDefaultAddress)
 );
 
+router.patch(
+    "/address/:id",
+    asyncHandler(authenticate),
+    asyncHandler(UserController.updateUserAddress)
+);
+
+router.put(
+    "/address/:id",
+    asyncHandler(authenticate),
+    asyncHandler(UserController.updateUserAddress)
+);
+
 router.delete(
     "/address/:id",
     asyncHandler(authenticate),

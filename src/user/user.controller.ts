@@ -229,6 +229,41 @@ class UserController {
         } catch (error) {}
     }
 
+    // [PATCH] /user/address/:id
+    // [PUT] /user/address/:id
+    async updateUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const addressId = req.params.id;
+            const index = user.addresses.findIndex(address => address.id === addressId);
+
+            if (index === -1) {
+                ResponseHandler.error(res, "Address not found", 404);
+            }
+
+            if (req.body.isDefault !== undefined) {
+                delete req.body.isDefault;
+            }
+
+            const address = user.addresses[index];
+            Object.assign(address, req.body);
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: user.addresses },
+                "Address updated successfully"
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // [DELETE] /user/address/:id
     async deleteUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
         try {
