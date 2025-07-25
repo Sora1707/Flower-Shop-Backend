@@ -204,6 +204,31 @@ class UserController {
         }
     }
 
+    // [PATCH] /user/address/:id/default
+    async setDefaultAddress(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const addressId = req.params.id;
+
+            const index = user.addresses.findIndex(address => address.id === addressId);
+            user.addresses.forEach(address => (address.isDefault = false));
+            user.addresses[index].isDefault = true;
+            [user.addresses[0], user.addresses[index]] = [user.addresses[index], user.addresses[0]];
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: user.addresses },
+                "Default address set successfully"
+            );
+        } catch (error) {}
+    }
+
     // [DELETE] /user/address/:id
     async deleteUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
         try {

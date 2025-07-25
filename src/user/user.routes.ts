@@ -30,6 +30,13 @@ router.post(
     validateBody(UserAddressValidation),
     asyncHandler(UserController.addUserAddress)
 );
+
+router.patch(
+    "/address/:id/default",
+    asyncHandler(authenticate),
+    asyncHandler(UserController.setDefaultAddress)
+);
+
 router.delete(
     "/address/:id",
     asyncHandler(authenticate),
