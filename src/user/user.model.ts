@@ -20,10 +20,10 @@ const UserSchema = new Schema<IUser>(
         password: { type: String, required: true },
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
-        email: { type: String, required: true, unique: true },
+        email: { type: String, required: true, unique: true, trim: true, lowercase: true },
         phoneNumber: { type: String },
         birthdate: { type: Date },
-        gender: { type: String, enum: Object.values(Gender) },
+        gender: { type: String, enum: Object.values(Gender), default: Gender.Unknown },
         avatar: {
             small: { type: String },
             medium: { type: String },

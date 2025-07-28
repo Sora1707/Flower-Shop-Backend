@@ -38,7 +38,7 @@ async function createSampleCart() {
             await cartService.create({ user: user.id as Types.ObjectId });
         }
 
-        const user = await userService.findOne({ username: "sora" });
+        const user = await userService.findOne({ username: "sora1" });
         const products = await productService.findAll();
         const slicedProducts = products.slice(0, 3);
 

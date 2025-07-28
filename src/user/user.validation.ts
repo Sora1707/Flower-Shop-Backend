@@ -21,13 +21,13 @@ export const UserRegisterValidation = z.object({
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
     email: z.string().email({ message: "Invalid email address" }),
-    birthdate: z.coerce.date(),
-    gender: z.enum([Gender.Male, Gender.Female, Gender.Other]),
+    birthdate: z.coerce.date().optional(),
+    gender: z.enum([Gender.Male, Gender.Female, Gender.Other, Gender.Unknown]).optional(),
 });
 export type UserRegisterInput = z.infer<typeof UserRegisterValidation>;
 
 export const UserAddressValidation = z.object({
-    fullName: z.string().min(1, { message: "Full name is required" }),
+    name: z.string().min(1, { message: "Full name is required" }),
     phoneNumber: z.string().min(1, { message: "Phone number is required" }),
     country: z.string().min(1, { message: "Country is required" }),
     stateOrProvince: z.string().min(1, { message: "State or province is required" }),

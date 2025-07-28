@@ -9,7 +9,7 @@
         "birthdate": "2002/10/30",
         "addresses": [
             {
-                "fullName": "Sora Takamiya",
+                "name": "Sora Takamiya",
                 "phoneNumber": "0123456789",
                 "country": "Vietnam",
                 "stateOrProvince": "Ho Chi Minh",
@@ -19,7 +19,7 @@
                 "isdefault": true
             }
         ],
-        "gender": "Male",
+        "gender": "male",
         "role": "admin"
     },
     {
@@ -30,7 +30,7 @@
         "phoneNumber": "001-436-157-4520x38833",
         "email": "usavage@richardson.com",
         "birthdate": "1989/08/12",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -41,7 +41,7 @@
         "phoneNumber": "(345)682-5680x582",
         "email": "kimkristen@campbell-bruce.com",
         "birthdate": "1969/04/29",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -52,7 +52,7 @@
         "phoneNumber": "+1-732-038-4942",
         "email": "michaelalexander@miles.com",
         "birthdate": "1995/10/11",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -63,7 +63,7 @@
         "phoneNumber": "(233)883-1487",
         "email": "dominiquehall@scott-johnson.com",
         "birthdate": "1990/04/04",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -74,7 +74,7 @@
         "phoneNumber": "(929)973-1466",
         "email": "hardydiana@hotmail.com",
         "birthdate": "1997/11/01",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -85,7 +85,7 @@
         "phoneNumber": "001-504-374-0159x0636",
         "email": "jenkinselizabeth@villegas-jackson.biz",
         "birthdate": "1987/03/06",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -96,7 +96,7 @@
         "phoneNumber": "818-843-4153",
         "email": "dyerdavid@hotmail.com",
         "birthdate": "1986/08/03",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -107,7 +107,7 @@
         "phoneNumber": "+1-295-648-9913x198",
         "email": "hguzman@jackson-meadows.com",
         "birthdate": "1978/08/28",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -118,7 +118,7 @@
         "phoneNumber": "493-984-2572x984",
         "email": "daviscorey@robinson.com",
         "birthdate": "1980/04/15",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -129,7 +129,7 @@
         "phoneNumber": "274-218-7781",
         "email": "pryan@payne-colon.com",
         "birthdate": "2001/03/05",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -140,7 +140,7 @@
         "phoneNumber": "117.963.5276",
         "email": "katiejones@carroll-graham.com",
         "birthdate": "1998/03/02",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -151,7 +151,7 @@
         "phoneNumber": "+1-344-416-6881x85045",
         "email": "brianboone@graves-lynch.com",
         "birthdate": "1987/06/15",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -162,7 +162,7 @@
         "phoneNumber": "5216089518",
         "email": "richard77@yahoo.com",
         "birthdate": "1997/02/25",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -173,7 +173,7 @@
         "phoneNumber": "019.419.8525",
         "email": "phillipsnathan@hughes.net",
         "birthdate": "1968/02/04",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -184,7 +184,7 @@
         "phoneNumber": "+1-377-938-5470x793",
         "email": "odavis@alvarez-king.com",
         "birthdate": "1972/01/27",
-        "gender": "Female",
+        "gender": "female",
         "role": "user"
     },
     {
@@ -195,7 +195,7 @@
         "phoneNumber": "(527)380-6949x34190",
         "email": "zachary46@smith-rogers.com",
         "birthdate": "1964/11/10",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -206,7 +206,7 @@
         "phoneNumber": "+1-826-001-4265x43878",
         "email": "rasmussenjerry@yahoo.com",
         "birthdate": "1997/10/28",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -217,7 +217,7 @@
         "phoneNumber": "001-073-116-9836x214",
         "email": "amorris@yahoo.com",
         "birthdate": "2004/01/27",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     },
     {
@@ -228,7 +228,7 @@
         "phoneNumber": "695.724.7369x0233",
         "email": "heather14@hotmail.com",
         "birthdate": "1986/06/29",
-        "gender": "Male",
+        "gender": "male",
         "role": "user"
     }
 ]

@@ -3,7 +3,7 @@ import { IAddress } from "./address.interface";
 
 export const AddressSchema = new Schema<IAddress>(
     {
-        fullName: { type: String, required: true },
+        name: { type: String, required: true },
         phoneNumber: { type: String, required: true },
         country: { type: String, required: true },
         stateOrProvince: { type: String, required: true },

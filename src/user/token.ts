@@ -5,7 +5,7 @@ import { JWT_SECRET, RESET_PASSWORD_SECRET } from "@/config/dotenv";
 
 import { IUser } from "./user.interface";
 
-const LOGIN_EXPIRATION = "10m";
+const LOGIN_EXPIRATION = "1h";
 const RESET_PASSWORD_EXPIRATION = "15m";
 
 function generateToken(secretKey: string, expiration: StringValue | number) {

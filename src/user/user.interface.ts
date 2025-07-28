@@ -2,9 +2,10 @@ import { Document } from "mongoose";
 import { IAddress } from "./address.interface";
 
 export enum Gender {
-    Male = "Male",
-    Female = "Female",
+    Male = "male",
+    Female = "female",
     Other = "other",
+    Unknown = "unknown",
 }
 
 export enum Role {
