@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/default";
-console.log(MONGO_URI);
+import { MONGO_URI } from "./dotenv";
+
 export const connectDB = async () => {
     try {
         await mongoose.connect(MONGO_URI);
