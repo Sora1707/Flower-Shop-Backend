@@ -13,9 +13,9 @@ import { FRONT_END_IP, FRONT_END_PORT, PORT } from "./config/dotenv";
 
 import { connectDB } from "./config/db";
 
-import errorHandler from "./middleware/errorHandler";
+import errorHandler from "./middleware/errorHandler.middelware";
 import arcjetMiddleware from "./middleware/arcjet.middleware";
-import asyncHandler from "./middleware/asyncHandler";
+import asyncHandler from "./middleware/asyncHandler.middelware";
 
 import cartRouter from "@/cart/cart.routes";
 import orderRouter from "@/order/order.routes";
@@ -54,6 +54,9 @@ app.use(
         credentials: true,
     })
 );
+
+// Rate limiting and Bot detection
+app.use(asyncHandler(arcjetMiddleware));
 
 // Public (Static) files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

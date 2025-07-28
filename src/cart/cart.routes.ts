@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import asyncHandler from "@/middleware/asyncHandler";
-import authenticate from "@/middleware/authenticate";
-import { isAdmin } from "@/middleware/authorize";
+import asyncHandler from "@/middleware/asyncHandler.middelware";
+import authenticate from "@/middleware/authenticate.middelware";
+import { isAdmin } from "@/middleware/authorize.middleware";
 
 import cartController from "./cart.controller";
 import orderController from "@/order/order.controller";
