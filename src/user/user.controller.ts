@@ -1,32 +1,30 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
 
 import { SelectedFieldsObject } from "@/services";
 import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 
 import { cartService, ICartItem } from "@/cart";
-import { generateLoginToken, generatePasswordResetToken, getPasswordResetPayload } from "./token";
+import {
+    checkPayloadBeforePasswordReset,
+    generateLoginToken,
+    generatePasswordResetToken,
+    getPasswordResetPayload,
+} from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { UserLoginInput } from "./user.validation";
+import { UserAddressInput, UserLoginInput, UserPasswordChangeInput } from "./user.validation";
 import { processAvatar } from "./avatar";
-import { getSafeUser } from "./util";
+import { getSafeUser, getSafeUserProfile } from "./util";
+import { sendResetPasswordEmail } from "@/utils/mailer";
+import { IAddress } from "./address.interface";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
     role: 0,
 };
-
-const transporter = nodemailer.createTransport({
-    service: "Gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
 
 class UserController {
     // [GET] /user/
@@ -78,10 +76,27 @@ class UserController {
     // [GET] /user/me
     async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
-            return res.status(401).json({ message: "Unauthorized" });
+            return;
         }
         const safeUser = getSafeUser(req.user.toObject());
         ResponseHandler.success(res, { user: safeUser });
+    }
+
+    // [GET] /user/profile
+    async getUserProfile(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) {
+            return;
+        }
+        const safeUserProfile = getSafeUserProfile(req.user.toObject());
+        ResponseHandler.success(res, { user: safeUserProfile });
+    }
+
+    async getUserAddresses(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) {
+            return;
+        }
+        const safeUser = getSafeUser(req.user.toObject());
+        ResponseHandler.success(res, { addresses: safeUser.addresses });
     }
 
     // [POST] /user/login
@@ -126,8 +141,6 @@ class UserController {
                 avatar,
             } = req.body;
 
-            console.log(req.body);
-
             const existingUser = await userService.findOne({ username });
             if (existingUser) {
                 return res.status(400).json({ message: "Username already registered" });
@@ -157,6 +170,125 @@ class UserController {
             const { password: _pw, role, ...safeUser } = newUser.toObject();
 
             ResponseHandler.success(res, { user: safeUser }, "User registered successfully", 201);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [POST] /user/address
+    async addUserAddress(
+        req: AuthRequest<{}, {}, UserAddressInput>,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const newAddress = req.body as UserAddressInput;
+
+            user.addresses.push(newAddress as IAddress);
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: user.addresses },
+                "Address added successfully",
+                201
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [PATCH] /user/address/:id/default
+    async setDefaultAddress(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const addressId = req.params.id;
+
+            const index = user.addresses.findIndex(address => address.id === addressId);
+            user.addresses.forEach(address => (address.isDefault = false));
+            user.addresses[index].isDefault = true;
+            [user.addresses[0], user.addresses[index]] = [user.addresses[index], user.addresses[0]];
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: user.addresses },
+                "Default address set successfully"
+            );
+        } catch (error) {}
+    }
+
+    // [PATCH] /user/address/:id
+    // [PUT] /user/address/:id
+    async updateUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const addressId = req.params.id;
+            const index = user.addresses.findIndex(address => address.id === addressId);
+
+            if (index === -1) {
+                ResponseHandler.error(res, "Address not found", 404);
+            }
+
+            if (req.body.isDefault !== undefined) {
+                delete req.body.isDefault;
+            }
+
+            const address = user.addresses[index];
+            Object.assign(address, req.body);
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: user.addresses },
+                "Address updated successfully"
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [DELETE] /user/address/:id
+    async deleteUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const addressId = req.params.id;
+
+            const addressIndex = user.addresses.findIndex(address => address.id === addressId);
+
+            if (addressIndex === -1) {
+                ResponseHandler.error(res, "Address not found", 404);
+            }
+
+            const removedAddress = user.addresses.splice(addressIndex, 1)[0];
+
+            await user.save();
+
+            ResponseHandler.success(
+                res,
+                { addresses: removedAddress },
+                "Address deleted successfully"
+            );
         } catch (error) {
             next(error);
         }
@@ -237,18 +369,17 @@ class UserController {
 
             const user = await userService.findOne({ email });
             if (!user) {
-                return ResponseHandler.error(res, "User not found", 404);
+                return ResponseHandler.error(res, "This email is not registered", 404);
             }
 
             const resetToken = generatePasswordResetToken(user.id);
 
-            const resetLink = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
-            await transporter.sendMail({
-                to: email,
-                subject: "Password Reset Request",
-                html: `Click <a href="${resetLink}">${resetLink}</a> to reset your password. This link expires in 1 hour.`,
-            });
+            const frontEndURL = `${process.env.FRONT_END_IP}:${process.env.FRONT_END_PORT}`;
+            const resetLink = `${frontEndURL}/reset-password?token=${resetToken}`;
 
+            await sendResetPasswordEmail(email, resetLink);
+
+            // ResponseHandler.success(res, { resetLink }, "Password reset requested");
             ResponseHandler.success(res, null, "Password reset requested. Check your email.");
         } catch (error) {
             next(error);
@@ -276,38 +407,45 @@ class UserController {
             if (!user) {
                 return ResponseHandler.error(res, "User not found", 404);
             }
+            if (checkPayloadBeforePasswordReset(payload, user)) {
+                return ResponseHandler.error(
+                    res,
+                    "Token is outdated due to recent password change",
+                    400
+                );
+            }
 
-            user.password = await bcrypt.hash(newPassword, 10);
+            user.password = newPassword;
+            user.passwordChangedAt = new Date();
             await user.save();
 
-            ResponseHandler.success(res, null, "Password reset successful");
+            ResponseHandler.success(res, null, "Password reset successfully");
         } catch (error) {
             next(error);
         }
     }
 
-    // [PUT] user/change-password
-    async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
+    // [POST] user/change-password
+    async changePassword(
+        req: AuthRequest<{}, {}, UserPasswordChangeInput>,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
+            if (!req.user) {
+                return;
+            }
+
             const { currentPassword, newPassword } = req.body;
             const user = req.user;
 
-            if (!currentPassword || !newPassword) {
-                return res
-                    .status(400)
-                    .json({ message: "Current password and new password are required" });
-            }
-
-            if (!user) {
-                return res.status(401).json({ message: "Unauthorized" });
-            }
-
-            const isMatch = await bcrypt.compare(currentPassword, user.password);
+            const isMatch = await user.matchPassword(currentPassword);
             if (!isMatch) {
-                return res.status(400).json({ message: "Current password is incorrect" });
+                ResponseHandler.error(res, "Wrong password", 400);
             }
 
-            user.password = await bcrypt.hash(newPassword, 10);
+            user.password = newPassword;
+            user.passwordChangedAt = new Date();
             await user.save();
 
             ResponseHandler.success(res, null, "Password changed successfully");

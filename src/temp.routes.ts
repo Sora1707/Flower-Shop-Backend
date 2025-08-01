@@ -7,6 +7,7 @@ import { productService } from "@/product";
 import { reviewService } from "@/review";
 import { userService } from "@/user";
 import { randomInt } from "./utils/number";
+import withTransaction from "./utils/withTransaction";
 
 async function reloadSampleUsers() {
     try {
@@ -31,7 +32,13 @@ async function reloadSampleProducts() {
 async function createSampleCart() {
     try {
         await cartService.deleteAll();
-        const user = await userService.findOne({ username: "sora" });
+
+        const users = await userService.findAll();
+        for (const user of users) {
+            await cartService.create({ user: user.id as Types.ObjectId });
+        }
+
+        const user = await userService.findOne({ username: "sora1" });
         const products = await productService.findAll();
         const slicedProducts = products.slice(0, 3);
 
@@ -39,7 +46,7 @@ async function createSampleCart() {
             items: slicedProducts.map(product => {
                 const quantity = randomInt(1, 3);
                 return {
-                    product: product.id as Types.ObjectId,
+                    product: product.id,
                     quantity,
                     priceAtAddTime: product.price,
                 };
@@ -79,10 +86,12 @@ async function createSampleOrder() {
             status: OrderStatus.COMPLETED,
             contactInfo: {
                 name: "sora",
-                email: "sora@me.com",
-                phone: "1234567890",
+                phoneNumber: "1234567890",
+                postalCode: "12345",
                 address: "123 Main St, Anytown, USA",
             },
+            paymentMethod: "cash",
+            shippingPrice: 0,
             totalPrice: products[0].price,
         };
 
@@ -100,11 +109,14 @@ const router = Router();
 
 router.post("/reload_sample_data", async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await reloadSampleUsers();
-        await reloadSampleProducts();
-        await createSampleCart();
-        await createSampleOrder();
-        await reviewService.deleteAll();
+        await withTransaction(async session => {
+            await reloadSampleUsers();
+            await reloadSampleProducts();
+            await createSampleCart();
+            await createSampleOrder();
+            await reviewService.deleteAll();
+        });
+
         res.status(200).json({ message: "Successfully reloaded sample data." });
     } catch (error) {
         next(error);
@@ -126,6 +138,15 @@ router.get("/get_all", async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
+router.get("/user/:username", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const username = req.params.username;
+        const user = await userService.findOne({ username });
+        res.status(200).json(user);
+    } catch (error) {
+        next(error);
+    }
+});
 // IMAGE UPLOAD
 
 export default router;

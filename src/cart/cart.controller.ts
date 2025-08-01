@@ -2,11 +2,17 @@ import { Request, Response, NextFunction } from "express";
 import { Types } from "mongoose";
 
 import { AuthRequest } from "@/types/request";
+
 import productService from "@/product/product.service";
 import userService from "@/user/user.service";
-
 import cartService from "./cart.service";
 import { ICartItem } from "./cartItem.interface";
+
+import { UpdateCartItemQuantityInput } from "./cart.validation";
+
+import ResponseHandler from "@/utils/ResponseHandler";
+import { IProduct } from "@/product";
+import { ICart } from "./cart.interface";
 
 class CartController {
     // [GET] /cart/all
@@ -66,73 +72,92 @@ class CartController {
         }
     }
 
-    // [PUT] /cart
-    async addItem(req: AuthRequest, res: Response, next: NextFunction) {
+    // [PATCH] /cart
+    async updateItemQuantity(
+        req: AuthRequest<{}, {}, UpdateCartItemQuantityInput>,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
-            const userId = req.user?._id;
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
             const { productId, quantity } = req.body;
 
-            let cart = await cartService.findOne({ user: userId });
+            const product = await productService.findById(productId);
+
+            if (!product) {
+                return ResponseHandler.error(res, "Product not found", 404);
+            }
+
+            const cart = await cartService.findOne({ user: user.id });
 
             if (!cart) {
-                return res.status(404).json({ message: "Cart not found" });
+                return ResponseHandler.error(res, "Cart not found", 404);
             }
 
-            const existingItem = cart.items.find(
-                (item: ICartItem) => item.product.toString() === productId
-            );
+            if (quantity > 0) await this.addItemQuantity(res, cart, product, quantity);
+            else await this.removeItemQuantity(res, cart, product, -quantity);
 
-            if (existingItem) {
-                existingItem.quantity += Number(quantity);
-            } else {
-                const product = await productService.findById(productId);
-                const newItem = {
-                    product: product?._id,
-                    quantity,
-                    priceAtAddTime: product?.price,
-                } as ICartItem;
-
-                cart.items.push(newItem);
-            }
-
-            await cart.save();
-            res.status(200).json(cart);
+            ResponseHandler.success(res, null, "Successfully updated item quantity");
         } catch (error) {
             next(error);
         }
     }
 
-    // [PATCH] /cart
-    async updateItemQuantity(req: AuthRequest, res: Response, next: NextFunction) {
-        try {
-            const userId = req.user?._id;
-            const { productId, quantity } = req.body;
+    private async addItemQuantity(res: Response, cart: ICart, product: IProduct, quantity: number) {
+        const existingItem = cart.items.find(
+            (item: ICartItem) => item.product.toString() === product.id
+        );
 
-            if (!quantity || quantity < 1) {
-                return res.status(400).json({ message: "Invalid quantity value" });
-            }
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            const newCartItem = {
+                product: product.id,
+                quantity,
+                priceAtAddTime: product.price,
+            } as ICartItem;
 
-            const cart = await cartService.findOne({ user: userId });
-
-            if (!cart) {
-                return res.status(404).json({ message: "Cart not found" });
-            }
-
-            const existingItem = cart.items.find(
-                (item: ICartItem) => item.product.toString() === productId
-            );
-
-            if (!existingItem) {
-                return res.status(404).json({ message: "Item not found in the cart" });
-            }
-
-            existingItem.quantity = quantity;
-            await cart.save();
-
-            res.status(200).json(cart);
-        } catch (error) {
-            next(error);
+            cart.items.push(newCartItem);
         }
+
+        await cart.save();
+    }
+
+    private async removeItemQuantity(
+        res: Response,
+        cart: ICart,
+        product: IProduct,
+        quantity: number
+    ) {
+        const existingItem = cart.items.find(
+            (item: ICartItem) => item.product.toString() === product.id
+        );
+
+        if (!existingItem) {
+            return ResponseHandler.error(res, "Item not found in the cart", 404);
+        }
+
+        existingItem.quantity -= quantity;
+
+        if (existingItem.quantity < 0) {
+            return ResponseHandler.error(
+                res,
+                "The quantity will be negative by subtracting this value",
+                400
+            );
+        }
+
+        if (existingItem.quantity === 0) {
+            cart.items = cart.items.filter(
+                (item: ICartItem) => item.product.toString() !== product.id
+            );
+        }
+
+        await cart.save();
     }
 
     // [DELETE] /cart

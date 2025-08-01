@@ -1,9 +1,11 @@
 import { Document } from "mongoose";
+import { IAddress } from "./address.interface";
 
 export enum Gender {
-    Male = "Male",
-    Female = "Female",
+    Male = "male",
+    Female = "female",
     Other = "other",
+    Unknown = "unknown",
 }
 
 export enum Role {
@@ -26,7 +28,9 @@ export interface IUser extends Document {
         medium: string;
         large: string;
     } | null;
+    addresses: IAddress[];
     createdAt: Date;
     updatedAt: Date;
+    passwordChangedAt: Date;
     matchPassword(inputPassword: string): Promise<boolean>;
 }
