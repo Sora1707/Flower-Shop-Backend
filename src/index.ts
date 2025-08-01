@@ -22,6 +22,7 @@ import orderRouter from "@/order/order.routes";
 import productRouter from "@/product/product.routes";
 import reviewRouter from "@/review/review.routes";
 import userRouter from "@/user/user.routes";
+import priceRuleRouter from "@/priceRule/priceRule.routes";
 import tempRouter from "./temp.routes";
 import uploadRouter from "./upload.routes";
 
@@ -69,6 +70,7 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/review", reviewRouter);
+app.use("/api/price-rule", priceRuleRouter);
 
 // temporary route for testing
 app.use("/api/temp", tempRouter);

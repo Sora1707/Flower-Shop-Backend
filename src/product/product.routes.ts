@@ -7,6 +7,9 @@ import { isAdmin } from "@/middleware/authorize.middleware";
 import { reviewController } from "@/review";
 
 import productController from "./product.controller";
+import { validateBody } from "@/middleware/validate";
+import { ProductCreateValidation } from "./product.validation";
+import { ReviewValidation } from "@/review/review.validation";
 
 const router = Router();
 
@@ -16,16 +19,25 @@ router.get("/:id/review", asyncHandler(reviewController.getProductReviews));
 router.get("/:id", asyncHandler(productController.getProductById));
 router.get("/", asyncHandler(productController.getAllProducts));
 
-router.post("/:id/review", asyncHandler(authenticate), asyncHandler(reviewController.createReview));
+router.post(
+    "/:id/review", 
+    asyncHandler(authenticate), 
+    validateBody(ReviewValidation),
+    asyncHandler(reviewController.createReview));
 
 router.post(
     "/",
     asyncHandler(authenticate),
     isAdmin,
+    validateBody(ProductCreateValidation),
     asyncHandler(productController.createProduct)
 );
 
-router.put("/:id/review", asyncHandler(authenticate), asyncHandler(reviewController.updateReview));
+router.put(
+    "/:id/review", 
+    asyncHandler(authenticate), 
+    // validateBody(ReviewValidation),
+    asyncHandler(reviewController.updateReview));
 
 router.put(
     "/:id",

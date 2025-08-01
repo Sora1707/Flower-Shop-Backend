@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import productService from "./product.service";
 import { extractProductOptionsFromRequest, getFilters } from "./requestQuery";
+import priceRuleService from "@/priceRule/priceRule.service";
 
 class ProductController {
     // [GET] /product/
@@ -26,7 +27,13 @@ class ProductController {
             if (!product) {
                 return res.status(404).json({ message: "Product not found." });
             }
-            res.status(200).json(product);
+            const assignedPrice = await priceRuleService.applyRulesToProduct({
+                price: product.price,
+                createdAt: product.createdAt,
+                dailyRuleID: product.dailyRuleId,     
+                promotionId: product.promotionId
+            });
+            res.status(200).json({assignedPrice, product});
         } catch (error) {
             next(error);
         }

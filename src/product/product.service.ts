@@ -41,6 +41,14 @@ class ProductService extends BasePaginateService<IProduct> {
             })
             .limit(limit); // Limit to 10 results
     }
+
+    async getProductStock(productId: string): Promise<number> {
+        const product = await this.findById(productId);
+        if (!product) {
+            throw new Error("Product not found");
+        }
+        return product.stock;
+    }
 }
 
 const productService = new ProductService();

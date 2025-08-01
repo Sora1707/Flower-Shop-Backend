@@ -7,6 +7,9 @@ import { create } from "domain";
 import { ContactInfo, OrderStatus } from "./order.interface";
 import { userService } from "@/user";
 import { AuthRequest } from "@/types/request";
+import ResponseHandler from "@/utils/ResponseHandler";
+import { IProduct, productService } from "@/product";
+import { CartItemSchema } from "@/cart/cartItem.schema";
 
 class OrderController {
     // [GET] /order
@@ -88,8 +91,7 @@ class OrderController {
     // [POST] /order/
     async createOrder(req: AuthRequest, res: Response, next: NextFunction) {
         try {
-            const authUser = req.user;
-            const userId = authUser?._id;
+            const userId = req.user?._id;
 
             const { selectedItems, address } = req.body;
 
@@ -98,6 +100,7 @@ class OrderController {
             }
 
             const cart = await cartService.findOne({ user: userId });
+
             if (!cart || !cart.items || cart.items.length === 0) {
                 return res.status(404).json({ message: "Cart is empty" });
             }
@@ -107,12 +110,12 @@ class OrderController {
             );
 
             if (selectedCartItems.length === 0) {
-                return res.status(400).json({ message: "No matching items found in cart." });
+                return ResponseHandler.error(res, "The cart is empty", 404);
             }
 
             const user = await userService.findById(userId as string);
             if (!user) {
-                return res.status(404).json({ message: "User not found." });
+                return ResponseHandler.error(res, "This user does not exist", 404);
             }
 
             const contactInfo: ContactInfo = {
@@ -126,6 +129,21 @@ class OrderController {
             const orderItems: IOrderItem[] = [];
 
             for (const item of selectedCartItems) {
+                const populatedItem = await item.populate<{ product: IProduct }>("product");
+                const product = populatedItem.product;
+                const quantityToOrder = item.quantity;
+
+                if ( !product.isAvailable || product.stock < quantityToOrder) {
+                    return ResponseHandler.error(res, `Product ${product.name} is not available or out of stock`, 400);
+                }
+
+                product.stock -= quantityToOrder;
+                if (product.stock === 0) {
+                    product.isAvailable = false;
+                }
+
+                await product.save();
+
                 const newItem = {
                     product: item.product,
                     quantity: item.quantity,
@@ -150,7 +168,7 @@ class OrderController {
             );
             await cart.save();
 
-            res.status(201).json({ message: "Order created", order });
+            ResponseHandler.success(res, order, "Order created successfully", 201);
         } catch (error) {
             next(error);
         }
