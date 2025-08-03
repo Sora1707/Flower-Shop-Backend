@@ -22,7 +22,7 @@ class PriceRuleService extends BaseService<IPriceRule> {
                 (now.getTime() - product.createdAt.getTime()) / (1000 * 60 * 60 * 24)
             );
             const dailyDecreaseAmount = (dailyRule as any).discountAmount || 0;
-            console.log("Daily Decrease Amount:", dailyDecreaseAmount);
+            // console.log("Daily Decrease Amount:", dailyDecreaseAmount);
             const totalDecrease = dailyDecreaseAmount * daysSinceAdded;
             finalPrice = Math.max(0, finalPrice - totalDecrease);
         }

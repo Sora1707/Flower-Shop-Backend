@@ -7,7 +7,7 @@ import { isAdmin } from "@/middleware/authorize.middleware";
 import { reviewController } from "@/review";
 
 import productController from "./product.controller";
-import { validateBody } from "@/middleware/validate";
+import { validateBody } from "@/middleware/validate.middelware";
 import { ProductCreateValidation } from "./product.validation";
 import { ReviewValidation } from "@/review/review.validation";
 

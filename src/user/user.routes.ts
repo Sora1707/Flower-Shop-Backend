@@ -74,7 +74,7 @@ router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController
 router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
 router.post(
     "/register",
-    validateBody(UserRegisterValidation),
+    //validateBody(UserRegisterValidation),
     asyncHandler(UserController.register)
 );
 
