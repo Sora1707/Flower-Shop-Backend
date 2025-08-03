@@ -8,8 +8,8 @@ import { PriceRuleCreateValidation, PriceRuleUpdateValidation } from "./priceRul
 
 const router = Router();
 
-// router.use(authenticate);
-// router.use(isAdmin);
+router.use(asyncHandler(authenticate));
+router.use(isAdmin);
 
 router.get("/all", asyncHandler(priceRuleController.getAll));
 router.get("/:id", asyncHandler(priceRuleController.getById));
