@@ -25,6 +25,7 @@ import userRouter from "@/user/user.routes";
 import priceRuleRouter from "@/priceRule/priceRule.routes";
 import tempRouter from "./temp.routes";
 import uploadRouter from "./upload.routes";
+import royaltyRoutes from "./royalty/royalty.routes";
 
 // Database connection
 connectDB();
@@ -71,6 +72,8 @@ app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/price-rule", priceRuleRouter);
+app.use("/api/royalty", royaltyRoutes);
+
 
 // temporary route for testing
 app.use("/api/temp", tempRouter);

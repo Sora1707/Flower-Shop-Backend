@@ -10,6 +10,8 @@ import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 import { IProduct, productService } from "@/product";
 import { CartItemSchema } from "@/cart/cartItem.schema";
+import { royaltyService } from "@/royalty/royalty.service";
+import { RoyaltyPointAction } from "@/royalty/royalty.interface";
 
 class OrderController {
     // [GET] /order
@@ -161,6 +163,14 @@ class OrderController {
                 contactInfo,
                 status: OrderStatus.PENDING,
                 totalPrice,
+            });
+
+            await royaltyService.create({
+                user: order.user,
+                orderId: order._id as Types.ObjectId,
+                points: Math.floor(order.totalPrice / 10),
+                type: "EARNED" as RoyaltyPointAction,
+                description: `Points from order ${order._id}`,
             });
 
             cart.items = cart.items.filter(
