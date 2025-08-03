@@ -9,7 +9,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { swaggerOptions } from "./config/swagger";
 
-import { FRONT_END_IP, FRONT_END_PORT, PORT } from "./config/dotenv";
+import { APPLICATION_MODE, FRONT_END_IP, FRONT_END_PORT, PORT } from "./config/dotenv";
 
 import { connectDB } from "./config/db";
 
@@ -33,9 +33,9 @@ connectDB();
 const app: Application = express();
 
 /* GLOBAL MIDDLEWARES */
-// Swagger
-const specs = swaggerJsdoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+// Swagger Documentation
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Body parser
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -74,7 +74,6 @@ app.use("/api/review", reviewRouter);
 app.use("/api/price-rule", priceRuleRouter);
 app.use("/api/royalty", royaltyRoutes);
 
-
 // temporary route for testing
 app.use("/api/temp", tempRouter);
 
@@ -86,6 +85,8 @@ app.get("/", (req: Request, res: Response) => {
 app.use(errorHandler);
 
 app.listen(PORT, () => {
+    console.log(`Application is running at ${APPLICATION_MODE.toUpperCase()} mode`);
     console.log(`Server running on port ${PORT}`);
-    console.log(`[DEVELOPMENT] Frontend at port ${process.env.FRONT_END_PORT}`);
+    console.log("Swagger docs:  http://localhost:3000/api-docs");
+    console.log(`Frontend: ${FRONT_END_IP}:${FRONT_END_PORT}`);
 });

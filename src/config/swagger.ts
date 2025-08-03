@@ -18,11 +18,6 @@ export const swaggerOptions: Options = {
             },
         },
         security: [{ bearerAuth: [] }],
-        servers: [
-            {
-                url: "http://localhost:8080/api",
-            },
-        ],
     },
     apis: ["./src/**/*docs.ts"], // Path to your route/controller files
 };
