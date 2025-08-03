@@ -71,10 +71,14 @@ router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.
 router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
-router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
+router.post(
+    "/login", 
+    validateBody(UserLoginValidation), 
+    asyncHandler(UserController.login));
+    
 router.post(
     "/register",
-    //validateBody(UserRegisterValidation),
+    validateBody(UserRegisterValidation),
     asyncHandler(UserController.register)
 );
 

@@ -1,15 +1,30 @@
-// import * as z from "zod";
+import * as z from "zod";
+import { PriceRuleType } from "./priceRule.interface";
 
-// function validatePriceRuleInput(rule: Partial<IPriceRule>) {
-//   if (rule.type === PriceRuleType.DailyDecrease) {
-//     if (!rule.dailyDecreaseAmount) throw new Error("dailyDecreaseAmount is required for daily_decrease");
-//     if (rule.promotionDiscount || rule.productIds || rule.categoryIds)
-//       throw new Error("Promotion fields are not allowed in daily_decrease rules");
-//   }
+export const PriceRuleCreateValidation = z.object({
+    type: z.nativeEnum(PriceRuleType, {
+        errorMap: () => ({ message: "Invalid price rule type" }),
+    }),
+    discountAmount: z
+        .number({
+        required_error: "Discount amount is required",
+        invalid_type_error: "Discount amount must be a number",
+        })
+        .positive("Discount amount must be greater than 0"),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+});
 
-//   if (rule.type === PriceRuleType.Promotion) {
-//     if (!rule.promotionDiscount) throw new Error("promotionDiscount is required for promotion");
-//     if (rule.dailyDecreaseAmount)
-//       throw new Error("dailyDecreaseAmount is not allowed in promotion rules");
-//   }
-// }
+export type PriceRuleCreateInput = z.infer<typeof PriceRuleCreateValidation>;
+
+export const PriceRuleUpdateValidation = z.object({
+    type: z.nativeEnum(PriceRuleType).optional(),
+    discountAmount: z
+        .number()
+        .positive("Discount amount must be greater than 0")
+        .optional(),
+    startDate: z.coerce.date().optional(),
+    endDate: z.coerce.date().optional(),
+});
+
+export type PriceRuleUpdateInput = z.infer<typeof PriceRuleUpdateValidation>;
