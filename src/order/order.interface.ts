@@ -1,6 +1,7 @@
 import { Document, Types } from "mongoose";
 
 import { IOrderItem } from "./orderItem.interface";
+import { PaymentMethod, PaymentStatus } from "./payment.interface";
 
 export enum OrderStatus {
     PENDING = "pending",
@@ -12,8 +13,8 @@ export enum OrderStatus {
 
 export type ContactInfo = {
     name: string;
-    email: string;
-    phone: string;
+    phoneNumber: string;
+    postalCode: string;
     address: string;
 };
 
@@ -22,7 +23,19 @@ export interface IOrder extends Document {
     items: IOrderItem[];
     status: OrderStatus;
     contactInfo: ContactInfo;
+    paymentMethod: PaymentMethod;
+    // paymentResult: {
+    //     id: string;
+    //     status: PaymentStatus;
+    //     update_time: string;
+    //     email_address: string;
+    // };
+    shippingPrice: number;
     totalPrice: number;
+    isPaid: boolean;
+    paidAt: Date;
+    isDelivered: boolean;
+    deliveredAt: Date;
     createdAt: Date;
     updatedAt: Date;
 }

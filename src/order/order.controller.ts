@@ -107,7 +107,7 @@ class OrderController {
                 return res.status(404).json({ message: "Cart is empty" });
             }
 
-            const selectedCartItems = cart.items.filter(item =>
+            const selectedCartItems = cart.items.filter((item) =>
                 selectedItems.includes(item.product.toString())
             );
 
@@ -122,8 +122,9 @@ class OrderController {
 
             const contactInfo: ContactInfo = {
                 name: `${user.firstName} ${user.lastName}`,
-                email: user.email,
-                phone: user.phoneNumber,
+                phoneNumber: user.phoneNumber,
+                // * NOT ADDING ADDRESSES YET
+                postalCode: "TEMP",
                 address: address,
             };
 
@@ -135,8 +136,12 @@ class OrderController {
                 const product = populatedItem.product;
                 const quantityToOrder = item.quantity;
 
-                if ( !product.isAvailable || product.stock < quantityToOrder) {
-                    return ResponseHandler.error(res, `Product ${product.name} is not available or out of stock`, 400);
+                if (!product.isAvailable || product.stock < quantityToOrder) {
+                    return ResponseHandler.error(
+                        res,
+                        `Product ${product.name} is not available or out of stock`,
+                        400
+                    );
                 }
 
                 product.stock -= quantityToOrder;
@@ -174,7 +179,7 @@ class OrderController {
             });
 
             cart.items = cart.items.filter(
-                item => !selectedItems.includes(item.product.toString())
+                (item) => !selectedItems.includes(item.product.toString())
             );
             await cart.save();
 
