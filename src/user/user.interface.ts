@@ -29,6 +29,9 @@ export interface IUser extends Document {
         large: string;
     } | null;
     addresses: IAddress[];
+
+    stripeCustomerId: string;
+
     createdAt: Date;
     updatedAt: Date;
     passwordChangedAt: Date;

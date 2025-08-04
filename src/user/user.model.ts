@@ -1,6 +1,8 @@
 import mongoose, { PaginateModel, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
+import { createNewCustomer } from "@/services/stripe";
+
 import { Gender, IUser, Role } from "./user.interface";
 
 import * as password from "./password";
@@ -35,7 +37,7 @@ const UserSchema = new Schema<IUser>(
             validate: [
                 {
                     validator: function (addresses: IAddress[]) {
-                        const defaultCount = addresses.filter(a => a.isDefault).length;
+                        const defaultCount = addresses.filter((a) => a.isDefault).length;
                         return defaultCount <= 1;
                     },
                     message: "Only one address can be set as default.",
@@ -48,6 +50,7 @@ const UserSchema = new Schema<IUser>(
                 },
             ],
         },
+        stripeCustomerId: { type: String, immutable: true },
         passwordChangedAt: { type: Date, default: Date.now },
     },
     { timestamps: true }
@@ -73,6 +76,10 @@ UserSchema.pre("save", async function (next) {
         }
         if (this.isModified("password")) {
             this.password = await password.hash(this.password);
+        }
+        if (this.isNew) {
+            const customer = await createNewCustomer(this);
+            this.stripeCustomerId = customer.id;
         }
 
         next();
