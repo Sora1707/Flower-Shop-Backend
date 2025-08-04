@@ -23,7 +23,7 @@ import productRouter from "@/product/product.routes";
 import reviewRouter from "@/review/review.routes";
 import userRouter from "@/user/user.routes";
 import priceRuleRouter from "@/priceRule/priceRule.routes";
-import tempRouter from "./temp.routes";
+import tempRouter from "./temp/";
 import uploadRouter from "./upload.routes";
 import royaltyRoutes from "./royalty/royalty.routes";
 
