@@ -29,4 +29,6 @@ export const {
     EMAIL_PASSWORD,
     ARCJET_KEY,
     ARCJET_ENV,
+    STRIPE_PUBLIC_KEY,
+    STRIPE_SECRET_KEY,
 } = process.env;
