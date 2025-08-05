@@ -1,6 +1,10 @@
 src/uploads/products
 src/uploads/users
 
+.env.development
+.env.test
+.env.production
+
 # Logs
 logs
 *.log

@@ -21,8 +21,7 @@ export const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/def
 export const PORT = process.env.PORT || 5000;
 export const {
     BASE_URL,
-    FRONT_END_PORT,
-    FRONT_END_IP,
+    FRONT_END_URL,
     JWT_SECRET,
     RESET_PASSWORD_SECRET,
     EMAIL_HOST,
