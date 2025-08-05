@@ -4,6 +4,7 @@ import { userService } from "@/user";
 import { createCheckoutSession, initiatePayment, setupPaymentIntent } from "./stripe";
 import { stripe } from "@/config/stripe";
 import { IStripeCard } from "@/payment/stripe";
+import asyncHandler from "@/middleware/asyncHandler.middelware";
 
 const router = Router();
 
@@ -99,5 +100,10 @@ router.get("/user/:username", async (req: Request, res: Response, next: NextFunc
         next(error);
     }
 });
+
+function testError(req: Request, res: Response, next: NextFunction) {
+    throw new Error("Test error");
+}
+router.get("/error", testError);
 
 export default router;

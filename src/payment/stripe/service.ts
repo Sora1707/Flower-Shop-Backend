@@ -15,7 +15,7 @@ class StripeService {
         return customer;
     }
 
-    async getPaymentMethods(customerId: string) {
+    async getCustomerPaymentMethods(customerId: string) {
         const paymentMethods = await stripe.paymentMethods.list({
             customer: customerId,
             type: "card",
@@ -35,7 +35,7 @@ class StripeService {
         return paymentMethod;
     }
 
-    async detechPaymentMethod(paymentMethodId: string) {
+    async detachPaymentMethod(paymentMethodId: string) {
         const paymentMethod = await stripe.paymentMethods.detach(paymentMethodId);
         return paymentMethod;
     }
@@ -72,7 +72,7 @@ class StripeService {
         customerId,
         paymentMethodId,
         amount, // in cents (e.g., $10 = 1000)
-        currency = "usd",
+        currency,
     }: {
         customerId: string;
         paymentMethodId: string;
@@ -85,9 +85,9 @@ class StripeService {
             customer: customerId,
             payment_method: paymentMethodId,
             confirm: true,
-            off_session: true,
             automatic_payment_methods: {
                 enabled: true,
+                allow_redirects: "never", // This line prevents the need for `return_url`
             },
         });
 

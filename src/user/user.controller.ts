@@ -84,7 +84,7 @@ class UserController {
         if (!req.user) {
             return;
         }
-        const safeUser = getSafeUser(req.user.toObject());
+        const safeUser = getSafeUser(req.user);
         ResponseHandler.success(res, { user: safeUser });
     }
 
@@ -381,7 +381,9 @@ class UserController {
                 return;
             }
 
-            user.cards.splice(cardIndex, 1);
+            const card = user.cards.splice(cardIndex, 1)[0];
+
+            await stripeService.detachPaymentMethod(card.paymentMethodId);
 
             await user.save();
 
