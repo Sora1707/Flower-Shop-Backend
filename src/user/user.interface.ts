@@ -6,7 +6,6 @@ export enum Gender {
     Male = "male",
     Female = "female",
     Other = "other",
-    Unknown = "unknown",
 }
 
 export enum Role {
@@ -23,7 +22,7 @@ export interface IUser extends Document {
     email: string;
     phoneNumber: string;
     birthdate: Date;
-    gender?: Gender;
+    gender: Gender;
     avatar?: {
         small: string;
         medium: string;

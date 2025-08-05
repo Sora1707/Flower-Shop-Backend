@@ -9,7 +9,7 @@ import * as password from "./password";
 import { AddressSchema } from "./address.schema";
 import { IAddress } from "./address.interface";
 import { StripeCardSchema } from "@/payment/stripe";
-import { modifyPropertiesBeforeSave } from "./user.middelware";
+import { getBeforeSavePropertyModifiers, getInitializers } from "./user.middelware";
 
 const MAX_ADDRESSES = 5;
 const MAX_CARDS = 5;
@@ -32,8 +32,8 @@ const UserSchema = new Schema<IUser>(
         lastName: { type: String, required: true },
         email: { type: String, required: true, unique: true, trim: true, lowercase: true },
         phoneNumber: { type: String },
-        birthdate: { type: Date },
-        gender: { type: String, enum: Object.values(Gender), default: Gender.Unknown },
+        birthdate: { type: Date, required: true },
+        gender: { type: String, enum: Object.values(Gender), required: true },
         avatar: {
             small: { type: String },
             medium: { type: String },
@@ -85,12 +85,14 @@ UserSchema.methods.matchPassword = async function (inputPassword: string) {
 
 UserSchema.pre("save", async function (next) {
     try {
-        await modifyPropertiesBeforeSave(this);
+        const handlers: Promise<void>[] = [];
+        handlers.push(...getBeforeSavePropertyModifiers(this));
 
         if (this.isNew) {
-            const customer = await stripeService.createNewCustomer(this);
-            this.stripeCustomerId = customer.id;
+            handlers.push(...getInitializers(this));
         }
+
+        await Promise.all(handlers);
         next();
     } catch (error) {
         next(error as any);
