@@ -15,11 +15,17 @@ import {
 } from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import { UserAddressInput, UserLoginInput, UserPasswordChangeInput } from "./user.validation";
+import {
+    UserAddCardInput,
+    UserAddressInput,
+    UserLoginInput,
+    UserPasswordChangeInput,
+} from "./user.validation";
 import { processAvatar } from "./avatar";
-import { getSafeUser, getSafeUserProfile } from "./util";
+import { getSafeCardInfo, getSafeUser, getSafeUserProfile } from "./util";
 import { sendResetPasswordEmail } from "@/utils/mailer";
 import { IAddress } from "./address.interface";
+import { IStripeCard, stripeService } from "@/payment/stripe";
 
 const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
     password: 0,
@@ -214,8 +220,8 @@ class UserController {
             const user = req.user;
             const addressId = req.params.id;
 
-            const index = user.addresses.findIndex(address => address.id === addressId);
-            user.addresses.forEach(address => (address.isDefault = false));
+            const index = user.addresses.findIndex((address) => address.id === addressId);
+            user.addresses.forEach((address) => (address.isDefault = false));
             user.addresses[index].isDefault = true;
             [user.addresses[0], user.addresses[index]] = [user.addresses[index], user.addresses[0]];
 
@@ -239,7 +245,7 @@ class UserController {
 
             const user = req.user;
             const addressId = req.params.id;
-            const index = user.addresses.findIndex(address => address.id === addressId);
+            const index = user.addresses.findIndex((address) => address.id === addressId);
 
             if (index === -1) {
                 ResponseHandler.error(res, "Address not found", 404);
@@ -274,7 +280,7 @@ class UserController {
             const user = req.user;
             const addressId = req.params.id;
 
-            const addressIndex = user.addresses.findIndex(address => address.id === addressId);
+            const addressIndex = user.addresses.findIndex((address) => address.id === addressId);
 
             if (addressIndex === -1) {
                 ResponseHandler.error(res, "Address not found", 404);
@@ -289,6 +295,97 @@ class UserController {
                 { addresses: removedAddress },
                 "Address deleted successfully"
             );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [GET] /user/payment
+    async getUserPayment(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+
+            const safeCards = getSafeCardInfo(user.cards);
+
+            ResponseHandler.success(res, { cards: safeCards });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [POST] /user/payment
+    async addUserPayment(
+        req: AuthRequest<{}, {}, UserAddCardInput>,
+        res: Response,
+        next: NextFunction
+    ) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const { paymentMethodId } = req.body;
+            const user = req.user;
+
+            await stripeService.attachPaymentMethod(user.stripeCustomerId, paymentMethodId);
+
+            const paymentMethod = await stripeService.getPaymentMethodById(paymentMethodId);
+
+            const card = paymentMethod.card;
+
+            if (!card) {
+                res.status(404).json({ success: false, message: "Card not found" });
+                return;
+            }
+            const { brand, last4, exp_month, exp_year } = card;
+
+            const newCard = {
+                paymentMethodId,
+                brand,
+                last4,
+                exp_month,
+                exp_year,
+                isDefault: false,
+            } as IStripeCard;
+
+            user.cards.push(newCard);
+
+            await user.save();
+
+            const safeCards = getSafeCardInfo(user.cards);
+
+            ResponseHandler.success(res, { cards: safeCards }, "Card added successfully", 201);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // [DELETE] /user/payment/:id
+    async deleteUserPayment(req: AuthRequest, res: Response, next: NextFunction) {
+        try {
+            if (!req.user) {
+                return;
+            }
+
+            const user = req.user;
+            const cardId = req.params.id;
+
+            const cardIndex = user.cards.findIndex((card) => card.id === cardId);
+
+            if (cardIndex === -1) {
+                ResponseHandler.error(res, "Card not found", 404);
+                return;
+            }
+
+            user.cards.splice(cardIndex, 1);
+
+            await user.save();
+
+            ResponseHandler.success(res, null, "Card deleted successfully");
         } catch (error) {
             next(error);
         }

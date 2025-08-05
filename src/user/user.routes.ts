@@ -11,6 +11,7 @@ import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
 import {
+    UserAddCardValidation,
     UserAddressValidation,
     UserLoginValidation,
     UserPasswordChangeValidaton,
@@ -56,6 +57,21 @@ router.delete(
     asyncHandler(UserController.deleteUserAddress)
 );
 
+router.get("/payment", asyncHandler(authenticate), asyncHandler(UserController.getUserPayment));
+
+router.post(
+    "/payment",
+    asyncHandler(authenticate),
+    validateBody(UserAddCardValidation),
+    asyncHandler(UserController.addUserPayment)
+);
+
+router.delete(
+    "/payment/:id",
+    asyncHandler(authenticate),
+    asyncHandler(UserController.deleteUserPayment)
+);
+
 router.get(
     "/order/:orderId",
     asyncHandler(authenticate),
@@ -71,11 +87,8 @@ router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.
 router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
-router.post(
-    "/login", 
-    validateBody(UserLoginValidation), 
-    asyncHandler(UserController.login));
-    
+router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
+
 router.post(
     "/register",
     validateBody(UserRegisterValidation),

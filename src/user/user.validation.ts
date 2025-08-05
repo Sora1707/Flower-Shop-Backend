@@ -46,3 +46,9 @@ export const UserPasswordChangeValidaton = z.object({
 });
 
 export type UserPasswordChangeInput = z.infer<typeof UserPasswordChangeValidaton>;
+
+export const UserAddCardValidation = z.object({
+    paymentMethodId: z.string().min(1, { message: "Payment method ID is required" }),
+});
+
+export type UserAddCardInput = z.infer<typeof UserAddCardValidation>;
