@@ -1,5 +1,6 @@
 import { Document } from "mongoose";
 import { IAddress } from "./address.interface";
+import { IStripeCard } from "@/payment/stripe";
 
 export enum Gender {
     Male = "male",
@@ -31,6 +32,7 @@ export interface IUser extends Document {
     addresses: IAddress[];
 
     stripeCustomerId: string;
+    cards: IStripeCard[];
 
     createdAt: Date;
     updatedAt: Date;

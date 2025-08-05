@@ -1,15 +1,23 @@
 import mongoose, { PaginateModel, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-import { createNewCustomer } from "@/services/stripe";
+import stripeService from "@/payment/stripe/service";
 
 import { Gender, IUser, Role } from "./user.interface";
 
 import * as password from "./password";
 import { AddressSchema } from "./address.schema";
 import { IAddress } from "./address.interface";
+import { StripeCardSchema } from "@/payment/stripe";
+import { modifyPropertiesBeforeSave } from "./user.middelware";
 
 const MAX_ADDRESSES = 5;
+const MAX_CARDS = 5;
+
+function validateOneDefaultValue<T extends { isDefault: boolean }>(elements: T[]) {
+    const defaultCount = elements.filter((element) => element.isDefault).length;
+    return defaultCount <= 1;
+}
 
 const UserSchema = new Schema<IUser>(
     {
@@ -36,10 +44,7 @@ const UserSchema = new Schema<IUser>(
             default: [],
             validate: [
                 {
-                    validator: function (addresses: IAddress[]) {
-                        const defaultCount = addresses.filter((a) => a.isDefault).length;
-                        return defaultCount <= 1;
-                    },
+                    validator: validateOneDefaultValue,
                     message: "Only one address can be set as default.",
                 },
                 {
@@ -51,6 +56,22 @@ const UserSchema = new Schema<IUser>(
             ],
         },
         stripeCustomerId: { type: String, immutable: true },
+        cards: {
+            type: [StripeCardSchema],
+            default: [],
+            validate: [
+                {
+                    validator: validateOneDefaultValue,
+                    message: "Only one card can be set as default.",
+                },
+                {
+                    validator: function (cards: any[]) {
+                        return cards.length <= MAX_CARDS;
+                    },
+                    message: `A user can have up to ${MAX_CARDS} cards only. Please remove a card to add a new one.`,
+                },
+            ],
+        },
         passwordChangedAt: { type: Date, default: Date.now },
     },
     { timestamps: true }
@@ -58,38 +79,22 @@ const UserSchema = new Schema<IUser>(
 
 UserSchema.plugin(mongoosePaginate);
 
-// model.save()
+UserSchema.methods.matchPassword = async function (inputPassword: string) {
+    return await password.compare(inputPassword, this.password);
+};
+
 UserSchema.pre("save", async function (next) {
     try {
-        if (this.isModified("addresses")) {
-            let hasDefaultAddress = false;
-            for (const address of this.addresses) {
-                if (address.isDefault) {
-                    hasDefaultAddress = true;
-                    break;
-                }
-            }
+        await modifyPropertiesBeforeSave(this);
 
-            if (!hasDefaultAddress) {
-                this.addresses[0].isDefault = true;
-            }
-        }
-        if (this.isModified("password")) {
-            this.password = await password.hash(this.password);
-        }
         if (this.isNew) {
-            const customer = await createNewCustomer(this);
+            const customer = await stripeService.createNewCustomer(this);
             this.stripeCustomerId = customer.id;
         }
-
         next();
     } catch (error) {
         next(error as any);
     }
 });
-
-UserSchema.methods.matchPassword = async function (inputPassword: string) {
-    return await password.compare(inputPassword, this.password);
-};
 
 export const UserModel = mongoose.model<IUser, PaginateModel<IUser>>("User", UserSchema);
