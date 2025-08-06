@@ -1,14 +1,14 @@
 import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Schema, PaginateModel } from "mongoose";
 
-import { IProduct, Category } from "./product.interface";
+import { IProduct, Category, IProductDocument } from "./product.interface";
 
-const ProductSchema = new Schema<IProduct>(
+const ProductSchema = new Schema<IProductDocument>(
     {
         name: { type: String, required: true },
         price: { type: Number, required: true },
-        dailyRuleId: { type: String, required: true, ref: "DailyRule"},
-        promotionId: [{ type: String}],
+        dailyRuleId: { type: String, required: true, ref: "DailyRule" },
+        promotionId: [{ type: String }],
         description: { type: String, required: true },
         categories: [
             {
@@ -31,7 +31,7 @@ const ProductSchema = new Schema<IProduct>(
 
 ProductSchema.plugin(mongoosePaginate);
 
-export const ProductModel = mongoose.model<IProduct, PaginateModel<IProduct>>(
+export const ProductModel = mongoose.model<IProductDocument, PaginateModel<IProductDocument>>(
     "Product",
     ProductSchema
 );

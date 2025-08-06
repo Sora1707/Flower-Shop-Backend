@@ -1,11 +1,11 @@
 import { FilterQuery } from "mongoose";
 
-import { IProduct } from "./product.interface";
+import { IProduct, IProductDocument } from "./product.interface";
 import { ProductModel } from "./product.model";
 
 import { BasePaginateService } from "@/services";
 
-class ProductService extends BasePaginateService<IProduct> {
+class ProductService extends BasePaginateService<IProductDocument> {
     protected model = ProductModel;
 
     async getProductsWithFilters(

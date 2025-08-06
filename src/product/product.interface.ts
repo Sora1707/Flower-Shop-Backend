@@ -9,7 +9,7 @@ export enum Category {
     Anniversary = "anniversary",
 }
 
-export interface IProduct extends Document {
+export interface IProduct {
     name: string;
     price: number;
     dailyRuleId: string;
@@ -26,3 +26,5 @@ export interface IProduct extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface IProductDocument extends IProduct, Document {}
