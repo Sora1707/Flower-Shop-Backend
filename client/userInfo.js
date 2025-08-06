@@ -4,7 +4,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 async function getUserInfo() {
     try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
+        console.log(token);
         const res = await fetch("http://localhost:8080/api/user/me", {
             method: "GET",
             headers: {
@@ -13,7 +14,7 @@ async function getUserInfo() {
         });
 
         if (!res.ok) throw new Error("Failed to fetch user info");
-        const userInfo = (await res.json()).data.user;
+        const userInfo = (await res.json()).data;
 
         console.log(userInfo);
 
@@ -47,7 +48,7 @@ function logout() {
 }
 
 async function checkToken() {
-    const token = localStorage.getItem("token");
+    const token = getToken();
 
     if (!token) {
         logout();
@@ -91,7 +92,7 @@ loginForm.addEventListener("submit", async (e) => {
         }
         token = data.data.token;
 
-        localStorage.setItem("token", token);
+        setToken(token);
         login();
         alert("Login successful!");
     } catch (err) {

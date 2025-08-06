@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import { IStripeCard } from "./StripeCard.interface";
+import { IStripeCard, IStripeCardDocument } from "./StripeCard.interface";
 
-export const StripeCardSchema = new Schema<IStripeCard>(
+export const StripeCardSchema = new Schema<IStripeCardDocument>(
     {
         paymentMethodId: { type: String, required: true, immutable: true },
         brand: { type: String, required: true, immutable: true },

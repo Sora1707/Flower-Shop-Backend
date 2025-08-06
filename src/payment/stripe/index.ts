@@ -1,5 +1,5 @@
-export { IStripeCard } from "./StripeCard.interface";
-export { StripeCardSchema } from "./StripeCard.schema";
+export * from "./StripeCard.interface";
+export * from "./StripeCard.schema";
 
 import stripeService from "./service";
 export { stripeService };

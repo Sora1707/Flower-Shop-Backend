@@ -2,9 +2,10 @@ import { IUser, IUserDocument } from "./user.interface";
 
 import { getDefaultAvatarPaths } from "./avatar";
 import { IStripeCard } from "@/payment/stripe";
+import { IStripeCardDocument } from "@/payment/stripe/StripeCard.interface";
 
 type UserProperty = keyof IUser;
-type SafeCard = Partial<Omit<IStripeCard, "paymentMethodId">>;
+type SafeCard = Omit<IStripeCard, "paymentMethodId">;
 type SafeUser = Partial<Omit<IUser, "cards"> & { cards: SafeCard[] }>;
 
 const addressFields: UserProperty[] = ["addresses"];
@@ -26,13 +27,13 @@ function getUserAvatar(user: SafeUser) {
 }
 
 export function getSafeUser(user: IUserDocument) {
-    const safeUser = user.toObject<IUser>();
+    const safeUser: SafeUser = user.toObject<IUser>();
 
     safeUser.avatar = getUserAvatar(safeUser);
 
     safeUserExcludedFields.forEach((field) => delete safeUser[field]);
 
-    safeUser.cards = getSafeCardInfo(user.cards);
+    safeUser.cards = getSafeCardInfo(user.cards as IStripeCardDocument[]);
 
     return safeUser;
 }
@@ -45,10 +46,10 @@ export function getSafeUserProfile(user: IUserDocument) {
     return safeUser;
 }
 
-export function getSafeCardInfo(cards: IStripeCard[]) {
+export function getSafeCardInfo(cards: IStripeCardDocument[]) {
     const safeCards = cards.map((card) => {
         const { paymentMethodId, ...safeCard } = card.toObject();
-        return safeCard;
+        return safeCard as SafeCard;
     });
     return safeCards;
 }

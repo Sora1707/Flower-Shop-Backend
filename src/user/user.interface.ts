@@ -1,6 +1,7 @@
 import { Document } from "mongoose";
 import { IAddress } from "./address.interface";
 import { IStripeCard } from "@/payment/stripe";
+import { IStripeCardDocument } from "@/payment/stripe/StripeCard.interface";
 
 export enum Gender {
     Male = "male",

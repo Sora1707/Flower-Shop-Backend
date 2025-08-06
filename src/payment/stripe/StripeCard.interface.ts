@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-export interface IStripeCard extends Document {
+export interface IStripeCard {
     paymentMethodId: string;
     brand: string;
     exp_month: number;
@@ -8,3 +8,5 @@ export interface IStripeCard extends Document {
     last4: string;
     isDefault: boolean;
 }
+
+export interface IStripeCardDocument extends IStripeCard, Document {}
