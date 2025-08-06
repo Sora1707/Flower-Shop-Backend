@@ -1,8 +1,6 @@
 import "mongoose-paginate-v2";
 import { FilterQuery, Types, Model } from "mongoose";
 import { PaginateModel, PaginateOptions } from "mongoose";
-import { ClassDef } from "@/types/class";
-import { IUser } from "@/user";
 
 type ObjectId = Types.ObjectId;
 
@@ -12,34 +10,27 @@ type MongooseSelectedFieldsObject = Record<string, 1 | 0>;
 export abstract class BaseService<T> {
     protected abstract model: Model<T>;
 
-    public async findAll(selectFieldsObject: SelectedFieldsObject<T> = {}) {
-        const items = await this.model
-            .find()
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
+    public async findAll() {
+        const items = await this.model.find();
+
         return items;
     }
 
-    public async findById(id: string, selectFieldsObject: SelectedFieldsObject<T> = {}) {
-        const item = await this.model
-            .findById(id)
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
+    public async findById(id: string) {
+        const item = await this.model.findById(id);
+
         return item;
     }
 
-    public async findOne(filter: FilterQuery<T>, selectFieldsObject: SelectedFieldsObject<T> = {}) {
-        const item = await this.model
-            .findOne(filter)
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
+    public async findOne(filter: FilterQuery<T>) {
+        const item = await this.model.findOne(filter);
+
         return item;
     }
 
-    public async findMany(
-        filter: FilterQuery<T>,
-        selectFieldsObject: SelectedFieldsObject<T> = {}
-    ) {
-        const items = await this.model
-            .find(filter)
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
+    public async findMany(filter: FilterQuery<T>) {
+        const items = await this.model.find(filter);
+
         return items;
     }
 
@@ -59,7 +50,7 @@ export abstract class BaseService<T> {
 
     public async createMany(inputs: Partial<T>[]) {
         const items = await Promise.all(
-            inputs.map(async input => {
+            inputs.map(async (input) => {
                 return await this.model.create(input);
             })
         );
@@ -81,40 +72,45 @@ export abstract class BaseService<T> {
         return result;
     }
 
-    public async updateMany(filter: Partial<T> & { id?: ObjectId }, input: Partial<T>) {
-        const result = await this.model.updateMany(filter, input, { new: true });
-        return result;
+    public async updateMany(filter: Partial<T> & { id?: ObjectId }, update: Partial<T>) {
+        // ! TEMPORARILY DEPRECATED
+        // const result = await this.model.updateMany(filter, update, { new: true });
+
+        const items = await this.model.find(filter);
+        const updatedItems = await Promise.all(
+            items.map((item) => {
+                item.set(update);
+                return item.save() as T;
+            })
+        );
+
+        return updatedItems;
     }
 
-    public async updateOne(
-        filter: Partial<T> & { id?: ObjectId },
-        input: Partial<T>,
-        selectFieldsObject: SelectedFieldsObject<T> = {}
-    ) {
-        const item = await this.model
-            .findOneAndUpdate(filter, input, { new: true })
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
-        return item;
+    public async updateOne(filter: Partial<T> & { id?: ObjectId }, update: Partial<T>) {
+        // ! TEMPORARILY DEPRECATED
+        // const item = await this.model.updateOne(filter, input, { new: true });
+        const item = await this.model.findOne(filter);
+        if (!item) return null;
+        item.set(update);
+        const updatedItem = (await item.save()) as T;
+        return updatedItem;
     }
 
-    public async updateById(
-        id: string,
-        update: Partial<T>,
-        selectFieldsObject: SelectedFieldsObject<T> = {}
-    ): Promise<T | null> {
-        const item = await this.model
-            .findByIdAndUpdate(id, update, { new: true })
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
-        return item;
+    public async updateById(id: string, update: Partial<T>) {
+        // ! TEMPORARILY DEPRECATED
+        // const item = await this.model.findByIdAndUpdate(id, update, { new: true });
+
+        const item = await this.model.findById(id);
+        if (!item) return null;
+        item.set(update);
+        const updatedItem = (await item.save()) as T;
+        return updatedItem;
     }
 
-    public async deleteById(
-        id: string,
-        selectFieldsObject: SelectedFieldsObject<T> = {}
-    ): Promise<T | null> {
-        const item = await this.model
-            .findByIdAndDelete(id)
-            .select(selectFieldsObject as MongooseSelectedFieldsObject);
+    public async deleteById(id: string): Promise<T | null> {
+        const item = await this.model.findByIdAndDelete(id);
+
         return item;
     }
 }

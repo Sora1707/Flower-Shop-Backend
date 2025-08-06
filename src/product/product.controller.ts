@@ -30,10 +30,10 @@ class ProductController {
             const assignedPrice = await priceRuleService.applyRulesToProduct({
                 price: product.price,
                 createdAt: product.createdAt,
-                dailyRuleID: product.dailyRuleId,     
-                promotionId: product.promotionId
+                dailyRuleID: product.dailyRuleId,
+                promotionId: product.promotionId,
             });
-            res.status(200).json({assignedPrice, product});
+            res.status(200).json({ assignedPrice, product });
         } catch (error) {
             next(error);
         }

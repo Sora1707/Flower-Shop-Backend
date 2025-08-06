@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { IUser } from "@/user";
+import { IUserDocument } from "@/user";
 
 import * as core from "express-serve-static-core";
 
@@ -10,5 +10,5 @@ export interface AuthRequest<
     ReqQuery = core.Query,
     Locals extends Record<string, any> = Record<string, any>
 > extends Request<P, ResBody, ReqBody, ReqQuery, Locals> {
-    user?: IUser;
+    user?: IUserDocument;
 }

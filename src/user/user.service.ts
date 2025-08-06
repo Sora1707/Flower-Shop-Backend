@@ -1,7 +1,7 @@
 import { BasePaginateService, SelectedFieldsObject } from "@/services";
-import { IUser } from "./user.interface";
+import { IUserDocument } from "./user.interface";
 import { UserModel } from "./user.model";
-class UserService extends BasePaginateService<IUser> {
+class UserService extends BasePaginateService<IUserDocument> {
     protected model = UserModel;
 }
 

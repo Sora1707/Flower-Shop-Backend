@@ -1,6 +1,7 @@
-import userService from "./user.service";
+export * from "./user.interface";
+export * from "./user.model";
 
-export { Role, Gender } from "./user.interface";
-export { IUser } from "./user.interface";
-export { UserModel } from "./user.model";
+import userService from "./user.service";
 export { userService };
+
+export * from "./util";

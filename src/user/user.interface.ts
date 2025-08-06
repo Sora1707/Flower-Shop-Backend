@@ -13,7 +13,7 @@ export enum Role {
     Admin = "admin",
 }
 
-export interface IUser extends Document {
+export interface IUser {
     role: Role;
     username: string;
     password: string;
@@ -36,5 +36,8 @@ export interface IUser extends Document {
     createdAt: Date;
     updatedAt: Date;
     passwordChangedAt: Date;
+}
+
+export interface IUserDocument extends IUser, Document {
     matchPassword(inputPassword: string): Promise<boolean>;
 }

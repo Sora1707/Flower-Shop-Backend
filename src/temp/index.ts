@@ -106,4 +106,17 @@ function testError(req: Request, res: Response, next: NextFunction) {
 }
 router.get("/error", testError);
 
+router.post(
+    "/service-test",
+    asyncHandler(async (req: Request, res: Response) => {
+        const sora = await userService.findOne({ username: "sora" });
+        // sora!.phoneNumber = "123456789";
+        // await sora!.save();
+        res.json({ success: true });
+        await userService.updateById(sora!.id, { phoneNumber: "123456789" });
+        await userService.updateOne({ username: "sora" }, { phoneNumber: "123456789" });
+        await userService.updateMany({ username: "sora" }, { phoneNumber: "123456789" });
+    })
+);
+
 export default router;

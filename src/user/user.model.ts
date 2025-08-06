@@ -1,9 +1,7 @@
 import mongoose, { PaginateModel, Schema } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 
-import stripeService from "@/payment/stripe/service";
-
-import { Gender, IUser, Role } from "./user.interface";
+import { Gender, IUserDocument, Role } from "./user.interface";
 
 import * as password from "./password";
 import { AddressSchema } from "./address.schema";
@@ -19,14 +17,14 @@ function validateOneDefaultValue<T extends { isDefault: boolean }>(elements: T[]
     return defaultCount <= 1;
 }
 
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema<IUserDocument>(
     {
         role: {
             type: String,
             enum: Object.values(Role),
             default: Role.User,
         },
-        username: { type: String, required: true, unique: true },
+        username: { type: String, required: true, unique: true, lowercase: true },
         password: { type: String, required: true },
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
@@ -85,18 +83,37 @@ UserSchema.methods.matchPassword = async function (inputPassword: string) {
 
 UserSchema.pre("save", async function (next) {
     try {
+        console.log("save");
         const handlers: Promise<void>[] = [];
+
         handlers.push(...getBeforeSavePropertyModifiers(this));
 
         if (this.isNew) {
+            console.log("init");
             handlers.push(...getInitializers(this));
         }
 
         await Promise.all(handlers);
+
         next();
     } catch (error) {
         next(error as any);
     }
 });
 
-export const UserModel = mongoose.model<IUser, PaginateModel<IUser>>("User", UserSchema);
+UserSchema.pre("findOneAndUpdate", async function (next) {
+    console.log("findOneAndUpdate");
+});
+
+UserSchema.pre("updateOne", async function (next) {
+    console.log("updateOne");
+});
+
+UserSchema.pre("updateMany", async function (next) {
+    console.log("updateMany");
+});
+
+export const UserModel = mongoose.model<IUserDocument, PaginateModel<IUserDocument>>(
+    "User",
+    UserSchema
+);

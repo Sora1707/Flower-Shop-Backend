@@ -40,14 +40,6 @@ class StripeService {
         return paymentMethod;
     }
 
-    async getAllSavedCards(customerId: string) {
-        const paymentMethods = await stripe.paymentMethods.list({
-            customer: customerId,
-            type: "card",
-        });
-        return paymentMethods.data;
-    }
-
     async setDefaultCard(customerId: string, paymentMethodId: string) {
         const updatedCustomer = await stripe.customers.update(customerId, {
             invoice_settings: {
@@ -85,6 +77,7 @@ class StripeService {
             customer: customerId,
             payment_method: paymentMethodId,
             confirm: true,
+            off_session: true,
             automatic_payment_methods: {
                 enabled: true,
                 allow_redirects: "never", // This line prevents the need for `return_url`
