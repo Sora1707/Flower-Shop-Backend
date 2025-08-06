@@ -13,7 +13,7 @@ import { CartItemSchema } from "@/cart/cartItem.schema";
 import { royaltyService } from "@/royalty/royalty.service";
 import { RoyaltyPointAction } from "@/royalty/royalty.interface";
 import { PaymentMethod, PaymentStatus } from "@/payment/payment.interface";
-import { stripeService } from "@/payment/stripe";
+import { IStripeCardDocument, stripeService } from "@/payment/stripe";
 
 class OrderController {
     // [GET] /order
@@ -100,9 +100,9 @@ class OrderController {
 
         const user = req.user;
 
-        const { selectedItems, contactInfo, paymentMethod, paymentId } = req.body;
+        const { items, contactInfo, paymentMethod, paymentId } = req.body;
 
-        if (!selectedItems || !Array.isArray(selectedItems) || selectedItems.length === 0) {
+        if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({ message: "No selected items provided." });
         }
 
@@ -113,21 +113,21 @@ class OrderController {
         // }
 
         // const selectedCartItems = cart.items.filter((item) =>
-        //     selectedItems.includes(item.product.toString())
+        //     items.includes(item.product.toString())
         // );
 
         // if (selectedCartItems.length === 0) {
         //     return ResponseHandler.error(res, "The cart is empty", 404);
         // }
 
-        const totalPrice = selectedItems.reduce(
+        const totalPrice = items.reduce(
             (sum, item) => sum + item.priceAtAddTime * item.quantity,
             0
         );
 
         const orderObject = {
             user: user.id,
-            items: selectedItems,
+            items: items,
             contactInfo,
             status: OrderStatus.Pending,
             paymentStatus: PaymentStatus.Pending,
@@ -148,7 +148,8 @@ class OrderController {
             return;
         }
 
-        const card = user.cards.find((card) => card.id === paymentId);
+        const cards = user.cards as IStripeCardDocument[];
+        const card = cards.find((card) => card.id === paymentId);
 
         if (!card) {
             return ResponseHandler.error(res, "Card not found", 404);
@@ -238,7 +239,7 @@ class OrderController {
         // });
 
         // cart.items = cart.items.filter(
-        //     (item) => !selectedItems.includes(item.product.toString())
+        //     (item) => !items.includes(item.product.toString())
         // );
         // await cart.save();
     }

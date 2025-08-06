@@ -20,7 +20,7 @@ export type ContactInfo = {
     address: string;
 };
 
-export interface IOrder extends Document {
+export interface IOrder {
     user: Types.ObjectId;
     items: IOrderItem[];
     contactInfo: ContactInfo;
@@ -39,3 +39,5 @@ export interface IOrder extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface IOrderDocument extends IOrder, Document {}

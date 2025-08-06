@@ -1,10 +1,10 @@
 import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { PaginateModel, Schema } from "mongoose";
 import { OrderItemSchema } from "./orderItem.schema";
-import { IOrder, OrderStatus } from "./order.interface";
+import { IOrder, IOrderDocument, OrderStatus } from "./order.interface";
 import { PaymentMethod, PaymentStatus } from "../payment/payment.interface";
 
-const OrderSchema = new Schema<IOrder>(
+const OrderSchema = new Schema<IOrderDocument>(
     {
         user: { type: Schema.Types.ObjectId, ref: "User", required: true },
         items: {
@@ -46,4 +46,7 @@ const OrderSchema = new Schema<IOrder>(
 
 OrderSchema.plugin(mongoosePaginate);
 
-export const OrderModel = mongoose.model<IOrder, PaginateModel<IOrder>>("Order", OrderSchema);
+export const OrderModel = mongoose.model<IOrderDocument, PaginateModel<IOrderDocument>>(
+    "Order",
+    OrderSchema
+);
