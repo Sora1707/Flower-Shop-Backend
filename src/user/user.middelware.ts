@@ -1,4 +1,4 @@
-import { IUser } from "./user.interface";
+import { IUserDocument } from "./user.interface";
 import * as password from "./password";
 import { stripeService } from "@/payment/stripe";
 import { cartService } from "@/cart";
@@ -17,21 +17,23 @@ function modifyDefaultValue<T extends { isDefault: boolean }>(elements: T[]) {
     }
 }
 
-type ModifyPropertyFunctions = { [key in keyof Partial<IUser>]: (user: IUser) => Promise<void> };
+type ModifyPropertyFunctions = {
+    [key in keyof Partial<IUserDocument>]: (user: IUserDocument) => Promise<void>;
+};
 
 const propertyModifiersBeforeSave: ModifyPropertyFunctions = {
-    addresses: async function (user: IUser) {
+    addresses: async function (user: IUserDocument) {
         modifyDefaultValue(user.addresses);
     },
-    password: async function (user: IUser) {
+    password: async function (user: IUserDocument) {
         user.password = await password.hash(user.password);
     },
-    cards: async function (user: IUser) {
+    cards: async function (user: IUserDocument) {
         modifyDefaultValue(user.cards);
     },
 };
 
-export function getBeforeSavePropertyModifiers(user: IUser) {
+export function getBeforeSavePropertyModifiers(user: IUserDocument) {
     const propertyModifiers = Object.entries(propertyModifiersBeforeSave)
         .filter(([property, _]) => user.isModified(property))
         .map(([_, modifier]) => modifier(user));
@@ -39,14 +41,14 @@ export function getBeforeSavePropertyModifiers(user: IUser) {
     return propertyModifiers;
 }
 
-type InitializerFunctions = { [key: string]: (user: IUser) => Promise<void> };
+type InitializerFunctions = { [key: string]: (user: IUserDocument) => Promise<void> };
 
 const initializers: InitializerFunctions = {
-    stripe: async function (user: IUser) {
+    stripe: async function (user: IUserDocument) {
         const customer = await stripeService.createNewCustomer(user);
         user.stripeCustomerId = customer.id;
     },
-    cart: async function (user: IUser) {
+    cart: async function (user: IUserDocument) {
         await cartService.create({
             user: user.id,
             items: [],
@@ -54,6 +56,6 @@ const initializers: InitializerFunctions = {
     },
 };
 
-export function getInitializers(user: IUser) {
+export function getInitializers(user: IUserDocument) {
     return Object.values(initializers).map((initializer) => initializer(user));
 }

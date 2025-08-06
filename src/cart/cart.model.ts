@@ -1,9 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 import { CartItemSchema } from "./cartItem.schema";
-import { ICart } from "./cart.interface";
+import { ICart, ICartDocument } from "./cart.interface";
 
-const CartSchema = new Schema<ICart>(
+const CartSchema = new Schema<ICartDocument>(
     {
         user: { type: Schema.Types.ObjectId, ref: "User", required: true },
         items: {
@@ -14,4 +14,4 @@ const CartSchema = new Schema<ICart>(
     { timestamps: true }
 );
 
-export const CartModel = mongoose.model<ICart>("Cart", CartSchema);
+export const CartModel = mongoose.model<ICartDocument>("Cart", CartSchema);

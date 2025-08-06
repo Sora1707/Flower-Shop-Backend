@@ -12,7 +12,7 @@ import { UpdateCartItemQuantityInput } from "./cart.validation";
 
 import ResponseHandler from "@/utils/ResponseHandler";
 import { IProduct } from "@/product";
-import { ICart } from "./cart.interface";
+import { ICart, ICartDocument } from "./cart.interface";
 
 class CartController {
     // [GET] /cart/all
@@ -107,7 +107,12 @@ class CartController {
         }
     }
 
-    private async addItemQuantity(res: Response, cart: ICart, product: IProduct, quantity: number) {
+    private async addItemQuantity(
+        res: Response,
+        cart: ICartDocument,
+        product: IProduct,
+        quantity: number
+    ) {
         const existingItem = cart.items.find(
             (item: ICartItem) => item.product.toString() === product.id
         );
@@ -129,7 +134,7 @@ class CartController {
 
     private async removeItemQuantity(
         res: Response,
-        cart: ICart,
+        cart: ICartDocument,
         product: IProduct,
         quantity: number
     ) {

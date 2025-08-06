@@ -1,9 +1,9 @@
 import { BaseService } from "@/services";
 
-import { ICart } from "./cart.interface";
+import { ICart, ICartDocument } from "./cart.interface";
 import { CartModel } from "./cart.model";
 
-class CartService extends BaseService<ICart> {
+class CartService extends BaseService<ICartDocument> {
     protected model = CartModel;
 
     public async calculateTotal(cartId: string): Promise<number> {
