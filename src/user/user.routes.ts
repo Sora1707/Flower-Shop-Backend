@@ -2,7 +2,6 @@ import { Router } from "express";
 
 import asyncHandler from "@/middleware/asyncHandler.middelware";
 import authenticate from "@/middleware/authenticate.middelware";
-import { isAdmin } from "@/middleware/authorize.middleware";
 import { validateBody } from "@/middleware/validate.middelware";
 
 import { uploadAvatar } from "@/config/upload";
@@ -79,7 +78,6 @@ router.get(
 );
 router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.getUserReviews));
 router.get("/:id", asyncHandler(UserController.getUserById));
-router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
 
 router.put(
     "/me",
@@ -95,6 +93,5 @@ router.patch(
 );
 
 router.delete("/me", asyncHandler(authenticate), asyncHandler(UserController.deleteCurrentUser));
-router.delete("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.deleteUser));
 
 export default router;

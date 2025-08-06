@@ -27,8 +27,9 @@ router.patch(
     asyncHandler(cartController.updateItemQuantity.bind(cartController))
 );
 
-// TODO
+// TODO delete item
 // router.delete("/:productId", asyncHandler(authenticate), asyncHandler(cartController.removeItem));
+// TODO clear cart
 // router.delete("/", asyncHandler(authenticate), asyncHandler(cartController.clearCart));
 
 export default router;

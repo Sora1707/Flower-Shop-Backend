@@ -13,29 +13,9 @@ import { UserAddCardInput, UserAddressInput } from "./user.validation";
 import { processAvatar } from "./avatar";
 import { getSafeCardInfo, getSafeUser, getSafeUserProfile } from "./util";
 import { IAddress } from "./address.interface";
-import { IStripeCard, stripeService } from "@/payment/stripe";
+import { IStripeCard, IStripeCardDocument, stripeService } from "@/payment/stripe";
 
 class UserController {
-    // [GET] /user/
-    async getAllUsers(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { page, limit } = req.query;
-
-            const filter = {};
-
-            const paginateOptions = {
-                page: page ? parseInt(page as string, 10) : 1,
-                limit: limit ? parseInt(limit as string, 10) : 10,
-            };
-
-            const paginateResult = await userService.paginate(filter, paginateOptions);
-
-            ResponseHandler.success(res, paginateResult);
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // [GET] /user/:id
     async getUserById(req: Request, res: Response, next: NextFunction) {
         try {
@@ -197,8 +177,7 @@ class UserController {
             }
 
             const user = req.user;
-
-            const safeCards = getSafeCardInfo(user.cards);
+            const safeCards = getSafeCardInfo(user.cards as IStripeCardDocument[]);
 
             ResponseHandler.success(res, { cards: safeCards });
         } catch (error) {
@@ -245,7 +224,7 @@ class UserController {
 
             await user.save();
 
-            const safeCards = getSafeCardInfo(user.cards);
+            const safeCards = getSafeCardInfo(user.cards as IStripeCardDocument[]);
 
             ResponseHandler.success(res, safeCards, "Card added successfully", 201);
         } catch (error) {
@@ -263,14 +242,16 @@ class UserController {
             const user = req.user;
             const cardId = req.params.id;
 
-            const cardIndex = user.cards.findIndex((card) => card.id === cardId);
+            const cards = user.cards as IStripeCardDocument[];
+
+            const cardIndex = cards.findIndex((card) => card._id === cardId);
 
             if (cardIndex === -1) {
                 ResponseHandler.error(res, "Card not found", 404);
                 return;
             }
 
-            const card = user.cards.splice(cardIndex, 1)[0];
+            const card = cards.splice(cardIndex, 1)[0];
 
             await stripeService.detachPaymentMethod(card.paymentMethodId);
 
@@ -309,22 +290,6 @@ class UserController {
             const safeUser = getSafeUser(updatedUser);
 
             ResponseHandler.success(res, safeUser, "User updated successfully");
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // [DELETE] /user/:id
-    async deleteUser(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const deleteUser = await userService.deleteById(id);
-
-            if (!deleteUser) {
-                return res.status(404).json({ message: "User not found." });
-            }
-
-            ResponseHandler.success(res, null, "User deleted successfully");
         } catch (error) {
             next(error);
         }

@@ -9,18 +9,11 @@ import OrderController from "./order.controller";
 const router = Router();
 
 // Order
-router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(OrderController.getAllOrders));
+// TODO: Get user's orders
 
 router.get("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(OrderController.getOrderById));
 
 router.post("/", asyncHandler(authenticate), asyncHandler(OrderController.createOrder));
-
-router.patch(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(OrderController.updateOrder)
-);
 
 // router.delete(
 //     "/:userId",

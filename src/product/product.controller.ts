@@ -72,49 +72,6 @@ class ProductController {
             next(error);
         }
     }
-
-    // [POST] /product
-    async createProduct(req: Request, res: Response, next: NextFunction) {
-        try {
-            const newProduct = await productService.create(req.body);
-            res.status(201).json(newProduct);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // [PUT] /product/:id
-    async updateProduct(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const update = req.body;
-
-            const updatedProduct = await productService.updateById(id, update);
-
-            if (!updatedProduct) {
-                return res.status(404).json({ message: "Product not found." });
-            }
-            res.status(200).json({ message: "Product updated", product: updatedProduct });
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // [DELETE] /product/:id
-    async deleteProduct(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const deletedProduct = await productService.deleteById(id);
-
-            if (!deletedProduct) {
-                return res.status(404).json({ message: "Product not found." });
-            }
-
-            res.status(200).json({ message: "Product deleted successfully." });
-        } catch (error) {
-            next(error);
-        }
-    }
 }
 
 const productController = new ProductController();

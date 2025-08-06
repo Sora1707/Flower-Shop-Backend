@@ -16,16 +16,6 @@ import { PaymentMethod, PaymentStatus } from "@/payment/payment.interface";
 import { IStripeCardDocument, stripeService } from "@/payment/stripe";
 
 class OrderController {
-    // [GET] /order
-    async getAllOrders(req: Request, res: Response, next: NextFunction) {
-        try {
-            const orders = await orderService.findAll();
-            res.status(200).json(orders);
-        } catch (error) {
-            next(error);
-        }
-    }
-
     // [GET] /order/:id
     async getOrderById(req: Request, res: Response, next: NextFunction) {
         try {
@@ -243,8 +233,6 @@ class OrderController {
         // );
         // await cart.save();
     }
-
-    async updateOrder(req: Request, res: Response, next: NextFunction) {}
 
     // [DELETE] /order/:id
     async deleteOrderById(req: Request, res: Response, next: NextFunction) {

@@ -17,6 +17,7 @@ import errorHandler from "./middleware/errorHandler.middelware";
 import arcjetMiddleware from "./middleware/arcjet.middleware";
 import asyncHandler from "./middleware/asyncHandler.middelware";
 
+import adminRouter from "@/admin/admin.routes";
 import apiRouter from "@/auth/auth.routes";
 import cartRouter from "@/cart/cart.routes";
 import orderRouter from "@/order/order.routes";
@@ -66,6 +67,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/", express.static(path.join(__dirname, "public")));
 
 /* ROUTING */
+app.use("/api/admin", adminRouter);
 app.use("/api/auth", apiRouter);
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);

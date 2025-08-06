@@ -2,14 +2,12 @@ import { Router } from "express";
 
 import asyncHandler from "@/middleware/asyncHandler.middelware";
 import authenticate from "@/middleware/authenticate.middelware";
-import { isAdmin } from "@/middleware/authorize.middleware";
 
 import { reviewController } from "@/review";
 
 import productController from "./product.controller";
 import { validateBody } from "@/middleware/validate.middelware";
-import { productCreateValidation } from "./product.validation";
-import { ReviewValidation } from "@/review/review.validation";
+import { reviewValidation } from "@/review/review.validation";
 
 const router = Router();
 
@@ -22,50 +20,21 @@ router.get("/", asyncHandler(productController.getAllProducts));
 router.post(
     "/:id/review",
     asyncHandler(authenticate),
-    validateBody(ReviewValidation),
+    validateBody(reviewValidation),
     asyncHandler(reviewController.createReview)
 );
 
-router.post(
-    "/",
-    asyncHandler(authenticate),
-    isAdmin,
-    validateBody(productCreateValidation),
-    asyncHandler(productController.createProduct)
-);
-
 router.put(
     "/:id/review",
     asyncHandler(authenticate),
-    // validateBody(ReviewValidation),
+    // validateBody(reviewValidation),
     asyncHandler(reviewController.updateReview)
-);
-
-router.put(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(productController.updateProduct)
 );
 
 router.patch(
     "/:id/review",
     asyncHandler(authenticate),
     asyncHandler(reviewController.updateReview)
-);
-
-router.patch(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(productController.updateProduct)
-);
-
-router.delete(
-    "/:id",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(productController.deleteProduct)
 );
 
 export default router;

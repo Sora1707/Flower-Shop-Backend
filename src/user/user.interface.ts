@@ -12,6 +12,7 @@ export enum Gender {
 export enum Role {
     User = "user",
     Admin = "admin",
+    SuperAdmin = "superadmin",
 }
 
 export interface IUser {
