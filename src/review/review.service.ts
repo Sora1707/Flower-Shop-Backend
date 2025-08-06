@@ -1,9 +1,9 @@
 import { BasePaginateService } from "@/services";
 
 import { ReviewModel } from "./review.model";
-import { IReview } from "./review.interface";
+import { IReview, IReviewDocument } from "./review.interface";
 
-class ReviewService extends BasePaginateService<IReview> {
+class ReviewService extends BasePaginateService<IReviewDocument> {
     protected model = ReviewModel;
 }
 
