@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 
 import ResponseHandler from "@/utils/ResponseHandler";
-import { checkPayloadBeforePasswordReset, getLoginPayload } from "@/user/token";
+
+import { authService } from "@/auth";
 
 import { AuthRequest } from "@/types/request";
 import { userService } from "@/user";
@@ -26,7 +27,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
     const token = extractTokenFromHeader(req);
 
     try {
-        const payload = getLoginPayload(token);
+        const payload = authService.getLoginPayload(token);
 
         const user = await userService.findById(payload.userId);
 
@@ -34,7 +35,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
             return ResponseHandler.error(res, "Invalid token", 401);
         }
 
-        if (checkPayloadBeforePasswordReset(payload, user)) {
+        if (authService.checkPayloadBeforePasswordReset(payload, user)) {
             return ResponseHandler.error(
                 res,
                 "Token is outdated due to recent password change",

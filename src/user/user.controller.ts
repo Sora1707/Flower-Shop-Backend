@@ -7,30 +7,13 @@ import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 
 import { cartService, ICartItem } from "@/cart";
-import {
-    checkPayloadBeforePasswordReset,
-    generateLoginToken,
-    generatePasswordResetToken,
-    getPasswordResetPayload,
-} from "./token";
 import { IUser } from "./user.interface";
 import userService from "./user.service";
-import {
-    UserAddCardInput,
-    UserAddressInput,
-    UserLoginInput,
-    UserPasswordChangeInput,
-} from "./user.validation";
+import { UserAddCardInput, UserAddressInput } from "./user.validation";
 import { processAvatar } from "./avatar";
 import { getSafeCardInfo, getSafeUser, getSafeUserProfile } from "./util";
-import { sendResetPasswordEmail } from "@/utils/mailer";
 import { IAddress } from "./address.interface";
 import { IStripeCard, stripeService } from "@/payment/stripe";
-
-const DEFAULT_SELECTED_FIELDS_OBJECT: SelectedFieldsObject<IUser> = {
-    password: 0,
-    role: 0,
-};
 
 class UserController {
     // [GET] /user/
@@ -40,14 +23,9 @@ class UserController {
 
             const filter = {};
 
-            const selectedFieldsObject: SelectedFieldsObject<IUser> = {
-                ...DEFAULT_SELECTED_FIELDS_OBJECT,
-            };
-
             const paginateOptions = {
                 page: page ? parseInt(page as string, 10) : 1,
                 limit: limit ? parseInt(limit as string, 10) : 10,
-                select: selectedFieldsObject,
             };
 
             const paginateResult = await userService.paginate(filter, paginateOptions);
@@ -63,11 +41,7 @@ class UserController {
         try {
             const { id } = req.params;
 
-            const selectedFieldsObject: SelectedFieldsObject<IUser> = {
-                ...DEFAULT_SELECTED_FIELDS_OBJECT,
-            };
-
-            const user = await userService.findById(id, selectedFieldsObject);
+            const user = await userService.findById(id);
 
             if (!user) {
                 return res.status(404).json({ message: "User not found." });
@@ -85,7 +59,7 @@ class UserController {
             return;
         }
         const safeUser = getSafeUser(req.user);
-        ResponseHandler.success(res, { user: safeUser });
+        ResponseHandler.success(res, safeUser);
     }
 
     // [GET] /user/profile
@@ -93,92 +67,16 @@ class UserController {
         if (!req.user) {
             return;
         }
-        const safeUserProfile = getSafeUserProfile(req.user.toObject());
-        ResponseHandler.success(res, { user: safeUserProfile });
+        const safeUserProfile = getSafeUserProfile(req.user);
+        ResponseHandler.success(res, safeUserProfile);
     }
 
     async getUserAddresses(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
             return;
         }
-        const safeUser = getSafeUser(req.user.toObject());
-        ResponseHandler.success(res, { addresses: safeUser.addresses });
-    }
-
-    // [POST] /user/login
-    async login(req: Request<{}, {}, UserLoginInput>, res: Response, next: NextFunction) {
-        try {
-            const { username, password } = req.body;
-
-            const user = await userService.findOne({ username });
-            if (!user) {
-                return ResponseHandler.error(res, "This user does not exist", 404);
-            }
-
-            const isMatch = await user.matchPassword(password);
-            if (!isMatch) {
-                return ResponseHandler.error(res, "Wrong password", 400);
-            }
-
-            const token = generateLoginToken(user.id);
-
-            ResponseHandler.success(
-                res,
-                { token, user: { id: user.id, username: user.username } },
-                "Successfully logged in"
-            );
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // [POST] /user/register
-    async register(req: Request, res: Response, next: NextFunction) {
-        try {
-            const {
-                email,
-                password,
-                username,
-                firstName,
-                lastName,
-                phoneNumber,
-                birthdate,
-                gender,
-                avatar,
-            } = req.body;
-
-            const existingUser = await userService.findOne({ username });
-            if (existingUser) {
-                return res.status(400).json({ message: "Username already registered" });
-            }
-
-            const newUserData = {
-                email,
-                password,
-                username,
-                firstName,
-                lastName,
-                phoneNumber,
-                birthdate,
-                gender,
-                avatar,
-            };
-
-            const newUser = await userService.create(newUserData);
-
-            await cartService.create({
-                user: new mongoose.Types.ObjectId(newUser._id as string),
-                items: [] as ICartItem[],
-            });
-
-            await cartService.create({ user: newUser.id });
-
-            const { password: _pw, role, ...safeUser } = newUser.toObject();
-
-            ResponseHandler.success(res, { user: safeUser }, "User registered successfully", 201);
-        } catch (error) {
-            next(error);
-        }
+        const safeUser = getSafeUser(req.user);
+        ResponseHandler.success(res, safeUser.addresses);
     }
 
     // [POST] /user/address
@@ -199,12 +97,7 @@ class UserController {
 
             await user.save();
 
-            ResponseHandler.success(
-                res,
-                { addresses: user.addresses },
-                "Address added successfully",
-                201
-            );
+            ResponseHandler.success(res, null, "Address added successfully", 201);
         } catch (error) {
             next(error);
         }
@@ -227,11 +120,7 @@ class UserController {
 
             await user.save();
 
-            ResponseHandler.success(
-                res,
-                { addresses: user.addresses },
-                "Default address set successfully"
-            );
+            ResponseHandler.success(res, null, "Default address set successfully");
         } catch (error) {}
     }
 
@@ -358,7 +247,7 @@ class UserController {
 
             const safeCards = getSafeCardInfo(user.cards);
 
-            ResponseHandler.success(res, { cards: safeCards }, "Card added successfully", 201);
+            ResponseHandler.success(res, safeCards, "Card added successfully", 201);
         } catch (error) {
             next(error);
         }
@@ -417,9 +306,9 @@ class UserController {
                 return res.status(404).json({ message: "User not found." });
             }
 
-            const safeUser = getSafeUser(updatedUser.toObject());
+            const safeUser = getSafeUser(updatedUser);
 
-            ResponseHandler.success(res, { user: safeUser }, "User updated successfully");
+            ResponseHandler.success(res, safeUser, "User updated successfully");
         } catch (error) {
             next(error);
         }
@@ -454,102 +343,6 @@ class UserController {
             ResponseHandler.success(res, null, "User deleted successfully");
         } catch (error) {
             next(error);
-        }
-    }
-
-    // POST /request-password-reset
-    async requestPasswordReset(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { email } = req.body;
-
-            if (!email) {
-                return ResponseHandler.error(res, "Email is required", 400);
-            }
-
-            const user = await userService.findOne({ email });
-            if (!user) {
-                return ResponseHandler.error(res, "This email is not registered", 404);
-            }
-
-            const resetToken = generatePasswordResetToken(user.id);
-
-            const frontEndURL = `${process.env.FRONT_END_IP}:${process.env.FRONT_END_PORT}`;
-            const resetLink = `${frontEndURL}/reset-password?token=${resetToken}`;
-
-            await sendResetPasswordEmail(email, resetLink);
-
-            // ResponseHandler.success(res, { resetLink }, "Password reset requested");
-            ResponseHandler.success(res, null, "Password reset requested. Check your email.");
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // POST user/reset-password
-    async resetPassword(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { token, newPassword } = req.body;
-
-            if (!token || !newPassword) {
-                return ResponseHandler.error(res, "Token and new password are required", 400);
-            }
-
-            let payload;
-            try {
-                payload = getPasswordResetPayload(token);
-            } catch (err) {
-                return ResponseHandler.error(res, "Invalid or expired token", 400);
-            }
-
-            const { userId } = payload;
-            const user = await userService.findById(userId);
-            if (!user) {
-                return ResponseHandler.error(res, "User not found", 404);
-            }
-            if (checkPayloadBeforePasswordReset(payload, user)) {
-                return ResponseHandler.error(
-                    res,
-                    "Token is outdated due to recent password change",
-                    400
-                );
-            }
-
-            user.password = newPassword;
-            user.passwordChangedAt = new Date();
-            await user.save();
-
-            ResponseHandler.success(res, null, "Password reset successfully");
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    // [POST] user/change-password
-    async changePassword(
-        req: AuthRequest<{}, {}, UserPasswordChangeInput>,
-        res: Response,
-        next: NextFunction
-    ) {
-        try {
-            if (!req.user) {
-                return;
-            }
-
-            const { currentPassword, newPassword } = req.body;
-            const user = req.user;
-
-            const isMatch = await user.matchPassword(currentPassword);
-            if (!isMatch) {
-                ResponseHandler.error(res, "Wrong password", 400);
-            }
-
-            user.password = newPassword;
-            user.passwordChangedAt = new Date();
-            await user.save();
-
-            ResponseHandler.success(res, null, "Password changed successfully");
-        } catch (err) {
-            next(err);
         }
     }
 }

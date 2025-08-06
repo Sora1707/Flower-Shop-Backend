@@ -33,11 +33,6 @@ async function createSampleCart() {
     try {
         await cartService.deleteAll();
 
-        const users = await userService.findAll();
-        for (const user of users) {
-            await cartService.create({ user: user.id as Types.ObjectId });
-        }
-
         const user = await userService.findOne({ username: "sora1" });
         const products = await productService.findAll();
         const slicedProducts = products.slice(0, 3);

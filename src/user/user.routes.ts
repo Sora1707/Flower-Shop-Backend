@@ -10,13 +10,7 @@ import { uploadAvatar } from "@/config/upload";
 import OrderController from "@/order/order.controller";
 import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
-import {
-    UserAddCardValidation,
-    UserAddressValidation,
-    UserLoginValidation,
-    UserPasswordChangeValidaton,
-    UserRegisterValidation,
-} from "./user.validation";
+import { userAddressValidation, userAddCardValidation } from "./user.validation";
 
 const router = Router();
 
@@ -29,7 +23,7 @@ router.get("/address", asyncHandler(authenticate), asyncHandler(UserController.g
 router.post(
     "/address",
     asyncHandler(authenticate),
-    validateBody(UserAddressValidation),
+    validateBody(userAddressValidation),
     asyncHandler(UserController.addUserAddress)
 );
 
@@ -62,7 +56,7 @@ router.get("/payment", asyncHandler(authenticate), asyncHandler(UserController.g
 router.post(
     "/payment",
     asyncHandler(authenticate),
-    validateBody(UserAddCardValidation),
+    validateBody(userAddCardValidation),
     asyncHandler(UserController.addUserPayment)
 );
 
@@ -86,28 +80,6 @@ router.get(
 router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.getUserReviews));
 router.get("/:id", asyncHandler(UserController.getUserById));
 router.get("/", asyncHandler(authenticate), isAdmin, asyncHandler(UserController.getAllUsers));
-
-router.post("/login", validateBody(UserLoginValidation), asyncHandler(UserController.login));
-
-router.post(
-    "/register",
-    validateBody(UserRegisterValidation),
-    asyncHandler(UserController.register)
-);
-
-router.post(
-    "/change-password",
-    asyncHandler(authenticate),
-    validateBody(UserPasswordChangeValidaton),
-    asyncHandler(UserController.changePassword)
-);
-router.post("/request-password-reset", asyncHandler(UserController.requestPasswordReset));
-router.post("/reset-password", asyncHandler(UserController.resetPassword));
-router.post(
-    "/change-password",
-    asyncHandler(authenticate),
-    asyncHandler(UserController.changePassword)
-);
 
 router.put(
     "/me",
