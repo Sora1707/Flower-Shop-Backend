@@ -12,7 +12,7 @@ import ResponseHandler from "@/utils/ResponseHandler";
 
 class UserController {
     // [GET] /user/:id
-    async getUserById(req: Request, res: Response, next: NextFunction) {
+    async getUserProfileById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const user = await userService.findById(id);
@@ -259,6 +259,12 @@ class UserController {
 
         ResponseHandler.success(res, null, "User deleted successfully");
     }
+
+    // TODO
+    async updateUserProfile(req: AuthRequest, res: Response, next: NextFunction) {}
+
+    // TODO
+    async setDefaultPayment(req: AuthRequest, res: Response, next: NextFunction) {}
 }
 
 const userController = new UserController();

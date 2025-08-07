@@ -6,7 +6,7 @@ import priceRuleService from "@/priceRule/priceRule.service";
 
 class ProductController {
     // [GET] /product/
-    async getAllProducts(req: Request, res: Response, next: NextFunction) {
+    async getProducts(req: Request, res: Response, next: NextFunction) {
         const { filters, paginateOptions } = extractProductOptionsFromRequest(req);
 
         const result = await productService.paginate(filters, paginateOptions);

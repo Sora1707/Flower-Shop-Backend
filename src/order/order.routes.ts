@@ -2,24 +2,19 @@ import { Router } from "express";
 
 import asyncHandler from "@/middleware/asyncHandler.middelware";
 import authenticate from "@/middleware/authenticate.middelware";
-import { isAdmin } from "@/middleware/authorize.middleware";
 
 import OrderController from "./order.controller";
 
 const router = Router();
 
-// Order
-// TODO: Get user's orders
+router.use(asyncHandler(authenticate));
 
-router.get("/:id", asyncHandler(authenticate), isAdmin, asyncHandler(OrderController.getOrderById));
+router.get("/:id", asyncHandler(OrderController.getUserOrderById));
 
-router.post("/", asyncHandler(authenticate), asyncHandler(OrderController.createOrder));
+router.get("/", asyncHandler(OrderController.getUserOrders));
 
-// router.delete(
-//     "/:userId",
-//     asyncHandler(authenticate),
-//     asyncHandler(OrderController.deleteOrderByUserId)
-// );
-// router.delete("/:id", asyncHandler(authenticate), asyncHandler(OrderController.deleteOrderById));
-// router.delete("/", asyncHandler(authenticate), asyncHandler(OrderController.deleteAllOrders));
+router.post("/", asyncHandler(OrderController.createOrder));
+
+// TODO: request cancel order
+
 export default router;

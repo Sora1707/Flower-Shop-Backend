@@ -16,17 +16,6 @@ import { PaymentMethod, PaymentStatus } from "@/payment/payment.interface";
 import { IStripeCardDocument, stripeService } from "@/payment/stripe";
 
 class OrderController {
-    // [GET] /order/:id
-    async getOrderById(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
-        const order = await orderService.findById(id);
-
-        if (!order) {
-            return res.status(404).json({ message: "Order not found." });
-        }
-        res.status(200).json(order);
-    }
-
     // [GET] /user/order
     async getUserOrders(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
@@ -218,41 +207,6 @@ class OrderController {
         //     (item) => !items.includes(item.product.toString())
         // );
         // await cart.save();
-    }
-
-    // [DELETE] /order/:id
-    async deleteOrderById(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
-        const deletedOrder = await orderService.deleteById(id);
-
-        if (!deletedOrder) {
-            return res.status(404).json({ message: "Order not found." });
-        }
-
-        res.status(200).json({ message: "Order deleted successfully." });
-    }
-
-    // [DELETE] /order/:userId
-    async deleteOrderByUserId(req: Request, res: Response, next: NextFunction) {
-        const { userId } = req.params;
-        const deletedOrders = await orderService.deleteMany({ user: userId });
-
-        if (deletedOrders.deletedCount === 0) {
-            return res.status(404).json({ message: "No orders found for this user." });
-        }
-
-        res.status(200).json({ message: "Orders deleted successfully." });
-    }
-
-    // [DELETE] /order/
-    async deleteAllOrders(req: Request, res: Response, next: NextFunction) {
-        const deletedOrders = await orderService.deleteAll();
-
-        if (deletedOrders.deletedCount === 0) {
-            return res.status(404).json({ message: "No orders found to delete." });
-        }
-
-        res.status(200).json({ message: "All orders deleted successfully." });
     }
 }
 

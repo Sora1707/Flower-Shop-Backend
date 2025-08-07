@@ -11,30 +11,14 @@ import { reviewValidation } from "@/review/review.validation";
 
 const router = Router();
 
+// TODO Move to search
 router.get("/autocomplete", asyncHandler(productController.autoCompleteSearchQuery));
+
 router.get("/search", asyncHandler(productController.searchProducts));
-router.get("/:id/review", asyncHandler(reviewController.getProductReviews));
+
+//
 router.get("/:id", asyncHandler(productController.getProductById));
-router.get("/", asyncHandler(productController.getAllProducts));
 
-router.post(
-    "/:id/review",
-    asyncHandler(authenticate),
-    validateBody(reviewValidation),
-    asyncHandler(reviewController.createReview)
-);
-
-router.put(
-    "/:id/review",
-    asyncHandler(authenticate),
-    // validateBody(reviewValidation),
-    asyncHandler(reviewController.updateReview)
-);
-
-router.patch(
-    "/:id/review",
-    asyncHandler(authenticate),
-    asyncHandler(reviewController.updateReview)
-);
+router.get("/", asyncHandler(productController.getProducts));
 
 export default router;

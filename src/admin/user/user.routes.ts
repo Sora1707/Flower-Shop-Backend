@@ -20,4 +20,6 @@ router.patch(
 
 router.delete("/:id", asyncHandler(adminUserController.deleteUser));
 
+// TODO Change user's status: ACTIVE, SUSPENDED, BANNED
+
 export default router;

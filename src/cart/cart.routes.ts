@@ -11,25 +11,19 @@ import cartController from "./cart.controller";
 
 const router = Router();
 
-router.get(
-    "/:userId",
-    asyncHandler(authenticate),
-    isAdmin,
-    asyncHandler(cartController.getCartByUserId)
-);
+router.use(asyncHandler(authenticate));
 
-router.get("/", asyncHandler(authenticate), asyncHandler(cartController.getUserCart));
+router.get("/", asyncHandler(cartController.getUserCart));
 
 router.patch(
-    "/",
-    asyncHandler(authenticate),
+    "/items/:productId",
     validateBody(updateCartItemQuantityValidation),
     asyncHandler(cartController.updateItemQuantity.bind(cartController))
 );
 
 // TODO delete item
-// router.delete("/:productId", asyncHandler(authenticate), asyncHandler(cartController.removeItem));
+router.delete("/items/:productId", asyncHandler(cartController.removeItemFromCartByProductId));
 // TODO clear cart
-// router.delete("/", asyncHandler(authenticate), asyncHandler(cartController.clearCart));
+router.delete("/items", asyncHandler(cartController.clearCart));
 
 export default router;

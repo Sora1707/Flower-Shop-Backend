@@ -8,14 +8,23 @@ import { orderService } from "@/order";
 import { productService } from "@/product";
 
 class ReviewController {
-    // [GET] /review/
     async getAllReviews(req: Request, res: Response, next: NextFunction) {
         const reviews = await reviewService.findAll();
         res.status(200).json(reviews);
     }
 
-    // [POST] /products/:id/review
-    async createReview(req: AuthRequest, res: Response, next: NextFunction) {
+    async getReviewsForProduct(req: Request, res: Response, next: NextFunction) {
+        const productId = req.params.id;
+        const { page, limit } = req.query;
+        const paginateOptions = {
+            page: page ? parseInt(page as string, 10) : 1,
+            limit: limit ? parseInt(limit as string, 10) : 10,
+        };
+        const reviews = await reviewService.paginate({ product: productId }, paginateOptions);
+        res.status(200).json(reviews);
+    }
+
+    async createReviewForProduct(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
             return res.status(401).json({ message: "User not authenticated." });
         }
@@ -69,8 +78,42 @@ class ReviewController {
         res.status(201).json(newReview);
     }
 
-    // [PUT, PATCH] /products/:id/review
-    async updateReview(req: AuthRequest, res: Response, next: NextFunction) {
+    async getUserReviewForProduct(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated." });
+        }
+        const userId = req.user.id;
+        const productId = req.params.productId;
+        const review = await reviewService.findOne({ user: userId, product: productId });
+
+        if (!review) {
+            return res.status(404).json({ message: "User has not reviewed this product yet." });
+        }
+
+        res.status(200).json(review);
+    }
+
+    async getUserReviews(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated." });
+        }
+        const userId = req.user.id;
+        const { page, limit } = req.query;
+        const paginateOptions = {
+            page: page ? parseInt(page as string, 10) : 1,
+            limit: limit ? parseInt(limit as string, 10) : 10,
+        };
+        const reviews = await reviewService.paginate({ user: userId }, paginateOptions);
+        res.status(200).json(reviews);
+    }
+
+    async getReviewById(req: Request, res: Response, next: NextFunction) {
+        const reviewId = req.params.id;
+        const review = await reviewService.findById(reviewId);
+        res.status(200).json(review);
+    }
+
+    async updateReviewById(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
             return res.status(401).json({ message: "User not authenticated." });
         }
@@ -127,47 +170,17 @@ class ReviewController {
         res.status(200).json({ message: "Review updated successfully." });
     }
 
-    // [GET] /user/review
-    async getUserReviews(req: AuthRequest, res: Response, next: NextFunction) {
+    async deleteReviewById(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
             return res.status(401).json({ message: "User not authenticated." });
         }
         const userId = req.user.id;
-        const { page, limit } = req.query;
-        const paginateOptions = {
-            page: page ? parseInt(page as string, 10) : 1,
-            limit: limit ? parseInt(limit as string, 10) : 10,
-        };
-        const reviews = await reviewService.paginate({ user: userId }, paginateOptions);
-        res.status(200).json(reviews);
-    }
-
-    // [GET] /user/review/:productId
-    async getUserReviewForProduct(req: AuthRequest, res: Response, next: NextFunction) {
-        if (!req.user) {
-            return res.status(401).json({ message: "User not authenticated." });
+        const reviewId = req.params.id;
+        const deletedReview = await reviewService.deleteById(reviewId, userId);
+        if (!deletedReview) {
+            return res.status(404).json({ message: "Review not found." });
         }
-        const userId = req.user.id;
-        const productId = req.params.productId;
-        const review = await reviewService.findOne({ user: userId, product: productId });
-
-        if (!review) {
-            return res.status(404).json({ message: "User has not reviewed this product yet." });
-        }
-
-        res.status(200).json(review);
-    }
-
-    // [GET] /products/:id/reviews
-    async getProductReviews(req: Request, res: Response, next: NextFunction) {
-        const productId = req.params.id;
-        const { page, limit } = req.query;
-        const paginateOptions = {
-            page: page ? parseInt(page as string, 10) : 1,
-            limit: limit ? parseInt(limit as string, 10) : 10,
-        };
-        const reviews = await reviewService.paginate({ product: productId }, paginateOptions);
-        res.status(200).json(reviews);
+        res.status(200).json({ message: "Review deleted successfully." });
     }
 }
 

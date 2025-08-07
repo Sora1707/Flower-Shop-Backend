@@ -6,92 +6,50 @@ import { validateBody } from "@/middleware/validate.middelware";
 
 import { uploadAvatar } from "@/config/upload";
 
-import OrderController from "@/order/order.controller";
-import ReviewController from "@/review/review.controller";
 import UserController from "@/user/user.controller";
 import { userAddressValidation, userAddCardValidation } from "./user.validation";
 
 const router = Router();
 
-router.get("/me", asyncHandler(authenticate), asyncHandler(UserController.getCurrentUser));
+router.use(asyncHandler(authenticate));
 
-router.get("/profile", asyncHandler(authenticate), asyncHandler(UserController.getUserProfile));
-router.get("/address", asyncHandler(authenticate), asyncHandler(UserController.getUserAddresses));
-// router.get("/payment", asyncHandler(authenticate), asyncHandler(UserController.getUserPayment));
+router.get("/:id", asyncHandler(UserController.getUserProfileById));
+
+router.get("/me", asyncHandler(UserController.getCurrentUser));
+
+router.patch(
+    "/avatar",
+    uploadAvatar.single("avatar"),
+    asyncHandler(UserController.updateCurrentUser)
+);
+
+router.get("/profile", asyncHandler(UserController.getUserProfile));
+router.patch("profile", asyncHandler(UserController.updateUserProfile));
+
+router.get("/address", asyncHandler(UserController.getUserAddresses));
 
 router.post(
     "/address",
-    asyncHandler(authenticate),
     validateBody(userAddressValidation),
     asyncHandler(UserController.addUserAddress)
 );
 
-router.patch(
-    "/address/:id/default",
-    asyncHandler(authenticate),
-    asyncHandler(UserController.setDefaultAddress)
-);
+router.patch("/address/:id/set-default", asyncHandler(UserController.setDefaultAddress));
 
-router.patch(
-    "/address/:id",
-    asyncHandler(authenticate),
-    asyncHandler(UserController.updateUserAddress)
-);
+router.patch("/address/:id", asyncHandler(UserController.updateUserAddress));
 
-router.put(
-    "/address/:id",
-    asyncHandler(authenticate),
-    asyncHandler(UserController.updateUserAddress)
-);
+router.delete("/address/:id", asyncHandler(UserController.deleteUserAddress));
 
-router.delete(
-    "/address/:id",
-    asyncHandler(authenticate),
-    asyncHandler(UserController.deleteUserAddress)
-);
-
-router.get("/payment", asyncHandler(authenticate), asyncHandler(UserController.getUserPayment));
+router.get("/payment", asyncHandler(UserController.getUserPayment));
 
 router.post(
     "/payment",
-    asyncHandler(authenticate),
     validateBody(userAddCardValidation),
     asyncHandler(UserController.addUserPayment)
 );
 
-router.delete(
-    "/payment/:id",
-    asyncHandler(authenticate),
-    asyncHandler(UserController.deleteUserPayment)
-);
+router.patch("/payment/:id/set-default", asyncHandler(UserController.setDefaultPayment));
 
-router.get(
-    "/order/:orderId",
-    asyncHandler(authenticate),
-    asyncHandler(OrderController.getUserOrderById)
-);
-router.get("/order", asyncHandler(authenticate), asyncHandler(OrderController.getUserOrders));
-router.get(
-    "/review/:productId",
-    asyncHandler(authenticate),
-    asyncHandler(ReviewController.getUserReviewForProduct)
-);
-router.get("/review", asyncHandler(authenticate), asyncHandler(ReviewController.getUserReviews));
-router.get("/:id", asyncHandler(UserController.getUserById));
-
-router.put(
-    "/me",
-    asyncHandler(authenticate),
-    uploadAvatar.single("avatar"),
-    asyncHandler(UserController.updateCurrentUser)
-);
-router.patch(
-    "/me",
-    asyncHandler(authenticate),
-    uploadAvatar.single("avatar"),
-    asyncHandler(UserController.updateCurrentUser)
-);
-
-router.delete("/me", asyncHandler(authenticate), asyncHandler(UserController.deleteCurrentUser));
+router.delete("/payment/:id", asyncHandler(UserController.deleteUserPayment));
 
 export default router;

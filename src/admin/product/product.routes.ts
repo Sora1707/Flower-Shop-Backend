@@ -14,10 +14,10 @@ router.post(
     asyncHandler(adminProductController.createProduct)
 );
 
-router.put("/:id", asyncHandler(adminProductController.updateProduct));
-
 router.patch("/:id", asyncHandler(adminProductController.updateProduct));
 
 router.delete("/:id", asyncHandler(adminProductController.deleteProduct));
+
+// TODO Product avatar
 
 export default router;

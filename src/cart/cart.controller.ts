@@ -22,18 +22,6 @@ class CartController {
         res.status(200).json(carts);
     }
 
-    // [GET] /cart/:userId
-    async getCartByUserId(req: Request, res: Response, next: NextFunction) {
-        const { userId } = req.params;
-        const cart = await cartService.findOne({ user: userId });
-
-        if (!cart) {
-            return res.status(404).json({ message: "Cart not found" });
-        }
-
-        res.status(200).json(cart);
-    }
-
     // [GET] /cart
     async getUserCart(req: AuthRequest, res: Response, next: NextFunction) {
         const userId = req.user?._id;
@@ -162,24 +150,9 @@ class CartController {
     }
 
     // [DELETE] /cart
-    async clearCart(req: AuthRequest, res: Response, next: NextFunction) {
-        const userId = req.user?._id;
-        const clearedCart = await cartService.deleteOne({ user: userId });
-        if (!clearedCart) {
-            res.status(404).json({ message: "Cart not found" });
-        }
-        res.status(200).json({ message: "Cart cleared successfully" });
-    }
+    async clearCart(req: AuthRequest, res: Response, next: NextFunction) {}
 
-    // [DELETE] /cart/:userId
-    async deleteCartByUserId(req: Request, res: Response, next: NextFunction) {
-        const { userId } = req.params;
-        const deletedCart = await cartService.deleteOne({ user: userId });
-        if (!deletedCart) {
-            res.status(404).json({ message: "Cart not found" });
-        }
-        res.status(200).json({ message: "Cart deleted successfully" });
-    }
+    async removeItemFromCartByProductId(req: AuthRequest, res: Response, next: NextFunction) {}
 }
 
 const cartController = new CartController();
