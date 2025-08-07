@@ -18,68 +18,54 @@ import { IStripeCardDocument, stripeService } from "@/payment/stripe";
 class OrderController {
     // [GET] /order/:id
     async getOrderById(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const order = await orderService.findById(id);
+        const { id } = req.params;
+        const order = await orderService.findById(id);
 
-            if (!order) {
-                return res.status(404).json({ message: "Order not found." });
-            }
-            res.status(200).json(order);
-        } catch (error) {
-            next(error);
+        if (!order) {
+            return res.status(404).json({ message: "Order not found." });
         }
+        res.status(200).json(order);
     }
 
     // [GET] /user/order
     async getUserOrders(req: AuthRequest, res: Response, next: NextFunction) {
-        try {
-            if (!req.user) {
-                return res.status(401).json({ message: "User not authenticated." });
-            }
-
-            const userId = req.user.id;
-            const { page, limit } = req.query;
-            const paginateOptions = {
-                page: page ? parseInt(page as string, 10) : 1,
-                limit: limit ? parseInt(limit as string, 10) : 10,
-            };
-            const orders = await orderService.paginate({ user: userId }, paginateOptions);
-
-            if (!orders || orders.length === 0) {
-                return res.status(404).json({ message: "No orders found for this user." });
-            }
-            res.status(200).json(orders);
-        } catch (error) {
-            next(error);
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated." });
         }
+
+        const userId = req.user.id;
+        const { page, limit } = req.query;
+        const paginateOptions = {
+            page: page ? parseInt(page as string, 10) : 1,
+            limit: limit ? parseInt(limit as string, 10) : 10,
+        };
+        const orders = await orderService.paginate({ user: userId }, paginateOptions);
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: "No orders found for this user." });
+        }
+        res.status(200).json(orders);
     }
 
     // [GET] /user/order/:orderId
     async getUserOrderById(req: AuthRequest, res: Response, next: NextFunction) {
-        try {
-            if (!req.user) {
-                return res.status(401).json({ message: "User not authenticated." });
-            }
-            const userId = req.user.id;
-            const orderId = req.params.orderId;
-
-            const order = await orderService.findById(orderId);
-
-            if (!order) {
-                return res.status(404).json({ message: "Order not found." });
-            }
-
-            if (order.user != userId) {
-                return res
-                    .status(403)
-                    .json({ message: "You are not authorized to view this order." });
-            }
-
-            res.status(200).json(order);
-        } catch (error) {
-            next(error);
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated." });
         }
+        const userId = req.user.id;
+        const orderId = req.params.orderId;
+
+        const order = await orderService.findById(orderId);
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found." });
+        }
+
+        if (order.user != userId) {
+            return res.status(403).json({ message: "You are not authorized to view this order." });
+        }
+
+        res.status(200).json(order);
     }
 
     // [POST] /order/
@@ -236,49 +222,37 @@ class OrderController {
 
     // [DELETE] /order/:id
     async deleteOrderById(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req.params;
-            const deletedOrder = await orderService.deleteById(id);
+        const { id } = req.params;
+        const deletedOrder = await orderService.deleteById(id);
 
-            if (!deletedOrder) {
-                return res.status(404).json({ message: "Order not found." });
-            }
-
-            res.status(200).json({ message: "Order deleted successfully." });
-        } catch (error) {
-            next(error);
+        if (!deletedOrder) {
+            return res.status(404).json({ message: "Order not found." });
         }
+
+        res.status(200).json({ message: "Order deleted successfully." });
     }
 
     // [DELETE] /order/:userId
     async deleteOrderByUserId(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { userId } = req.params;
-            const deletedOrders = await orderService.deleteMany({ user: userId });
+        const { userId } = req.params;
+        const deletedOrders = await orderService.deleteMany({ user: userId });
 
-            if (deletedOrders.deletedCount === 0) {
-                return res.status(404).json({ message: "No orders found for this user." });
-            }
-
-            res.status(200).json({ message: "Orders deleted successfully." });
-        } catch (error) {
-            next(error);
+        if (deletedOrders.deletedCount === 0) {
+            return res.status(404).json({ message: "No orders found for this user." });
         }
+
+        res.status(200).json({ message: "Orders deleted successfully." });
     }
 
     // [DELETE] /order/
     async deleteAllOrders(req: Request, res: Response, next: NextFunction) {
-        try {
-            const deletedOrders = await orderService.deleteAll();
+        const deletedOrders = await orderService.deleteAll();
 
-            if (deletedOrders.deletedCount === 0) {
-                return res.status(404).json({ message: "No orders found to delete." });
-            }
-
-            res.status(200).json({ message: "All orders deleted successfully." });
-        } catch (error) {
-            next(error);
+        if (deletedOrders.deletedCount === 0) {
+            return res.status(404).json({ message: "No orders found to delete." });
         }
+
+        res.status(200).json({ message: "All orders deleted successfully." });
     }
 }
 
