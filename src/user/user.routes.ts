@@ -13,19 +13,17 @@ const router = Router();
 
 router.use(asyncHandler(authenticate));
 
-router.get("/:id", asyncHandler(UserController.getUserProfileById));
-
 router.get("/me", asyncHandler(UserController.getCurrentUser));
+
+/* PROFILE */
+router.get("/profile", asyncHandler(UserController.getUserProfile));
+router.patch("profile", asyncHandler(UserController.updateUserProfile));
 
 router.patch(
     "/avatar",
     uploadAvatar.single("avatar"),
     asyncHandler(UserController.updateCurrentUser)
 );
-
-/* PROFILE */
-router.get("/profile", asyncHandler(UserController.getUserProfile));
-router.patch("profile", asyncHandler(UserController.updateUserProfile));
 
 /* ADDRESS */
 router.get("/address", asyncHandler(UserController.getUserAddresses));
@@ -54,5 +52,7 @@ router.post(
 router.patch("/payment/:id/set-default", asyncHandler(UserController.setDefaultPayment));
 
 router.delete("/payment/:id", asyncHandler(UserController.deleteUserPayment));
+
+router.get("/:id", asyncHandler(UserController.getUserProfileById));
 
 export default router;

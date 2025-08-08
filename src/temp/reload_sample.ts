@@ -8,8 +8,20 @@ import { reviewService } from "@/review";
 import { userService } from "@/user";
 import { randomInt } from "../utils/number";
 import withTransaction from "../utils/withTransaction";
+import priceRuleService from "@/priceRule/priceRule.service";
+import { PriceRuleType } from "@/priceRule/priceRule.interface";
 
-async function reloadSampleUsers() {
+async function createSamplePriceRules() {
+    try {
+        const priceRules = require("@/data/priceRules.json");
+        await priceRuleService.deleteAll();
+        await priceRuleService.createMany(priceRules);
+    } catch (error) {
+        console.error("Error reloading sample price rules:", error);
+    }
+}
+
+async function createSampleUsers() {
     try {
         const users = require("@/data/users.json");
         await userService.deleteAll();
@@ -19,10 +31,13 @@ async function reloadSampleUsers() {
     }
 }
 
-async function reloadSampleProducts() {
+async function createSampleProducts() {
     try {
-        const products = require("@/data/products.json");
+        const priceRule = await priceRuleService.findOne({ type: PriceRuleType.DailyDecrease });
+
+        let products: any[] = require("@/data/products.json");
         await productService.deleteAll();
+        products = products.map((product) => ({ ...product, dailyRule: priceRule?.id }));
         await productService.createMany(products);
     } catch (error) {
         console.error("Error reloading sample products:", error);
@@ -33,7 +48,7 @@ async function createSampleCart() {
     try {
         await cartService.deleteAll();
 
-        const user = await userService.findOne({ username: "sora1" });
+        const user = await userService.findOne({ username: "sora" });
         const products = await productService.findAll();
         const slicedProducts = products.slice(0, 3);
 
@@ -78,7 +93,7 @@ async function createSampleOrder() {
                     priceAtAddTime: products[0].price,
                 },
             ],
-            status: OrderStatus.COMPLETED,
+            status: OrderStatus.Completed,
             contactInfo: {
                 name: "sora",
                 phoneNumber: "1234567890",
@@ -103,10 +118,11 @@ async function createSampleOrder() {
 export async function reloadSampleData(req: Request, res: Response, next: NextFunction) {
     try {
         await withTransaction(async (session) => {
-            await reloadSampleUsers();
-            // await reloadSampleProducts();
-            // await createSampleCart();
-            // await createSampleOrder();
+            await createSampleUsers();
+            await createSamplePriceRules();
+            await createSampleProducts();
+            await createSampleCart();
+            await createSampleOrder();
             await reviewService.deleteAll();
         });
 

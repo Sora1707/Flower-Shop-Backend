@@ -8,15 +8,15 @@ import { validateBody } from "@/middleware/validate.middelware";
 
 const router = Router();
 
+router.patch("/:id", asyncHandler(adminProductController.updateProduct));
+
+router.delete("/:id", asyncHandler(adminProductController.deleteProduct));
+
 router.post(
     "/",
     validateBody(productCreateValidation),
     asyncHandler(adminProductController.createProduct)
 );
-
-router.patch("/:id", asyncHandler(adminProductController.updateProduct));
-
-router.delete("/:id", asyncHandler(adminProductController.deleteProduct));
 
 // TODO Product avatar
 

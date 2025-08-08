@@ -1,23 +1,16 @@
 import mongoosePaginate from "mongoose-paginate-v2";
 import mongoose, { Schema, PaginateModel } from "mongoose";
 
-import { IProduct, Category, IProductDocument } from "./product.interface";
+import { IProduct, IProductDocument, ProductType } from "./product.interface";
 
 const ProductSchema = new Schema<IProductDocument>(
     {
         name: { type: String, required: true },
+        type: { type: String, enum: ProductType, required: true },
         price: { type: Number, required: true },
-        dailyRuleId: { type: String, required: true, ref: "DailyRule" },
-        promotionId: [{ type: String }],
+        dailyRule: { type: Schema.Types.ObjectId, required: true, ref: "PriceRule" },
+        promotions: [{ type: Schema.Types.ObjectId, ref: "PriceRule" }],
         description: { type: String, required: true },
-        categories: [
-            {
-                type: String,
-                enum: Category,
-                lowercase: true,
-                trim: true,
-            },
-        ],
         images: { type: [String], default: [] },
         stock: { type: Number, default: 0 },
         isAvailable: { type: Boolean, default: true },
@@ -26,7 +19,7 @@ const ProductSchema = new Schema<IProductDocument>(
             count: { type: Number, default: 0 },
         },
     },
-    { timestamps: true }
+    { discriminatorKey: "type", timestamps: true }
 );
 
 ProductSchema.plugin(mongoosePaginate);

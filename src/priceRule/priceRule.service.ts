@@ -1,11 +1,16 @@
-import { BaseService } from "@/services";
+import { BasePaginateService } from "@/services";
 import { IPriceRule, PriceRuleType } from "./priceRule.interface";
 import { PriceRuleModel } from "./priceRule.model";
 
-class PriceRuleService extends BaseService<IPriceRule> {
+class PriceRuleService extends BasePaginateService<IPriceRule> {
     protected model = PriceRuleModel;
 
-    public async applyRulesToProduct(product: { price: number; createdAt: Date; dailyRuleID: string; promotionId?: string[];}): Promise<number> {
+    public async applyRulesToProduct(product: {
+        price: number;
+        createdAt: Date;
+        dailyRuleID: string;
+        promotionId?: string[];
+    }): Promise<number> {
         const now = new Date();
         let finalPrice = product.price;
 
@@ -14,7 +19,7 @@ class PriceRuleService extends BaseService<IPriceRule> {
             type: PriceRuleType.DailyDecrease,
             active: true,
             startDate: { $lte: now },
-            endDate: { $gte: now }
+            endDate: { $gte: now },
         });
 
         if (dailyRule && dailyRule.type === PriceRuleType.DailyDecrease) {
@@ -33,18 +38,17 @@ class PriceRuleService extends BaseService<IPriceRule> {
                 type: PriceRuleType.Promotion,
                 active: true,
                 startDate: { $lte: now },
-                endDate: { $gte: now }
+                endDate: { $gte: now },
             });
 
             for (const promo of promotions) {
-                const discount = promo.discountAmount|| 0;
-                finalPrice *= (1 - discount / 100);
+                const discount = promo.discountAmount || 0;
+                finalPrice *= 1 - discount / 100;
             }
         }
 
         return parseFloat(finalPrice.toFixed(2));
     }
-
 }
 
 const priceRuleService = new PriceRuleService();

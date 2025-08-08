@@ -8,9 +8,9 @@ import { adminUserUpdateRoleValidation } from "./user.validation";
 
 const router = Router();
 
-router.get("/", asyncHandler(adminUserController.getUsers));
-
 router.get("/:id", asyncHandler(adminUserController.getUserById));
+
+router.get("/", asyncHandler(adminUserController.getUsers));
 
 router.patch(
     "/:id/role",

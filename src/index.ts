@@ -9,7 +9,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { swaggerOptions } from "./config/swagger";
 
-import { APPLICATION_MODE, FRONT_END_URL, PORT } from "./config/dotenv";
+import { APPLICATION_MODE, BASE_URL, FRONT_END_URL, PORT } from "./config/dotenv";
 
 import { connectDB } from "./config/db";
 
@@ -91,6 +91,6 @@ app.use(errorHandler);
 app.listen(PORT, () => {
     console.log(`Application is running at ${APPLICATION_MODE.toUpperCase()} mode`);
     console.log(`Server running on port ${PORT}`);
-    console.log("Swagger docs:  http://localhost:3000/api-docs");
+    console.log(`Swagger docs: ${BASE_URL}/api-docs`);
     console.log(`Frontend: ${FRONT_END_URL}`);
 });

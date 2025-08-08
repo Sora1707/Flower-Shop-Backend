@@ -11,35 +11,36 @@ import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
 
 class UserController {
+    // [GET] /user/me
+    async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) return;
+
+        const safeUser = getSafeUser(req.user);
+
+        ResponseHandler.success(res, safeUser);
+    }
+
     // [GET] /user/:id
     async getUserProfileById(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
 
         const user = await userService.findById(id);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
+        if (!user) return res.status(404).json({ message: "User not found." });
 
         ResponseHandler.success(res, user);
     }
 
-    // [GET] /user/me
-    async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction) {
-        if (!req.user) {
-            return;
-        }
-        const safeUser = getSafeUser(req.user);
-        ResponseHandler.success(res, safeUser);
-    }
-
     // [GET] /user/profile
     async getUserProfile(req: AuthRequest, res: Response, next: NextFunction) {
-        if (!req.user) {
-            return;
-        }
+        if (!req.user) return;
+
         const safeUserProfile = getSafeUserProfile(req.user);
         ResponseHandler.success(res, safeUserProfile);
+    }
+
+    // [PATCH] /user/profile
+    async updateUserProfile(req: AuthRequest, res: Response, next: NextFunction) {
+        if (!req.user) return;
     }
 
     async getUserAddresses(req: AuthRequest, res: Response, next: NextFunction) {
@@ -259,9 +260,6 @@ class UserController {
 
         ResponseHandler.success(res, null, "User deleted successfully");
     }
-
-    // TODO
-    async updateUserProfile(req: AuthRequest, res: Response, next: NextFunction) {}
 
     // TODO
     async setDefaultPayment(req: AuthRequest, res: Response, next: NextFunction) {}

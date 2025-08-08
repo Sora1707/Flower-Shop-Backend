@@ -1,4 +1,15 @@
 import * as z from "zod";
+import { Gender } from "./user.interface";
+
+export const userProfileChangeValidation = z.object({
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    birthdate: z.coerce.date().optional(),
+    gender: z.enum([Gender.Male, Gender.Female, Gender.Other]),
+});
+
+export type UserProfileChangeInput = z.infer<typeof userProfileChangeValidation>;
 
 export const userAddressValidation = z.object({
     name: z.string().min(1, { message: "Full name is required" }),
