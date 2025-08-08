@@ -13,11 +13,11 @@ router.delete("/:reviewId", asyncHandler(adminReviewController.deleteReviewById)
 
 router.get("/", asyncHandler(adminReviewController.getReviews));
 
-router.get("/product/:productId", asyncHandler(reviewController.getReviewsForProduct));
+router.get("/product/:productId", asyncHandler(adminReviewController.getReviewsForProduct));
 
-router.get("/user/:userId/:productId", asyncHandler(reviewController.getUserReviewForProduct));
+router.get("/user/:userId/:productId", asyncHandler(adminReviewController.getUserReviewForProduct));
 
-router.get("/user/:userId", asyncHandler(reviewController.getUserReviews));
+router.get("/user/:userId", asyncHandler(adminReviewController.getUserReviews));
 
 // TODO Change review status
 

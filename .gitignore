@@ -5,6 +5,8 @@ src/uploads/users
 .env.test
 .env.production
 
+TODO.txt
+
 # Logs
 logs
 *.log

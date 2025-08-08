@@ -23,9 +23,11 @@ router.patch(
     asyncHandler(UserController.updateCurrentUser)
 );
 
+/* PROFILE */
 router.get("/profile", asyncHandler(UserController.getUserProfile));
 router.patch("profile", asyncHandler(UserController.updateUserProfile));
 
+/* ADDRESS */
 router.get("/address", asyncHandler(UserController.getUserAddresses));
 
 router.post(
@@ -40,6 +42,7 @@ router.patch("/address/:id", asyncHandler(UserController.updateUserAddress));
 
 router.delete("/address/:id", asyncHandler(UserController.deleteUserAddress));
 
+/* PAYMENT */
 router.get("/payment", asyncHandler(UserController.getUserPayment));
 
 router.post(
