@@ -8,12 +8,17 @@
             .invisible {
                 display: none;
             }
+            #card-element {
+                border: 1px solid #ccc;
+                padding: 10px;
+            }
         </style>
         <link
             href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
             rel="stylesheet"
         />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+        <script src="https://js.stripe.com/v3/"></script>
     </head>
     <body>
         <form id="loginForm" class="invisible">
@@ -45,9 +50,18 @@
             <p id="username"></p>
             <p id="fullname"></p>
 
+            <h2>Enter your test card</h2>
+            <form id="payment-form">
+                <div id="card-element"><!-- Stripe injects card input here --></div>
+                <button type="submit">Save Card</button>
+            </form>
+
             <button id="logoutBtn">Log Out</button>
         </div>
 
         <script src="script.js"></script>
+        <script src="userInfo.js"></script>
+        <script src="avatar.js"></script>
+        <script src="stripe.js"></script>
     </body>
 </html>

@@ -1,19 +1,21 @@
 import { Document } from "mongoose";
 import { IAddress } from "./address.interface";
+import { IStripeCard } from "@/payment/stripe";
+import { IStripeCardDocument } from "@/payment/stripe/StripeCard.interface";
 
 export enum Gender {
     Male = "male",
     Female = "female",
     Other = "other",
-    Unknown = "unknown",
 }
 
 export enum Role {
     User = "user",
     Admin = "admin",
+    SuperAdmin = "superadmin",
 }
 
-export interface IUser extends Document {
+export interface IUser {
     role: Role;
     username: string;
     password: string;
@@ -22,7 +24,7 @@ export interface IUser extends Document {
     email: string;
     phoneNumber: string;
     birthdate: Date;
-    gender?: Gender;
+    gender: Gender;
     avatar?: {
         small: string;
         medium: string;
@@ -31,9 +33,13 @@ export interface IUser extends Document {
     addresses: IAddress[];
 
     stripeCustomerId: string;
+    cards: IStripeCard[];
 
     createdAt: Date;
     updatedAt: Date;
     passwordChangedAt: Date;
+}
+
+export interface IUserDocument extends IUser, Document {
     matchPassword(inputPassword: string): Promise<boolean>;
 }

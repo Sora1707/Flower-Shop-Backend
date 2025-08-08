@@ -9,7 +9,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import { swaggerOptions } from "./config/swagger";
 
-import { APPLICATION_MODE, FRONT_END_IP, FRONT_END_PORT, PORT } from "./config/dotenv";
+import { APPLICATION_MODE, FRONT_END_URL, PORT } from "./config/dotenv";
 
 import { connectDB } from "./config/db";
 
@@ -17,6 +17,8 @@ import errorHandler from "./middleware/errorHandler.middelware";
 import arcjetMiddleware from "./middleware/arcjet.middleware";
 import asyncHandler from "./middleware/asyncHandler.middelware";
 
+import adminRouter from "@/admin/admin.routes";
+import apiRouter from "@/auth/auth.routes";
 import cartRouter from "@/cart/cart.routes";
 import orderRouter from "@/order/order.routes";
 import productRouter from "@/product/product.routes";
@@ -52,7 +54,7 @@ app.use(morgan("dev"));
 // CORS
 app.use(
     cors({
-        origin: [`${FRONT_END_IP}:${FRONT_END_PORT}`, `http://127.0.0.1:${FRONT_END_PORT}`],
+        origin: [FRONT_END_URL],
         credentials: true,
     })
 );
@@ -65,6 +67,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/", express.static(path.join(__dirname, "public")));
 
 /* ROUTING */
+app.use("/api/admin", adminRouter);
+app.use("/api/auth", apiRouter);
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/upload", uploadRouter);
@@ -88,5 +92,5 @@ app.listen(PORT, () => {
     console.log(`Application is running at ${APPLICATION_MODE.toUpperCase()} mode`);
     console.log(`Server running on port ${PORT}`);
     console.log("Swagger docs:  http://localhost:3000/api-docs");
-    console.log(`Frontend: ${FRONT_END_IP}:${FRONT_END_PORT}`);
+    console.log(`Frontend: ${FRONT_END_URL}`);
 });

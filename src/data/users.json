@@ -20,7 +20,7 @@
             }
         ],
         "gender": "male",
-        "role": "admin"
+        "role": "superadmin"
     },
     {
         "username": "sora1",

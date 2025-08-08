@@ -1,14 +1,16 @@
 import { Document, Types } from "mongoose";
 
 import { IOrderItem } from "./orderItem.interface";
-import { PaymentMethod, PaymentStatus } from "./payment.interface";
+import { PaymentMethod, PaymentStatus } from "@/payment/payment.interface";
 
 export enum OrderStatus {
-    PENDING = "pending",
-    PROCESSING = "processing",
-    DELIVERING = "delivering",
-    COMPLETED = "completed",
-    CANCELLED = "cancelled",
+    Pending = "pending",
+    Processing = "processing",
+    Delivering = "delivering",
+    Completed = "completed",
+    Cancelled = "cancelled",
+    Failed = "failed",
+    Refunded = "refunded",
 }
 
 export type ContactInfo = {
@@ -18,18 +20,16 @@ export type ContactInfo = {
     address: string;
 };
 
-export interface IOrder extends Document {
+export interface IOrder {
     user: Types.ObjectId;
     items: IOrderItem[];
-    status: OrderStatus;
     contactInfo: ContactInfo;
+    status: OrderStatus;
+    paymentStatus: PaymentStatus;
     paymentMethod: PaymentMethod;
-    // paymentResult: {
-    //     id: string;
-    //     status: PaymentStatus;
-    //     update_time: string;
-    //     email_address: string;
-    // };
+    paymentMethodId?: string;
+    paymentIntentId?: string;
+    orderFailureReason?: string;
     shippingPrice: number;
     totalPrice: number;
     isPaid: boolean;
@@ -39,3 +39,5 @@ export interface IOrder extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface IOrderDocument extends IOrder, Document {}
