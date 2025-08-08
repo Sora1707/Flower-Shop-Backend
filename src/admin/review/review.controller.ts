@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 
 import ResponseHandler from "@/utils/ResponseHandler";
 import { reviewService } from "@/review";
+import { userService } from "@/user";
+import { productService } from "@/product";
 
 class AdminReviewController {
     // TODO: Filter reviews
@@ -19,7 +21,6 @@ class AdminReviewController {
         const { reviewId } = req.params;
 
         const review = await reviewService.findById(reviewId);
-
         if (!review) return ResponseHandler.error(res, "Review not found.", 404);
 
         ResponseHandler.success(res, review, "Review found");
@@ -30,7 +31,6 @@ class AdminReviewController {
         const { reviewId } = req.params;
 
         const deletedReview = await reviewService.deleteById(reviewId);
-
         if (!deletedReview) return ResponseHandler.error(res, "Review not found.", 404);
 
         ResponseHandler.success(res, null, "Review deleted successfully");
@@ -40,8 +40,7 @@ class AdminReviewController {
     async getReviewsForProduct(req: Request, res: Response, next: NextFunction) {
         const { productId } = req.params;
 
-        const product = await reviewService.findById(productId);
-
+        const product = await productService.findById(productId);
         if (!product) return ResponseHandler.error(res, "Product not found.", 404);
 
         const reviews = await reviewService.findMany({ product: productId });
@@ -53,10 +52,10 @@ class AdminReviewController {
     async getUserReviewForProduct(req: Request, res: Response, next: NextFunction) {
         const { userId, productId } = req.params;
 
-        const user = await reviewService.findById(userId);
+        const user = await userService.findById(userId);
         if (!user) return ResponseHandler.error(res, "User not found.", 404);
 
-        const product = await reviewService.findById(productId);
+        const product = await productService.findById(productId);
         if (!product) return ResponseHandler.error(res, "Product not found.", 404);
 
         const review = await reviewService.findOne({ user: userId, product: productId });
@@ -67,7 +66,7 @@ class AdminReviewController {
     async getUserReviews(req: Request, res: Response, next: NextFunction) {
         const { userId } = req.params;
 
-        const user = await reviewService.findById(userId);
+        const user = await userService.findById(userId);
         if (!user) return ResponseHandler.error(res, "User not found.", 404);
 
         const reviews = await reviewService.findMany({ user: userId });

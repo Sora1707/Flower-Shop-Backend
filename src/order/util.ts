@@ -1,14 +1,14 @@
 import { IUser } from "@/user";
 import { IOrderItem } from "./orderItem.interface";
 import { ICart } from "@/cart";
-import { ContactInfo } from "./order.interface";
+import { ContactInfo, OrderStatus } from "./order.interface";
 
 export function validateCart(cart: ICart, orderItems: IOrderItem[]) {
     const cartItems = [...cart.items];
     // Match cart
     for (const orderItem of orderItems) {
         const cartItem = cartItems.find(
-            item => item.product.toString() === orderItem.product.toString()
+            (item) => item.product.toString() === orderItem.product.toString()
         );
         if (!cartItem || cartItem.quantity !== orderItem.quantity) {
             return false;
@@ -29,4 +29,17 @@ export function validateAddress(user: IUser, contactInfo: ContactInfo) {
         }
     }
     return false;
+}
+
+const orderStatusOrders = [
+    OrderStatus.Pending,
+    OrderStatus.Processing,
+    OrderStatus.Delivering,
+    OrderStatus.Completed,
+];
+export function isSafeOrderStatusUpdate(currentStatus: OrderStatus, newStatus: OrderStatus) {
+    if (newStatus === OrderStatus.Cancelled) return true;
+    if (newStatus === OrderStatus.Failed) return true;
+    if (newStatus === OrderStatus.Refunded) return true;
+    return orderStatusOrders.indexOf(currentStatus) < orderStatusOrders.indexOf(newStatus);
 }
