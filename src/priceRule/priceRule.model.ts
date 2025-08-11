@@ -1,8 +1,8 @@
 import mongoose, { Schema, PaginateModel } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
-import { IPriceRule, PriceRuleType } from "./priceRule.interface";
+import { IPriceRuleDocument, PriceRuleType } from "./priceRule.interface";
 
-const PriceRuleSchema = new Schema<IPriceRule>(
+const PriceRuleSchema = new Schema<IPriceRuleDocument>(
     {
         name: { type: String },
         type: { type: String, enum: PriceRuleType, required: true },
@@ -30,7 +30,7 @@ PriceRuleSchema.pre("save", async function (next) {
     }
 });
 
-export const PriceRuleModel = mongoose.model<IPriceRule, PaginateModel<IPriceRule>>(
+export const PriceRuleModel = mongoose.model<IPriceRuleDocument, PaginateModel<IPriceRuleDocument>>(
     "PriceRule",
     PriceRuleSchema
 );

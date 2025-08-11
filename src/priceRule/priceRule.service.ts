@@ -1,15 +1,16 @@
 import { BasePaginateService } from "@/services";
-import { IPriceRule, PriceRuleType } from "./priceRule.interface";
+import { IPriceRuleDocument, PriceRuleType } from "./priceRule.interface";
 import { PriceRuleModel } from "./priceRule.model";
+import { Types } from "mongoose";
 
-class PriceRuleService extends BasePaginateService<IPriceRule> {
+class PriceRuleService extends BasePaginateService<IPriceRuleDocument> {
     protected model = PriceRuleModel;
 
     public async applyRulesToProduct(product: {
         price: number;
         createdAt: Date;
-        dailyRuleID: string;
-        promotionId?: string[];
+        dailyRuleID: Types.ObjectId;
+        promotionIds: Types.ObjectId[];
     }): Promise<number> {
         const now = new Date();
         let finalPrice = product.price;
@@ -32,9 +33,9 @@ class PriceRuleService extends BasePaginateService<IPriceRule> {
             finalPrice = Math.max(0, finalPrice - totalDecrease);
         }
 
-        if (product.promotionId && product.promotionId.length > 0) {
+        if (product.promotionIds && product.promotionIds.length > 0) {
             const promotions = await this.model.find({
-                _id: { $in: product.promotionId },
+                _id: { $in: product.promotionIds },
                 type: PriceRuleType.Promotion,
                 active: true,
                 startDate: { $lte: now },
