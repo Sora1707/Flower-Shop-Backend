@@ -11,6 +11,19 @@ export const userUpdateProfileValidation = z.object({
 
 export type UserUpdateProfileInput = z.infer<typeof userUpdateProfileValidation>;
 
+export const userUpdateAvatarFileValidation = z.object({
+    fieldname: z.literal("avatar"),
+    originalname: z.string(),
+    encoding: z.string(),
+    mimetype: z.enum(["image/jpeg", "image/png"]),
+    filename: z.string(),
+    destination: z.string(),
+    path: z.string(),
+    size: z.number(),
+    stream: z.any(),
+    buffer: z.any(),
+});
+
 export const userAddressValidation = z.object({
     name: z.string().min(1, { message: "Full name is required" }),
     phoneNumber: z.string().min(1, { message: "Phone number is required" }),

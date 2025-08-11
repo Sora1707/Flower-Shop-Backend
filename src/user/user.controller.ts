@@ -7,6 +7,7 @@ import {
     UserAddCardInput,
     UserAddressInput,
     UserUpdateAddressInput,
+    userUpdateAvatarFileValidation,
     UserUpdateProfileInput,
 } from "./user.validation";
 import { getSafeCardInfo, getSafeUser, getSafeUserProfile } from "./util";
@@ -96,6 +97,8 @@ class UserController {
 
         const addresses = user.addresses as IAddressDocument[];
 
+        console.log(addresses, addressId);
+
         const newDefaultindex = addresses.findIndex((address) => address.id === addressId);
         if (newDefaultindex === -1) return ResponseHandler.error(res, "Address not found", 404);
 
@@ -178,7 +181,7 @@ class UserController {
 
         const paymentMethod = await stripeService.getPaymentMethodById(paymentMethodId);
         const card = paymentMethod.card;
-        if (!card) return ResponseHandler.error(res, "Card not found", 404);
+        if (!card) return ResponseHandler.error(res, "Card error when saving", 500);
 
         const { brand, last4, exp_month, exp_year } = card;
 
@@ -222,7 +225,7 @@ class UserController {
 
         const safeCards = getSafeCardInfo(user.cards as IStripeCardDocument[]);
 
-        ResponseHandler.success(res, safeCards, "Default address set successfully");
+        ResponseHandler.success(res, safeCards, "Default payment set successfully");
     }
 
     // [DELETE] /user/payment/:id
@@ -255,8 +258,12 @@ class UserController {
 
         if (!req.file) return ResponseHandler.error(res, "Avatar is required", 400);
 
+        const fileValidation = userUpdateAvatarFileValidation.safeParse(req.file);
+
+        if (!fileValidation.success) return ResponseHandler.error(res, "Invalid upload file");
+
         const user = req.user;
-        const file = req.file;
+        const file = fileValidation.data as Express.Multer.File;
 
         const avatarPaths = await processAvatar(file, user.id);
 

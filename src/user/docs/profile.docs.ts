@@ -81,7 +81,7 @@
  * @swagger
  * /user/profile:
  *  get:
- *    tags: [User]
+ *    tags: [User/Profile]
  *    summary: Get current user profile
  *    security:
  *      - bearerAuth: []
@@ -100,7 +100,7 @@
  * @swagger
  * /user/profile:
  *   patch:
- *     tags: [User]
+ *     tags: [User/Profile]
  *     summary: Update current user profile
  *     security:
  *       - bearerAuth: []
