@@ -1,7 +1,7 @@
 import { FilterQuery } from "mongoose";
 
-import { IProduct, IProductDocument } from "./product.interface";
-import { ProductModel } from "./product.model";
+import { IProduct, IProductDocument } from "./model/product.interface";
+import { ProductModel } from "./model";
 
 import { BasePaginateService } from "@/services";
 

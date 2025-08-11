@@ -12,7 +12,7 @@ export interface IProduct {
     description: string;
 
     dailyRule: Types.ObjectId;
-    promotions?: Types.ObjectId[];
+    promotions: Types.ObjectId[];
 
     // TODO: Product images
     images: string[];

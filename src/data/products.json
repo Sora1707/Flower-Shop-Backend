@@ -218,5 +218,13 @@
         "tags": ["birthday", "valentine"],
         "flower_types": ["tulip"],
         "colors": ["orange"]
+    },
+    {
+        "type": "vase",
+        "name": "White Vase",
+        "price": 15.0,
+        "description": "A white vase for adding a touch of elegance.",
+        "stock": 20,
+        "isAvailable": true
     }
 ]
