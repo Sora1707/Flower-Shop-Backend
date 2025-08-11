@@ -13,6 +13,8 @@ export const AVATAR_SIZE = {
     large: 512,
 };
 
+export type AvatarPaths = Record<"small" | "medium" | "large", string>;
+
 export function generateNewAvatarFilename(req: AuthRequest, file: Express.Multer.File): string {
     if (!file || !file.originalname) {
         throw new Error("A file is required");
@@ -25,7 +27,10 @@ export function generateNewAvatarFilename(req: AuthRequest, file: Express.Multer
     return `${userId}${ext}`;
 }
 
-export async function processAvatar(file: Express.Multer.File, userId: string) {
+export async function processAvatar(
+    file: Express.Multer.File,
+    userId: string
+): Promise<AvatarPaths> {
     const filePaths: Record<string, string> = {};
 
     for (const [label, size] of Object.entries(AVATAR_SIZE)) {
@@ -39,7 +44,7 @@ export async function processAvatar(file: Express.Multer.File, userId: string) {
 
     fs.unlinkSync(file.path);
 
-    return filePaths; // return { small: "...", medium: "...", large: "..." }
+    return filePaths as AvatarPaths; // return { small: "...", medium: "...", large: "..." }
 }
 
 export function getDefaultAvatarPaths() {

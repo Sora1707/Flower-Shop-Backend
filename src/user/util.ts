@@ -48,7 +48,7 @@ export function getSafeUserProfile(user: IUserDocument) {
 
 export function getSafeCardInfo(cards: IStripeCardDocument[]) {
     const safeCards = cards.map((card) => {
-        const { paymentMethodId, ...safeCard } = card.toObject();
+        const { paymentMethodId, updatedAt, ...safeCard } = card.toObject();
         return safeCard as SafeCard;
     });
     return safeCards;

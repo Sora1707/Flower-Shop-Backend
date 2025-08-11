@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-export interface IAddress extends Document {
+export interface IAddress {
     name: string;
     phoneNumber: string;
     country: string;
@@ -11,3 +11,5 @@ export interface IAddress extends Document {
     postalCode: string;
     isDefault: boolean;
 }
+
+export interface IAddressDocument extends IAddress, Document {}

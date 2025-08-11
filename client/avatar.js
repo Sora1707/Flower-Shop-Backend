@@ -16,7 +16,7 @@ async function uploadAvatar() {
     const token = localStorage.getItem("token");
 
     try {
-        const res = await fetch("http://localhost:8080/api/user/me", {
+        const res = await fetch("http://localhost:8080/api/user/avatar", {
             method: "PATCH",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -70,7 +70,7 @@ cropBtn.addEventListener("click", () => {
 
         const token = localStorage.getItem("token");
 
-        const res = await fetch("http://localhost:8080/api/user/me", {
+        const res = await fetch("http://localhost:8080/api/user/avatar", {
             method: "PATCH",
             headers: {
                 Authorization: `Bearer ${token}`,

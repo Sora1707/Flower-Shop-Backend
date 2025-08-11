@@ -1,15 +1,15 @@
 import * as z from "zod";
 import { Gender } from "./user.interface";
 
-export const userProfileChangeValidation = z.object({
+export const userUpdateProfileValidation = z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     phoneNumber: z.string().optional(),
     birthdate: z.coerce.date().optional(),
-    gender: z.enum([Gender.Male, Gender.Female, Gender.Other]),
+    gender: z.enum([Gender.Male, Gender.Female, Gender.Other]).optional(),
 });
 
-export type UserProfileChangeInput = z.infer<typeof userProfileChangeValidation>;
+export type UserUpdateProfileInput = z.infer<typeof userUpdateProfileValidation>;
 
 export const userAddressValidation = z.object({
     name: z.string().min(1, { message: "Full name is required" }),
@@ -20,10 +20,22 @@ export const userAddressValidation = z.object({
     addressLine1: z.string().min(1, { message: "Address line 1 is required" }),
     addressLine2: z.string().optional(),
     postalCode: z.string().min(1, { message: "Postal code is required" }),
-    isDefault: z.boolean().default(false),
 });
 
 export type UserAddressInput = z.infer<typeof userAddressValidation>;
+
+export const userUpdateAddressValidation = z.object({
+    name: z.string().min(1).optional(),
+    phoneNumber: z.string().min(1).optional(),
+    country: z.string().min(1).optional(),
+    stateOrProvince: z.string().min(1).optional(),
+    city: z.string().min(1).optional(),
+    addressLine1: z.string().min(1).optional(),
+    addressLine2: z.string().optional().optional(),
+    postalCode: z.string().min(1).optional(),
+});
+
+export type UserUpdateAddressInput = z.infer<typeof userUpdateAddressValidation>;
 
 export const userAddCardValidation = z.object({
     paymentMethodId: z.string().min(1, { message: "Payment method ID is required" }),
