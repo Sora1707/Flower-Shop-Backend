@@ -37,7 +37,7 @@
  *                     username: 
  *                       type: string
  *       400:
- *         description: Bad request
+ *         description: Invalid username or password
  *       404:
  *         description: User not found
  */

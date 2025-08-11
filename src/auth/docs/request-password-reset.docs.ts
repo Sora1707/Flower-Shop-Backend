@@ -19,6 +19,8 @@
  *     responses:
  *       200:
  *         description: Password reset link sent to email
+ *       400:
+ *         description: Invalid email address
  *       404:
  *         description: Email has not been registered
  */

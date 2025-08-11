@@ -3,6 +3,8 @@
  * /auth/change-password:
  *   post:
  *     summary: Change password
+ *     security:
+ *       - bearerAuth: []
  *     tags: [Auth]
  *     requestBody:
  *       required: true
