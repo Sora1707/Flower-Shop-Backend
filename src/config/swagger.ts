@@ -1,4 +1,5 @@
 import { Options } from "swagger-jsdoc";
+import { BASE_URL } from "./dotenv";
 
 export const swaggerOptions: Options = {
     definition: {
@@ -8,6 +9,7 @@ export const swaggerOptions: Options = {
             version: "1.0.0",
             description: "API documentation for your e-commerce flower shop",
         },
+        servers: [{ url: `${BASE_URL}/api` }],
         components: {
             securitySchemes: {
                 bearerAuth: {
@@ -19,5 +21,9 @@ export const swaggerOptions: Options = {
         },
         security: [{ bearerAuth: [] }],
     },
-    apis: ["./src/**/*docs.ts"], // Path to your route/controller files
+    apis: [
+        // "./src/**/*docs.ts"
+        "./src/docs/*.docs.ts",
+        "./src/auth/**/*.docs.ts",
+    ], // Path to your route/controller files
 };
