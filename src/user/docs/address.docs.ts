@@ -140,15 +140,15 @@
 
 /**
  * @swagger
- * /user/address/{id}/set-default:
+ * /user/address/{addressId}/set-default:
  *   patch:
- *     summary: Set address with id as the default address
+ *     summary: Set default address with addressId
  *     tags: [User/Address]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: addressId
  *         required: true
  *         schema:
  *           type: string
@@ -163,15 +163,15 @@
 
 /**
  * @swagger
- * /user/address/{id}:
+ * /user/address/{addressId}:
  *   patch:
- *     summary: Update address with id
+ *     summary: Update address with addressId
  *     tags: [User/Address]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: addressId
  *         required: true
  *         schema:
  *           type: string
@@ -192,15 +192,15 @@
 
 /**
  * @swagger
- * /user/address/{id}:
+ * /user/address/{addressId}:
  *   delete:
- *     summary: Delete address with id
+ *     summary: Delete address with addressId
  *     tags: [User/Address]
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: addressId
  *         required: true
  *         schema:
  *           type: string

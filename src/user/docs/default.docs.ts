@@ -28,15 +28,15 @@
 
 /**
  * @swagger
- * /user/{id}:
+ * /user/{userId}:
  *   get:
  *     tags: [User]
- *     summary: Get user profile by id
+ *     summary: Get user profile by userId
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
  *         required: true
  *         schema:
  *           type: string

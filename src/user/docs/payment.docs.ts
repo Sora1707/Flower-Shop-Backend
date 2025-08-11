@@ -79,7 +79,7 @@
 
 /**
  * @swagger
- * /user/payment/{id}/set-default:
+ * /user/payment/{paymentId}/set-default:
  *   patch:
  *     summary: Set a payment method as default
  *     tags: [User/Payment]
@@ -87,7 +87,7 @@
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: paymentId
  *         required: true
  *         schema:
  *           type: string
@@ -102,7 +102,7 @@
 
 /**
  * @swagger
- * /user/payment/{id}:
+ * /user/payment/{paymentId}:
  *   delete:
  *     summary: Delete a payment method
  *     tags: [User/Payment]
@@ -110,7 +110,7 @@
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: paymentId
  *         required: true
  *         schema:
  *           type: string

@@ -26,11 +26,11 @@ class UserController {
         ResponseHandler.success(res, safeUser);
     }
 
-    // [GET] /user/:id
+    // [GET] /user/:userId
     async getUserProfileById(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
+        const { userId } = req.params;
 
-        const user = await userService.findById(id);
+        const user = await userService.findById(userId);
         if (!user) return ResponseHandler.error(res, "User not found", 404);
 
         const safeUser = getSafeUserProfile(user);
@@ -88,12 +88,12 @@ class UserController {
         ResponseHandler.success(res, user.addresses, "Address added successfully", 201);
     }
 
-    // [PATCH] /user/address/:id/set-default
+    // [PATCH] /user/address/:addressId/set-default
     async setDefaultAddress(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) return;
 
         const user = req.user;
-        const addressId = req.params.id;
+        const addressId = req.params.addressId;
 
         const addresses = user.addresses as IAddressDocument[];
 
@@ -114,16 +114,16 @@ class UserController {
         ResponseHandler.success(res, null, "Default address set successfully");
     }
 
-    // [PATCH] /user/address/:id
+    // [PATCH] /user/address/:addressId
     async updateUserAddress(
-        req: AuthRequest<{ id: string }, {}, UserUpdateAddressInput>,
+        req: AuthRequest<{ addressId: string }, {}, UserUpdateAddressInput>,
         res: Response,
         next: NextFunction
     ) {
         if (!req.user) return;
 
         const user = req.user;
-        const addressId = req.params.id;
+        const addressId = req.params.addressId;
         const addresses = user.addresses as IAddressDocument[];
         const index = addresses.findIndex((address) => address.id === addressId);
 
@@ -137,12 +137,12 @@ class UserController {
         ResponseHandler.success(res, user.addresses, "Address updated successfully");
     }
 
-    // [DELETE] /user/address/:id
+    // [DELETE] /user/address/:addressId
     async deleteUserAddress(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) return;
 
         const user = req.user;
-        const addressId = req.params.id;
+        const addressId = req.params.addressId;
         const addresses = user.addresses as IAddressDocument[];
 
         const index = addresses.findIndex((address) => address.id === addressId);
@@ -202,12 +202,12 @@ class UserController {
         ResponseHandler.success(res, safeCards, "Card added successfully", 201);
     }
 
-    // [PATCH] /user/payment/:id/set-default
+    // [PATCH] /user/payment/:paymentId/set-default
     async setDefaultPayment(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) return;
 
         const user = req.user;
-        const cardId = req.params.id;
+        const cardId = req.params.paymentId;
 
         const cards = user.cards as IStripeCardDocument[];
 
@@ -228,12 +228,12 @@ class UserController {
         ResponseHandler.success(res, safeCards, "Default payment set successfully");
     }
 
-    // [DELETE] /user/payment/:id
+    // [DELETE] /user/payment/:paymentId
     async deleteUserPayment(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) return;
 
         const user = req.user;
-        const cardId = req.params.id;
+        const cardId = req.params.paymentId;
 
         const cards = user.cards as IStripeCardDocument[];
 

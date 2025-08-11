@@ -47,20 +47,20 @@ router.post(
 );
 
 router.patch(
-    "/address/:id/set-default",
+    "/address/:addressId/set-default",
     asyncHandler(authenticate),
     asyncHandler(UserController.setDefaultAddress)
 );
 
 router.patch(
-    "/address/:id",
+    "/address/:addressId",
     asyncHandler(authenticate),
     validateBody(userUpdateAddressValidation),
     asyncHandler(UserController.updateUserAddress)
 );
 
 router.delete(
-    "/address/:id",
+    "/address/:addressId",
     asyncHandler(authenticate),
     asyncHandler(UserController.deleteUserAddress)
 );
@@ -76,17 +76,17 @@ router.post(
 );
 
 router.patch(
-    "/payment/:id/set-default",
+    "/payment/:paymentId/set-default",
     asyncHandler(authenticate),
     asyncHandler(UserController.setDefaultPayment)
 );
 
 router.delete(
-    "/payment/:id",
+    "/payment/:paymentId",
     asyncHandler(authenticate),
     asyncHandler(UserController.deleteUserPayment)
 );
 
-router.get("/:id", asyncHandler(UserController.getUserProfileById));
+router.get("/:userId", asyncHandler(UserController.getUserProfileById));
 
 export default router;
