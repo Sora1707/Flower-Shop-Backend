@@ -1,42 +1,47 @@
 import { Request } from "express";
 import { FilterQuery, PaginateOptions } from "mongoose";
 
-import { IProduct } from "./product.interface";
+import { IProduct } from "./model/product.interface";
+import { ProductFilter, ProductRequestQuery } from "./product.validation";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
 
-export function extractProductOptionsFromRequest(req: Request) {
-    const { query, category, isAvailable, minPrice, maxPrice, ...paginateQueries } = req.query;
+const fields = ["keyword", "type", "minPrice", "maxPrice"];
+const paginateFields = ["page", "limit", "sortBy", "order"];
 
-    const filterQueries = {
-        query,
-        category,
-        isAvailable,
+export function extractProductOptionsFromRequest(requestQuery: ProductRequestQuery) {
+    const { keyword, type, minPrice, maxPrice, page, limit, sortBy, order } = requestQuery;
+
+    const filters = {
+        keyword,
+        type,
         minPrice,
         maxPrice,
     };
 
+    const paginateOptions = {
+        page,
+        limit,
+        sortBy,
+        order,
+    };
+
     return {
-        filters: getFilters(filterQueries),
-        paginateOptions: getPaginateOptions(paginateQueries),
+        filters: getFilters(filters),
+        paginateOptions: getPaginateOptions(paginateOptions),
     };
 }
 
-export function getFilters(filterQueries: any) {
-    const { query, category, isAvailable, minPrice, maxPrice } = filterQueries;
+export function getFilters(filterQueries: ProductFilter) {
+    const { keyword, type, minPrice, maxPrice } = filterQueries;
 
     const filter: FilterQuery<IProduct> = {
-        name: { $regex: query ? query : "", $options: "i" },
+        name: { $regex: keyword ? keyword : "", $options: "i" },
     };
 
-    if (category) {
-        const categories = (category as string).split(",");
-        filter.categories = { $all: categories };
-    }
-
-    if (isAvailable) {
-        filter.isAvailable = Boolean(isAvailable);
+    if (type) {
+        filter.type = { $all: type };
     }
 
     if (minPrice || maxPrice) {
@@ -54,12 +59,14 @@ export function getFilters(filterQueries: any) {
 }
 
 export function getPaginateOptions(paginateQueries: any) {
-    const { page, limit, ...sortOptions } = paginateQueries;
+    const { page, limit, sortBy, order } = paginateQueries;
 
     const paginateOptions: PaginateOptions = {
         page: page ? Number(page) : DEFAULT_PAGE,
         limit: limit ? Number(limit) : DEFAULT_LIMIT,
-        sort: modifySortOptions(sortOptions),
+        sort: {
+            [sortBy]: order === "asc" ? 1 : -1,
+        },
     };
 
     return paginateOptions;
