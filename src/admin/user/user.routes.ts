@@ -3,22 +3,22 @@ import { Router } from "express";
 import adminUserController from "./user.controller";
 
 import asyncHandler from "@/middleware/asyncHandler.middelware";
-import { validateBody } from "@/middleware/validate.middelware";
-import { adminUserUpdateRoleValidation } from "./user.validation";
+import { validateBody, validateQuery } from "@/middleware/validate.middelware";
+import { adminUserRequestQuery, adminUserUpdateRoleValidation } from "./user.validation";
 
 const router = Router();
 
-router.get("/:id", asyncHandler(adminUserController.getUserById));
+router.get("/:userId", asyncHandler(adminUserController.getUserById));
 
-router.get("/", asyncHandler(adminUserController.getUsers));
+router.get("/", validateQuery(adminUserRequestQuery), asyncHandler(adminUserController.getUsers));
 
 router.patch(
-    "/:id/role",
+    "/:userId/role",
     validateBody(adminUserUpdateRoleValidation),
     asyncHandler(adminUserController.updateUserRole)
 );
 
-router.delete("/:id", asyncHandler(adminUserController.deleteUser));
+router.delete("/:userId", asyncHandler(adminUserController.deleteUser));
 
 // TODO Change user's status: ACTIVE, SUSPENDED, BANNED
 

@@ -3,57 +3,54 @@ import { NextFunction, Request, Response } from "express";
 import { Role, userService } from "@/user";
 
 import ResponseHandler from "@/utils/ResponseHandler";
-import { AdminUserUpdateRoleValidation } from "./user.validation";
+import { AdminUserRequestQuery, AdminUserUpdateRoleValidation } from "./user.validation";
 import { AuthRequest } from "@/types/request";
+import { extractUserOptionsFromRequest } from "./util";
 
 class AdminUserController {
-    async getUsers(req: Request, res: Response, next: NextFunction) {
-        const { page, limit, ...filter } = req.query;
+    // [GET] /admin/user
+    async getUsers(
+        req: Request<{}, {}, {}, AdminUserRequestQuery>,
+        res: Response,
+        next: NextFunction
+    ) {
+        const { filters, paginateOptions } = extractUserOptionsFromRequest(req.query);
+        console.log(filters, paginateOptions);
 
-        const paginateOptions = {
-            page: page ? parseInt(page as string, 10) : 1,
-            limit: limit ? parseInt(limit as string, 10) : 10,
-        };
-
-        const paginateResult = await userService.paginate(filter, paginateOptions);
+        const paginateResult = await userService.paginate(filters, paginateOptions);
 
         ResponseHandler.success(res, paginateResult);
     }
 
+    // [GET] /admin/user/:userId
     async getUserById(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
+        const { userId } = req.params;
 
-        const user = await userService.findById(id);
+        const user = await userService.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
+        if (!user) return ResponseHandler.error(res, "User not found.", 404);
 
         ResponseHandler.success(res, user);
     }
 
+    // [PATCH] /admin/user/:userId/role
     async updateUserRole(
-        req: AuthRequest<{ id: string }, {}, AdminUserUpdateRoleValidation>,
+        req: AuthRequest<{ userId: string }, {}, AdminUserUpdateRoleValidation>,
         res: Response,
         next: NextFunction
     ) {
         const user = req.user;
-        const { id } = req.params;
+        const userId = req.params.userId;
         const role = req.body.role as Role;
 
-        if (!user) {
-            return;
-        }
+        if (!user) return;
 
-        if (user.id == id) {
+        if (user.id == userId)
             return ResponseHandler.error(res, "You can't update your own role", 400);
-        }
 
-        const targetUser = await userService.findById(id);
+        const targetUser = await userService.findById(userId);
 
-        if (!targetUser) {
-            return ResponseHandler.error(res, "User not found.", 404);
-        }
+        if (!targetUser) return ResponseHandler.error(res, "User not found.", 404);
 
         if (user.role == Role.Admin) {
             if (targetUser.role == Role.SuperAdmin || targetUser.role == Role.Admin)
@@ -71,18 +68,32 @@ class AdminUserController {
         targetUser.role = role;
         const updatedUser = await targetUser.save();
 
-        ResponseHandler.success(res, updatedUser, "User updated");
+        ResponseHandler.success(res, updatedUser, "User role updated");
     }
 
-    async deleteUser(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
-        const deleteUser = await userService.deleteById(id);
+    // [DELETE] /admin/user/:userId
+    async deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
+        const user = req.user;
+        const userId = req.params.userId;
 
-        if (!deleteUser) {
-            return res.status(404).json({ message: "User not found." });
-        }
+        if (!user) return;
 
-        ResponseHandler.success(res, null, "User deleted successfully");
+        if (user.id == userId)
+            return ResponseHandler.error(res, "You can't delete your own account", 400);
+
+        const targetUser = await userService.findById(userId);
+
+        if (!targetUser) return ResponseHandler.error(res, "User not found.", 404);
+
+        if (user.role != Role.SuperAdmin)
+            return ResponseHandler.error(res, "Only Super Admin can delete user account", 403);
+
+        if (targetUser.role == Role.SuperAdmin)
+            return ResponseHandler.error(res, "You can't delete Super Admin account", 403);
+
+        const deleteUser = await userService.deleteById(userId);
+
+        ResponseHandler.success(res, deleteUser, "User deleted successfully");
     }
 }
 

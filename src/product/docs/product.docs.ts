@@ -44,26 +44,6 @@
 
 /**
  * @swagger
- * /product:
- *   get:
- *     summary: Get all products
- *     tags: [Product]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: A list of products
- */
-
-/**
- * @swagger
  * components:
  *   schemas:
  *     ProductPaginateResult:

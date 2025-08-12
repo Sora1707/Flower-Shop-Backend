@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import productService from "./product.service";
-import { extractProductOptionsFromRequest, getFilters } from "./requestQuery";
+import { extractProductOptionsFromRequest, getFilters } from "./util";
 import priceRuleService from "@/priceRule/priceRule.service";
 import ResponseHandler from "@/utils/ResponseHandler";
 import { ProductType } from "./model";

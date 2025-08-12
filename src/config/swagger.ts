@@ -27,5 +27,7 @@ export const swaggerOptions: Options = {
         "./src/auth/**/*.docs.ts",
         "./src/user/**/*.docs.ts",
         "./src/product/**/*.docs.ts",
+
+        "./src/admin/user/**/*.docs.ts",
     ], // Path to your route/controller files
 };
