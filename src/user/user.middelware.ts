@@ -5,14 +5,10 @@ import { cartService } from "@/cart";
 
 function modifyDefaultValue<T extends { isDefault: boolean }>(elements: T[]) {
     if (elements.length == 0) return;
-    let hasDefault = false;
-    for (const element of elements) {
-        if (element.isDefault) {
-            hasDefault = true;
-            break;
-        }
-    }
-    if (!hasDefault) {
+
+    const defaultIndex = elements.findIndex((element) => element.isDefault);
+
+    if (defaultIndex === -1) {
         elements[0].isDefault = true;
     }
 }

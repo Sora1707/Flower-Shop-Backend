@@ -1,302 +1,230 @@
 [
     {
-        "name": "Classic Red Rose Bouquet",
-        "price": 49.99,
-        "description": "A timeless bouquet of fresh red roses, perfect for romantic occasions.",
-        "categories": ["bouquet", "romantic", "valentine"],
-        "images": ["red-rose-1.jpg", "red-rose-2.jpg"],
+        "name": "Romantic Red Roses",
+        "type": "flower",
+        "price": 29.99,
+        "description": "A bouquet of vibrant red roses, perfect for romantic occasions.",
         "stock": 15,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-11T08:00:00Z",
-        "updatedAt": "2025-06-11T08:00:00Z"
-    },
-    {
-        "name": "Sunshine Tulip Bundle",
-        "price": 35.0,
-        "description": "Bright yellow tulips to bring sunshine into anyone’s day.",
-        "categories": ["bouquet", "birthday"],
-        "images": ["tulips-yellow-1.jpg", "tulips-yellow-2.jpg"],
-        "stock": 25,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-10T10:00:00Z",
-        "updatedAt": "2025-06-10T10:00:00Z"
+        "tags": ["romantic", "valentine", "anniversary"],
+        "flower_types": ["rose"],
+        "colors": ["red"]
     },
     {
         "name": "Elegant White Lilies",
-        "price": 40.5,
-        "description": "Pure white lilies for expressing sympathy and elegance.",
-        "categories": ["bouquet", "sympathy"],
-        "images": ["lilies-white-1.jpg", "lilies-white-2.jpg"],
+        "type": "flower",
+        "price": 24.99,
+        "description": "Pure white lilies to express sympathy or grace.",
         "stock": 10,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-09T12:30:00Z",
-        "updatedAt": "2025-06-09T12:30:00Z"
+        "tags": ["sympathy"],
+        "flower_types": ["lily"],
+        "colors": ["white"]
     },
     {
-        "name": "Pink Peony Passion",
-        "price": 55.0,
-        "description": "Soft pink peonies arranged for anniversaries and special moments.",
-        "categories": ["bouquet", "anniversary", "romantic"],
-        "images": ["peony-pink-1.jpg"],
-        "stock": 8,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-08T11:00:00Z",
-        "updatedAt": "2025-06-08T11:00:00Z"
-    },
-    {
-        "name": "Mixed Wildflower Basket",
-        "price": 30.0,
-        "description": "A rustic mix of seasonal wildflowers in a woven basket.",
-        "categories": ["bouquet", "birthday"],
-        "images": ["wildflower-1.jpg"],
+        "name": "Blushing Pink Tulips",
+        "type": "flower",
+        "price": 19.99,
+        "description": "Delicate pink tulips, ideal for birthdays or spring celebrations.",
         "stock": 20,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-07T14:00:00Z",
-        "updatedAt": "2025-06-07T14:00:00Z"
+        "tags": ["birthday"],
+        "flower_types": ["tulip"],
+        "colors": ["pink"]
     },
     {
-        "name": "Romantic Rose & Lily Combo",
-        "price": 60.0,
-        "description": "An elegant blend of roses and lilies for heartfelt moments.",
-        "categories": ["bouquet", "romantic"],
-        "images": ["rose-lily-1.jpg"],
-        "stock": 12,
+        "name": "Purple Passion Peonies",
+        "type": "flower",
+        "price": 34.99,
+        "description": "Deep purple peonies symbolizing admiration and elegance.",
+        "stock": 8,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-06T09:00:00Z",
-        "updatedAt": "2025-06-06T09:00:00Z"
+        "tags": ["anniversary", "romantic"],
+        "flower_types": ["peony"],
+        "colors": ["purple"]
     },
     {
-        "name": "Heartfelt Hydrangea Bunch",
-        "price": 38.0,
-        "description": "Delicate hydrangeas to convey deep emotions and appreciation.",
-        "categories": ["bouquet", "anniversary"],
-        "images": ["hydrangea-1.jpg"],
-        "stock": 9,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-05T08:30:00Z",
-        "updatedAt": "2025-06-05T08:30:00Z"
-    },
-    {
-        "name": "Cheerful Daisies Box",
-        "price": 28.99,
-        "description": "A colorful box of daisies to brighten any birthday celebration.",
-        "categories": ["bouquet", "birthday"],
-        "images": ["daisies-1.jpg"],
-        "stock": 30,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-04T13:45:00Z",
-        "updatedAt": "2025-06-04T13:45:00Z"
-    },
-    {
-        "name": "Lavender Love Arrangement",
-        "price": 44.99,
-        "description": "Soothing lavender bouquet to express love and serenity.",
-        "categories": ["bouquet", "romantic", "anniversary"],
-        "images": ["lavender-1.jpg"],
-        "stock": 14,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-03T11:15:00Z",
-        "updatedAt": "2025-06-03T11:15:00Z"
-    },
-    {
-        "name": "Valentine's Day Mixed Roses",
-        "price": 52.0,
-        "description": "A colorful mix of roses for the perfect Valentine's surprise.",
-        "categories": ["bouquet", "valentine"],
-        "images": ["mixed-roses-1.jpg"],
-        "stock": 18,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-02T10:10:00Z",
-        "updatedAt": "2025-06-02T10:10:00Z"
-    },
-    {
-        "name": "Graceful Orchid Set",
-        "price": 65.0,
-        "description": "Elegant orchids in a decorative pot for lasting impressions.",
-        "categories": ["bouquet", "anniversary"],
-        "images": ["orchid-1.jpg"],
+        "name": "Sympathy White Roses",
+        "type": "flower",
+        "price": 27.5,
+        "description": "Gentle white roses to express condolences and sympathy.",
         "stock": 6,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-06-01T12:00:00Z",
-        "updatedAt": "2025-06-01T12:00:00Z"
+        "tags": ["sympathy"],
+        "flower_types": ["rose"],
+        "colors": ["white"]
     },
     {
-        "name": "Sympathy White Rose Wreath",
-        "price": 70.0,
-        "description": "A thoughtful wreath of white roses for expressing sympathy.",
-        "categories": ["bouquet", "sympathy"],
-        "images": ["wreath-rose-1.jpg"],
-        "stock": 4,
+        "name": "Valentine's Mix Bouquet",
+        "type": "flower",
+        "price": 39.99,
+        "description": "A stunning mix of red and pink roses for your Valentine.",
+        "stock": 12,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-31T09:20:00Z",
-        "updatedAt": "2025-05-31T09:20:00Z"
+        "tags": ["valentine", "romantic"],
+        "flower_types": ["rose"],
+        "colors": ["red", "pink"]
     },
     {
-        "name": "Peach Rose Tabletop",
-        "price": 32.5,
-        "description": "A sweet tabletop arrangement of peach-toned roses.",
-        "categories": ["bouquet", "birthday"],
-        "images": ["rose-peach-1.jpg"],
-        "stock": 13,
+        "name": "Birthday Surprise Tulips",
+        "type": "flower",
+        "price": 22.5,
+        "description": "Colorful tulips to bring joy on birthdays.",
+        "stock": 18,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-30T07:30:00Z",
-        "updatedAt": "2025-05-30T07:30:00Z"
+        "tags": ["birthday"],
+        "flower_types": ["tulip"],
+        "colors": ["yellow", "orange", "pink"]
     },
     {
-        "name": "Romantic Purple Tulips",
-        "price": 39.0,
-        "description": "A stunning purple tulip bouquet to express deep feelings.",
-        "categories": ["bouquet", "romantic"],
-        "images": ["tulips-purple-1.jpg"],
-        "stock": 16,
+        "name": "Classic Red Tulips",
+        "type": "flower",
+        "price": 21.99,
+        "description": "Bold red tulips perfect for romantic gestures.",
+        "stock": 9,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-29T15:00:00Z",
-        "updatedAt": "2025-05-29T15:00:00Z"
+        "tags": ["romantic"],
+        "flower_types": ["tulip"],
+        "colors": ["red"]
     },
     {
-        "name": "Mini Succulent Gift Set",
+        "name": "Elegant Green Peonies",
+        "type": "flower",
+        "price": 31.0,
+        "description": "Unique green peonies that catch the eye.",
+        "stock": 5,
+        "isAvailable": false,
+        "tags": ["anniversary"],
+        "flower_types": ["peony"],
+        "colors": ["green"]
+    },
+    {
+        "name": "Sympathy Lilies",
+        "type": "flower",
         "price": 25.0,
-        "description": "A trio of mini succulents in a stylish gift box.",
-        "categories": ["birthday"],
-        "images": ["succulents-1.jpg"],
-        "stock": 22,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-28T16:00:00Z",
-        "updatedAt": "2025-05-28T16:00:00Z"
-    },
-    {
-        "name": "Bright Spring Bouquet",
-        "price": 42.0,
-        "description": "A joyful mix of spring flowers for any celebration.",
-        "categories": ["bouquet", "birthday"],
-        "images": ["spring-flowers-1.jpg"],
-        "stock": 19,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-27T08:00:00Z",
-        "updatedAt": "2025-05-27T08:00:00Z"
-    },
-    {
-        "name": "Anniversary Garden Basket",
-        "price": 50.0,
-        "description": "A charming basket of seasonal flowers for anniversaries.",
-        "categories": ["bouquet", "anniversary"],
-        "images": ["garden-basket-1.jpg"],
+        "description": "Soothing white and purple lilies for expressing sympathy.",
         "stock": 7,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-26T10:00:00Z",
-        "updatedAt": "2025-05-26T10:00:00Z"
+        "tags": ["sympathy"],
+        "flower_types": ["lily"],
+        "colors": ["white", "purple"]
     },
     {
-        "name": "Soft Pink Mixed Arrangement",
-        "price": 46.0,
-        "description": "A gentle mix of pink blossoms perfect for romantic gestures.",
-        "categories": ["bouquet", "romantic"],
-        "images": ["pink-mix-1.jpg"],
+        "name": "Anniversary Pink Roses",
+        "type": "flower",
+        "price": 30.99,
+        "description": "Soft pink roses for your special anniversary.",
+        "stock": 14,
+        "isAvailable": true,
+        "tags": ["anniversary"],
+        "flower_types": ["rose"],
+        "colors": ["pink"]
+    },
+    {
+        "name": "Bold Black Tulips",
+        "type": "flower",
+        "price": 28.5,
+        "description": "Mystical black tulips for a dramatic touch.",
+        "stock": 4,
+        "isAvailable": false,
+        "tags": ["romantic"],
+        "flower_types": ["tulip"],
+        "colors": ["black"]
+    },
+    {
+        "name": "Spring Mix Peonies",
+        "type": "flower",
+        "price": 32.0,
+        "description": "A vibrant mix of spring-colored peonies.",
         "stock": 11,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-25T12:00:00Z",
-        "updatedAt": "2025-05-25T12:00:00Z"
+        "tags": ["birthday"],
+        "flower_types": ["peony"],
+        "colors": ["pink", "yellow", "orange"]
     },
     {
-        "name": "Sympathy Lily & Rose Cross",
-        "price": 85.0,
-        "description": "A respectful floral cross featuring lilies and roses.",
-        "categories": ["bouquet", "sympathy"],
-        "images": ["sympathy-cross-1.jpg"],
+        "name": "Blue Romance Lilies",
+        "type": "flower",
+        "price": 27.99,
+        "description": "Rare blue lilies that convey deep emotion.",
         "stock": 3,
-        "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-24T14:00:00Z",
-        "updatedAt": "2025-05-24T14:00:00Z"
+        "isAvailable": false,
+        "tags": ["romantic"],
+        "flower_types": ["lily"],
+        "colors": ["blue"]
     },
     {
-        "name": "Deluxe Valentine's Package",
-        "price": 95.0,
-        "description": "A luxurious gift set including a bouquet, chocolates, and a teddy bear.",
-        "categories": ["bouquet", "valentine", "romantic"],
-        "images": ["valentine-package-1.jpg"],
-        "stock": 5,
+        "name": "Golden Anniversary Tulips",
+        "type": "flower",
+        "price": 23.5,
+        "description": "Bright yellow tulips for celebrating golden anniversaries.",
+        "stock": 13,
         "isAvailable": true,
-        "rating": {
-            "count": 0,
-            "average": 0
-        },
-        "createdAt": "2025-05-23T17:00:00Z",
-        "updatedAt": "2025-05-23T17:00:00Z"
+        "tags": ["anniversary"],
+        "flower_types": ["tulip"],
+        "colors": ["yellow"]
+    },
+    {
+        "name": "Valentine Peony Bouquet",
+        "type": "flower",
+        "price": 36.5,
+        "description": "A luxurious bouquet of red and pink peonies.",
+        "stock": 16,
+        "isAvailable": true,
+        "tags": ["valentine", "romantic"],
+        "flower_types": ["peony"],
+        "colors": ["red", "pink"]
+    },
+    {
+        "name": "Birthday Bloom Roses",
+        "type": "flower",
+        "price": 26.75,
+        "description": "Joyful mix of yellow and orange roses for birthdays.",
+        "stock": 17,
+        "isAvailable": true,
+        "tags": ["birthday"],
+        "flower_types": ["rose"],
+        "colors": ["yellow", "orange"]
+    },
+    {
+        "name": "Rare Brown Roses",
+        "type": "flower",
+        "price": 33.0,
+        "description": "Earthy and rare brown roses for unique occasions.",
+        "stock": 2,
+        "isAvailable": false,
+        "tags": ["anniversary"],
+        "flower_types": ["rose"],
+        "colors": ["brown"]
+    },
+    {
+        "name": "Pink Lily Delight",
+        "type": "flower",
+        "price": 24.0,
+        "description": "Pink lilies that radiate charm and affection.",
+        "stock": 10,
+        "isAvailable": true,
+        "tags": ["romantic", "birthday"],
+        "flower_types": ["lily"],
+        "colors": ["pink"]
+    },
+    {
+        "name": "Orange Sunset Tulips",
+        "type": "flower",
+        "price": 22.0,
+        "description": "Orange tulips that resemble a warm sunset.",
+        "stock": 6,
+        "isAvailable": true,
+        "tags": ["birthday", "valentine"],
+        "flower_types": ["tulip"],
+        "colors": ["orange"]
+    },
+    {
+        "type": "vase",
+        "name": "White Vase",
+        "price": 15.0,
+        "description": "A white vase for adding a touch of elegance.",
+        "stock": 20,
+        "isAvailable": true
     }
 ]

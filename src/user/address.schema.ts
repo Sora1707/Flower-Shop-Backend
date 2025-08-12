@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import { IAddress } from "./address.interface";
+import { IAddressDocument } from "./address.interface";
 
-export const AddressSchema = new Schema<IAddress>(
+export const AddressSchema = new Schema<IAddressDocument>(
     {
         name: { type: String, required: true },
         phoneNumber: { type: String, required: true },

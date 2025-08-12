@@ -9,18 +9,17 @@ import { PriceRuleCreateValidation, PriceRuleUpdateValidation } from "./priceRul
 const router = Router();
 
 router.use(asyncHandler(authenticate));
+// TODO Move to admin
 router.use(isAdmin);
 
 router.get("/all", asyncHandler(priceRuleController.getAll));
 router.get("/:id", asyncHandler(priceRuleController.getById));
-router.post(
-    "/",
-    validateBody(PriceRuleCreateValidation), 
-    asyncHandler(priceRuleController.create));
+router.post("/", validateBody(PriceRuleCreateValidation), asyncHandler(priceRuleController.create));
 router.patch(
     "/:id",
-    validateBody(PriceRuleUpdateValidation), 
-    asyncHandler(priceRuleController.update));
+    validateBody(PriceRuleUpdateValidation),
+    asyncHandler(priceRuleController.update)
+);
 router.delete("/:id", asyncHandler(priceRuleController.delete));
 
 export default router;

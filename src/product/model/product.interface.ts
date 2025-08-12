@@ -1,21 +1,20 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
-export enum Category {
-    Bouquet = "bouquet",
-    Romantic = "romantic",
-    Valentine = "valentine",
-    Birthday = "birthday",
-    Sympathy = "sympathy",
-    Anniversary = "anniversary",
+export enum ProductType {
+    Flower = "flower",
+    Vase = "vase",
 }
 
 export interface IProduct {
     name: string;
+    type: ProductType;
     price: number;
-    dailyRuleId: string;
-    promotionId?: string[];
     description: string;
-    categories: Category[];
+
+    dailyRule: Types.ObjectId;
+    promotions: Types.ObjectId[];
+
+    // TODO: Product images
     images: string[];
     stock: number;
     isAvailable: boolean;

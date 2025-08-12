@@ -1,0 +1,16 @@
+[
+    {
+        "name": "Daily Decrease Test",
+        "type": "daily_decrease",
+        "active": true,
+        "discountAmount": "10"
+    },
+    {
+        "name": "Promotion Test",
+        "type": "promotion",
+        "active": true,
+        "discountAmount": "20",
+        "startDate": "2025-08-01",
+        "endDate": "2025-08-15"
+    }
+]

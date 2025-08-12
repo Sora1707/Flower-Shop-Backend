@@ -1,5 +1,4 @@
-export * from "./product.interface";
-export * from "./product.model";
+export * from "./model";
 
 import productService from "./product.service";
 export { productService };

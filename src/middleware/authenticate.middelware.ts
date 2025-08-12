@@ -31,9 +31,7 @@ async function authenticate(req: Request, res: Response, next: NextFunction) {
 
         const user = await userService.findById(payload.userId);
 
-        if (!user) {
-            return ResponseHandler.error(res, "Invalid token", 401);
-        }
+        if (!user) return ResponseHandler.error(res, "Invalid token", 401);
 
         if (authService.checkPayloadBeforePasswordReset(payload, user)) {
             return ResponseHandler.error(

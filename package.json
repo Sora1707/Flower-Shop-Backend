@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
-        "dev": "cross-env NODE_ENV=development tsx watch src/index.ts",
+        "dev": "cross-env NODE_ENV=development tsx watch --include 'src/**/*.docs.ts' src/index.ts",
         "test": "cross-env NODE_ENV=test tsx src/index.ts",
         "prod": "cross-env NODE_ENV=production tsx src/index.ts"
     },

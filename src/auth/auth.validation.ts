@@ -23,7 +23,7 @@ export const registerValidation = z.object({
     firstName: z.string().min(1, { message: "First name is required" }),
     lastName: z.string().min(1, { message: "Last name is required" }),
     email: z.string().email({ message: "Invalid email address" }),
-    phoneNumber: z.string().min(1, { message: "Phone number is required" }).optional(),
+    phoneNumber: z.string().min(1, { message: "Phone number cannot be empty" }).optional(),
     birthdate: z.coerce.date(),
     gender: z.enum([Gender.Male, Gender.Female, Gender.Other]),
 });

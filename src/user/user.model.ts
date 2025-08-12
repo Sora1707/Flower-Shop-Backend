@@ -83,13 +83,11 @@ UserSchema.methods.matchPassword = async function (inputPassword: string) {
 
 UserSchema.pre("save", async function (next) {
     try {
-        console.log("save");
         const handlers: Promise<void>[] = [];
 
         handlers.push(...getBeforeSavePropertyModifiers(this));
 
         if (this.isNew) {
-            console.log("init");
             handlers.push(...getInitializers(this));
         }
 

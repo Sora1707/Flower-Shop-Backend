@@ -10,6 +10,7 @@ import {
     ChangePasswordInput,
     RequestPasswordResetInput,
     loginValidation,
+    ResetPasswordInput,
 } from "./auth.validation";
 
 import { sendResetPasswordEmail } from "@/utils/mailer";
@@ -24,14 +25,10 @@ class AuthController {
             const { username, password } = req.body;
 
             const user = await userService.findOne({ username });
-            if (!user) {
-                return ResponseHandler.error(res, "This user does not exist", 404);
-            }
+            if (!user) return ResponseHandler.error(res, "This user does not exist", 404);
 
             const isMatch = await user.matchPassword(password);
-            if (!isMatch) {
-                return ResponseHandler.error(res, "Wrong password", 400);
-            }
+            if (!isMatch) return ResponseHandler.error(res, "Wrong password", 400);
 
             const token = authService.generateLoginToken(user.id);
 
@@ -51,9 +48,8 @@ class AuthController {
             const newUserData = req.body;
 
             const existingUser = await userService.findOne({ username: newUserData.username });
-            if (existingUser) {
+            if (existingUser)
                 return res.status(400).json({ message: "Username already registered" });
-            }
 
             const newUser = await userService.create(newUserData);
 
@@ -65,7 +61,7 @@ class AuthController {
         }
     }
 
-    // POST /request-password-reset
+    // [POST] /auth/request-password-reset
     async requestPasswordReset(
         req: Request<{}, {}, RequestPasswordResetInput>,
         res: Response,
@@ -75,9 +71,7 @@ class AuthController {
             const { email } = req.body;
 
             const user = await userService.findOne({ email });
-            if (!user) {
-                return ResponseHandler.error(res, "This email has not been registered", 404);
-            }
+            if (!user) return ResponseHandler.error(res, "This email has not been registered", 404);
 
             const resetToken = authService.generatePasswordResetToken(user.id);
 
@@ -98,8 +92,12 @@ class AuthController {
         }
     }
 
-    // POST user/reset-password
-    async resetPassword(req: Request, res: Response, next: NextFunction) {
+    // [POST] /auth/reset-password
+    async resetPassword(
+        req: Request<{}, {}, ResetPasswordInput>,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
             const { token, newPassword } = req.body;
 
@@ -112,9 +110,8 @@ class AuthController {
 
             const { userId } = payload;
             const user = await userService.findById(userId);
-            if (!user) {
-                return ResponseHandler.error(res, "User not found", 404);
-            }
+            if (!user) return ResponseHandler.error(res, "User not found", 404);
+
             if (authService.checkPayloadBeforePasswordReset(payload, user)) {
                 return ResponseHandler.error(
                     res,
@@ -133,24 +130,20 @@ class AuthController {
         }
     }
 
-    // [POST] user/change-password
+    // [POST] /auth/change-password
     async changePassword(
         req: AuthRequest<{}, {}, ChangePasswordInput>,
         res: Response,
         next: NextFunction
     ) {
         try {
-            if (!req.user) {
-                return;
-            }
+            if (!req.user) return;
 
             const user = req.user;
             const { currentPassword, newPassword } = req.body;
 
             const isMatch = await user.matchPassword(currentPassword);
-            if (!isMatch) {
-                ResponseHandler.error(res, "Wrong password", 400);
-            }
+            if (!isMatch) return ResponseHandler.error(res, "Wrong password", 400);
 
             user.password = newPassword;
             user.passwordChangedAt = new Date();
