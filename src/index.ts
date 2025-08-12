@@ -38,6 +38,10 @@ const app: Application = express();
 // Swagger Documentation
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/swagger.json", (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+});
 
 // Body parser
 app.use(bodyParser.urlencoded({ extended: false }));
