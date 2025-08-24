@@ -19,7 +19,7 @@ class CartController {
     async getAllCarts(req: Request, res: Response, next: NextFunction) {
         const carts = await cartService.findAll();
 
-        res.status(200).json(carts);
+        return ResponseHandler.success(res, carts, "Carts retrieved successfully");
     }
 
     // [GET] /cart
@@ -27,10 +27,10 @@ class CartController {
         const userId = req.user?._id;
         const cart = await cartService.findOne({ user: userId });
         if (!cart) {
-            return res.status(404).json({ message: "Cart not found" });
+            return ResponseHandler.error(res, "Cart not found", 404);
         }
 
-        res.status(200).json(cart);
+        return ResponseHandler.success(res, cart, "Cart retrieved successfully");
     }
 
     // [POST] /:productId/cart (in ProductRoutes)
@@ -38,10 +38,10 @@ class CartController {
         const userId = req.user?._id;
         const cart = await cartService.findOne({ user: userId });
         if (!cart) {
-            return res.status(404).json({ message: "Cart not found" });
+            return ResponseHandler.error(res, "Cart not found", 404);
         }
 
-        res.status(200).json(cart);
+        return ResponseHandler.success(res, cart, "Update successfully");
     }
 
     // [PATCH] /cart
@@ -140,13 +140,13 @@ class CartController {
         const cart = await cartService.findOne({ user: userId });
 
         if (!cart) {
-            return res.status(404).json({ message: "Cart not found" });
+            return ResponseHandler.error(res, "Cart not found", 404);
         }
 
         cart.items = cart.items.filter((item: ICartItem) => item.product.toString() !== productId);
         await cart.save();
 
-        res.status(200).json({ message: "Item removed from cart" });
+        return ResponseHandler.success(res, null, "Item removed from cart");
     }
 
     // [DELETE] /cart

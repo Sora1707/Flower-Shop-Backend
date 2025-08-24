@@ -19,7 +19,7 @@ class OrderController {
     // [GET] /user/order
     async getUserOrders(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
-            return res.status(401).json({ message: "User not authenticated." });
+            return ResponseHandler.error(res, "User not authenticated", 401);
         }
 
         const userId = req.user.id;
@@ -31,9 +31,10 @@ class OrderController {
         const orders = await orderService.paginate({ user: userId }, paginateOptions);
 
         if (!orders || orders.length === 0) {
-            return res.status(404).json({ message: "No orders found for this user." });
+            return ResponseHandler.error(res, "No orders found for this user.", 404);
         }
-        res.status(200).json(orders);
+
+        return ResponseHandler.success(res, orders, "Orders retrieved successfully");
     }
 
     // [GET] /user/order/:orderId
@@ -47,20 +48,20 @@ class OrderController {
         const order = await orderService.findById(orderId);
 
         if (!order) {
-            return res.status(404).json({ message: "Order not found." });
+            return ResponseHandler.error(res, "Order not found", 404);
         }
 
         if (order.user != userId) {
-            return res.status(403).json({ message: "You are not authorized to view this order." });
+            return ResponseHandler.error(res, "You are not authorized to view this order.", 403);
         }
 
-        res.status(200).json(order);
+        return ResponseHandler.success(res, order, "Order retriever successfully");
     }
 
     // [POST] /order/
     async createOrder(req: AuthRequest, res: Response, next: NextFunction) {
         if (!req.user) {
-            return;
+            return ResponseHandler.error(res, "User not authenticated", 401);
         }
 
         const user = req.user;
@@ -82,7 +83,7 @@ class OrderController {
         // );
 
         // if (selectedCartItems.length === 0) {
-        //     return ResponseHandler.error(res, "The cart is empty", 404);
+        //     return return ResponseHandler.error(res, "The cart is empty", 404);
         // }
 
         const totalPrice = items.reduce(
@@ -109,8 +110,7 @@ class OrderController {
 
             const order = await orderService.create(orderObject);
 
-            ResponseHandler.success(res, order, "Order created successfully");
-            return;
+            return ResponseHandler.success(res, order, "Order created successfully");
         }
 
         const cards = user.cards as IStripeCardDocument[];
@@ -149,7 +149,7 @@ class OrderController {
             await session.commitTransaction();
             session.endSession();
 
-            ResponseHandler.success(res, order, "Order created successfully", 201);
+            return ResponseHandler.success(res, order, "Order created successfully", 201);
         } catch (error) {
             await session.abortTransaction();
             session.endSession();
@@ -160,7 +160,7 @@ class OrderController {
 
             await order.save();
 
-            ResponseHandler.error(res, "Order creation failed", 500, (error as Error).message);
+            return ResponseHandler.error(res, "Order creation failed", 500, (error as Error).message);
         }
 
         // const orderItems: IOrderItem[] = [];
@@ -170,7 +170,7 @@ class OrderController {
         //     const quantityToOrder = item.quantity;
 
         //     if (!product.isAvailable || product.stock < quantityToOrder) {
-        //         return ResponseHandler.error(
+        //         return return ResponseHandler.error(
         //             res,
         //             `Product ${product.name} is not available or out of stock`,
         //             400
