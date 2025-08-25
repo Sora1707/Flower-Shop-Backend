@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import { IOrderItem, orderService } from "./";
+import priceRuleService from "@/priceRule/priceRule.service"; 
 import { cartService } from "@/cart";
 import mongoose, { Types } from "mongoose";
 import { create } from "domain";
@@ -8,7 +9,7 @@ import { ContactInfo, IOrder, OrderStatus } from "./order.interface";
 import { userService } from "@/user";
 import { AuthRequest } from "@/types/request";
 import ResponseHandler from "@/utils/ResponseHandler";
-import { IProduct, productService } from "@/product";
+import { IProduct, ProductModel, productService } from "@/product";
 import { CartItemSchema } from "@/cart/cartItem.schema";
 import { royaltyService } from "@/royalty/royalty.service";
 import { RoyaltyPointAction } from "@/royalty/royalty.interface";
@@ -69,31 +70,48 @@ class OrderController {
         const { items, contactInfo, paymentMethod, paymentId } = req.body;
 
         if (!items || !Array.isArray(items) || items.length === 0) {
-            return res.status(400).json({ message: "No selected items provided." });
+            return ResponseHandler.error(res, "No items provided", 400);
         }
 
-        // const cart = await cartService.findOne({ user: userId });
+        const productIds = items.map((item: IOrderItem) => item.product);
 
-        // if (!cart || !cart.items || cart.items.length === 0) {
-        //     return res.status(404).json({ message: "Cart is empty" });
-        // }
+        const products = await ProductModel.find({_id : { $in: productIds }})
+                    .select("_id price createdAt dailyRuleID promotionIds")
+                    .lean();
+        
+        const productMap = new Map(products.map((p: any) => [String(p._id), p]))
 
-        // const selectedCartItems = cart.items.filter((item) =>
-        //     items.includes(item.product.toString())
-        // );
+        const recalculatedItems = await Promise.all(
+            items.map(async (item: any) => {
+            const key = String(item.product ?? item.productId);
+            const p = productMap.get(key);
+            if (!p) {
+                return ResponseHandler.error(res, `Product not found: ${key}`, 404);
+            }
 
-        // if (selectedCartItems.length === 0) {
-        //     return return ResponseHandler.error(res, "The cart is empty", 404);
-        // }
+            const adjustedPrice = await priceRuleService.applyRulesToProduct({
+                price: p.price,
+                createdAt: new Date(p.createdAt),
+                dailyRuleID: p.dailyRuleID,
+                promotionIds: p.promotionIds ?? [],
+            });
 
-        const totalPrice = items.reduce(
+            return {
+                ...item,
+                priceAtAddTime: adjustedPrice,
+            };
+            })
+        );
+
+
+        const totalPrice = recalculatedItems.reduce(
             (sum, item) => sum + item.priceAtAddTime * item.quantity,
             0
         );
 
         const orderObject = {
             user: user.id,
-            items: items,
+            items: recalculatedItems,
             contactInfo,
             status: OrderStatus.Pending,
             paymentStatus: PaymentStatus.Pending,
@@ -162,51 +180,6 @@ class OrderController {
 
             return ResponseHandler.error(res, "Order creation failed", 500, (error as Error).message);
         }
-
-        // const orderItems: IOrderItem[] = [];
-        // for (const item of selectedCartItems) {
-        //     const populatedItem = await item.populate<{ product: IProduct }>("product");
-        //     const product = populatedItem.product;
-        //     const quantityToOrder = item.quantity;
-
-        //     if (!product.isAvailable || product.stock < quantityToOrder) {
-        //         return return ResponseHandler.error(
-        //             res,
-        //             `Product ${product.name} is not available or out of stock`,
-        //             400
-        //         );
-        //     }
-
-        //     product.stock -= quantityToOrder;
-        //     if (product.stock === 0) {
-        //         product.isAvailable = false;
-        //     }
-
-        //     await product.save();
-
-        // const newItem = {
-        //     product: item.product,
-        //     quantity: item.quantity,
-        //     priceAtAddTime: item.priceAtAddTime,
-        // } as IOrderItem;
-
-        // orderItems.push(newItem);
-        // totalPrice += newItem.quantity * (newItem.priceAtAddTime || 0);
-
-        // totalPrice = Math.round(totalPrice * 100) / 100;
-
-        // await royaltyService.create({
-        //     user: order.user,
-        //     orderId: order._id as Types.ObjectId,
-        //     points: Math.floor(order.totalPrice / 10),
-        //     type: "EARNED" as RoyaltyPointAction,
-        //     description: `Points from order ${order._id}`,
-        // });
-
-        // cart.items = cart.items.filter(
-        //     (item) => !items.includes(item.product.toString())
-        // );
-        // await cart.save();
     }
 }
 
